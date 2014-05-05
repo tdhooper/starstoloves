@@ -1,0 +1,17 @@
+# If local.py is present, any settings in it will override those in base.py and dev.py.
+# Use this for any settings that are specific to this one installation, such as developer API keys.
+# local.py should not be checked in to version control.
+
+# Include your own Spotify key, username, and password; and Last.fm key and secret
+
+SPOTIFY = {
+    'user_agent': 'Stars to Loves',
+    'key_file': os.path.join(PROJECT_ROOT, 'spotify_appkey.key'),
+    'username': 'your_username',
+    'password': 'your_password',
+}
+
+LASTFM = {
+    'key': 'your_key',
+    'secret': 'your_secret',
+}
