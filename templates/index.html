@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+        {% if not lfmUsername %}
+            <h2>Step 1: <a href="{{lfmConnectUrl}}">Connect to Last.fm</a></h2>
+        {% else %}
+            <h2>Step 1: Connected to Last.fm as <strong>{{lfmUsername}}</strong>
+            {% if not spUsername %}
+                (<a href="{{lfmDisconnectUrl}}">disconnect</a>)</h2>
+            {% endif %}    
+        {% endif %}
+
+        {% if not lfmUsername %}
+            <h2 class="sp-connect-heading step-disabled">Step 2: Connect to Spotify</h2>
+        {% elif not spUsername %}
+            <h2 class="sp-connect-heading">Step 2: Connect to Spotify:</h2>
+            <form action="{{spConnectUrl}}" method="POST" class="sp-connect-form">
+                {% csrf_token %}
+                {{spForm.as_p}}
+                <input type="submit" />
+            </form>
+        {% else %}
+            <h2>Step 2: Connected to Spotify as <strong>{{spUsername}}</strong> (<a href="{{spDisconnectUrl}}">disconnect</a>)</h2>
+        {% endif %}
+
+        {% if not spUsername %}
+            <h2 class="step-disabled">Step 3: Select tracks</h2>
+        {% else %}
+            <h2>Step 3: Select tracks</h2>
+            {% if starred %}
+                <ul>
+                {% for track in starred %}
+                    <li>{{track.name}} - {{track.date}}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endif %}
+
+{% endblock %}

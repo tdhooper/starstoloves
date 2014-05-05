@@ -1,0 +1,36 @@
+html {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+}
+
+h2 {
+    font-weight: normal;
+    font-size: 20px;
+}
+
+.sp-connect-heading,
+.sp-connect-form,
+.sp-connect-form p {
+    display: inline;
+}
+
+.sp-connect-form input {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 20px;
+}
+
+/* .visuallyhidden */
+.sp-connect-form label {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+.step-disabled {
+    color: #ccc;
+}
