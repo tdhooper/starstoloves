@@ -1,2 +1,3 @@
 *.pyc
 spotify_appkey.key
+.vagrant
