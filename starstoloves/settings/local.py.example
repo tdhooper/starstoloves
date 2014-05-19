@@ -5,6 +5,7 @@
 # Include your own Spotify key, username, and password; and Last.fm key and secret
 
 import os
+from .base import PROJECT_ROOT
 
 SPOTIFY = {
     'user_agent': 'Stars to Loves',
