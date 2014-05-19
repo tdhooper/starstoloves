@@ -25,8 +25,8 @@ Vagrant.configure("2") do |config|
 	config.vm.network "forwarded_port", guest: 8000, host: 8111
 
 	# Share an additional folder to the guest VM
-	config.vm.synced_folder ".", "/home/vagrant/{{ project_name }}"
+	config.vm.synced_folder ".", "/home/vagrant/starstoloves"
 	
 	# Enable provisioning with a shell script.
-	config.vm.provision :shell, :path => "etc/install/install.sh", :args => "{{ project_name }}"
+	config.vm.provision :shell, :path => "etc/install/install.sh", :args => "starstoloves"
 end
