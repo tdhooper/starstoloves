@@ -9,7 +9,6 @@ from helpers import lastfm_connection
 from helpers import spotify_connection
 
 @decorator_from_middleware(middleware.SpotifySession)
-@decorator_from_middleware(middleware.LastfmApp)
 def index(request):
     context = {}
     session = request.session
@@ -39,15 +38,14 @@ def index(request):
 @decorator_from_middleware(middleware.LastfmApp)
 def connectLastfm(request):
     session = request.session
+    lastfmApp = request.lastfmApp
     if lastfm_connection.is_connected(session):
         return redirect(reverse('index'))
     token = request.GET.get('token')
     if token:
-        lfmSession = request.lastfmApp.auth.get_session(str(token))
-        session['lfmSession'] = lfmSession
+        lastfm_connection.connect(session, lastfmApp, token)
         return redirect(reverse('index'))
-    authUrl = request.lastfmApp.auth.get_url('http://' + request.get_host() + reverse('connect_lastfm'))
-    return redirect(authUrl)
+    return redirect(lastfm_connection.get_auth_url(request, lastfmApp))
 
 def disconnectLastfm(request):
     lastfm_connection.disconnect(request.session)

@@ -18,6 +18,13 @@ def negotiate_connection(session, context):
     else:
         context.update(_get_connect_context())
 
+def connect(session, lastfmApp, token):
+    lfmSession = lastfmApp.auth.get_session(str(token))
+    session['lfmSession'] = lfmSession
+
+def get_auth_url(request, lastfmApp):
+    return lastfmApp.auth.get_url('http://' + request.get_host() + reverse('connect_lastfm'))
+
 def is_connected(session):
     return session.has_key('lfmSession')
 
