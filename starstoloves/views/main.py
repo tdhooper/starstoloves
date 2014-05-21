@@ -50,14 +50,10 @@ def connectLastfm(request):
     return redirect(authUrl)
 
 def disconnectLastfm(request):
-    session = request.session
-    if lastfm_connection.is_connected(session):
-        del session['lfmSession']
+    lastfm_connection.disconnect(request.session)
     return redirect(reverse('index'))
 
 def disconnectSpotify(request):
-    session = request.session
-    if spotify_connection.is_connected(session):
-        del session['spSession']
+    spotify_connection.disconnect(request.session)
     return redirect(reverse('index'))
     

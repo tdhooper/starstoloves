@@ -38,3 +38,7 @@ def negotiate_connection(request, context):
 
 def is_connected(session):
     return session.has_key('spSession')
+
+def disconnect(session):
+    if is_connected(session):
+        del session['spSession']

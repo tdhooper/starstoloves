@@ -20,3 +20,8 @@ def negotiate_connection(session, context):
 
 def is_connected(session):
     return session.has_key('lfmSession')
+
+def disconnect(session):
+    if is_connected(session):
+        del session['lfmSession']
+
