@@ -11,7 +11,7 @@
             {% endif %}    
         {% endif %}
 
-        {% if not lfmUsername %}
+        {% if not showSpotifyForm %}
             <h2 class="sp-connect-heading step-disabled">Step 2: Connect to Spotify</h2>
         {% elif not spUsername %}
             <h2 class="sp-connect-heading">Step 2: Connect to Spotify:</h2>
@@ -24,17 +24,15 @@
             <h2>Step 2: Connected to Spotify as <strong>{{spUsername}}</strong> (<a href="{{spDisconnectUrl}}">disconnect</a>)</h2>
         {% endif %}
 
-        {% if not spUsername %}
+        {% if not starred %}
             <h2 class="step-disabled">Step 3: Select tracks</h2>
         {% else %}
             <h2>Step 3: Select tracks</h2>
-            {% if starred %}
-                <ul>
-                {% for track in starred %}
-                    <li>{{track.name}} - {{track.date}}</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
+            <ul>
+            {% for track in starred %}
+                <li>{{track.name}} - {{track.date}}</li>
+            {% endfor %}
+            </ul>
         {% endif %}
 
 {% endblock %}
