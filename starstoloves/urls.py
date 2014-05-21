@@ -1,9 +1,9 @@
 from django.conf.urls import patterns, include, url
-import views
+from views import main
 
 urlpatterns = patterns('',
-    url(r'^$',                      views.index),
-    url(r'^connect-lastfm/$',       views.connectLastfm),
-    url(r'^disconnect-lastfm/$',    views.disconnectLastfm),
-    url(r'^disconnect-spotify/$',   views.disconnectSpotify),
+    url(r'^$',                      main.index),
+    url(r'^connect-lastfm/$',       main.connectLastfm),
+    url(r'^disconnect-lastfm/$',    main.disconnectLastfm),
+    url(r'^disconnect-spotify/$',   main.disconnectSpotify),
 )

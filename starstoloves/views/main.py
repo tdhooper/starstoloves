@@ -4,9 +4,11 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.utils.decorators import decorator_from_middleware
-import forms
-import middleware
+
 import spotify
+
+from starstoloves import forms
+from starstoloves import middleware
 
 
 def get_lastfm_session_context(lfmSession):
