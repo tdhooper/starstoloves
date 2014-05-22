@@ -13,11 +13,14 @@ def index(request):
     context = {}
     session = request.session
 
-    lastfm_connection.negotiate_connection(session, context)
-    spotify_connection.negotiate_connection(request, context)
-
     if lastfm_connection.is_connected(session):
+        context['lfmUsername'] = lastfm_connection.get_username(session)
+        context['lfmDisconnectUrl'] = reverse('disconnect_lastfm')
         context['showSpotifyForm'] = True
+    else:
+        context['lfmConnectUrl'] = reverse('connect_lastfm')
+
+    spotify_connection.negotiate_connection(request, context)
 
     if spotify_connection.is_connected(session):
         spSession = session.get('spSession')
