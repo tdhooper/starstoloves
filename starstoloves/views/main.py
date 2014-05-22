@@ -20,6 +20,9 @@ def index(request):
     else:
         context['lfmConnectUrl'] = reverse('connect_lastfm')
 
+    if request.lastfm_connection.get_connection_state() is request.lastfm_connection.FAILED:
+        context['lfmConnectFailure'] = True
+
     spotify_connection.negotiate_connection(request, context)
 
     if spotify_connection.is_connected(session):

@@ -2,6 +2,10 @@ from django.core.urlresolvers import reverse
 
 class LastfmConnectionHelper:
 
+    DISCONNECTED = 0;
+    CONNECTED = 1;
+    FAILED = 2;
+
     def __init__(self, session, lastfmApp):
         self.session = session
         self.lastfmApp = lastfmApp
@@ -12,16 +16,28 @@ class LastfmConnectionHelper:
             return lfmSession['name']
 
     def connect(self, token):
-        lfmSession = self.lastfmApp.auth.get_session(str(token))
-        self.session['lfmSession'] = lfmSession
+        try:
+            lfmSession = self.lastfmApp.auth.get_session(str(token))
+            self.session['lfmSession'] = lfmSession
+            if 'lfm_connection_failed' in self.session:
+                del self.session['lfm_connection_failed']
+        except:
+            self.session['lfm_connection_failed'] = True
 
     def get_auth_url(self, request):
         return self.lastfmApp.auth.get_url('http://' + request.get_host() + reverse('connect_lastfm'))
 
+    def get_connection_state(self):
+        if 'lfmSession' in self.session:
+            return self.CONNECTED
+        elif 'lfm_connection_failed' in self.session:
+            return self.FAILED
+        return self.DISCONNECTED
+
     def is_connected(self):
-        return self.session.has_key('lfmSession')
+        return self.get_connection_state() is self.CONNECTED
 
     def disconnect(self):
-        if self.is_connected():
+        if 'lfmSession' in self.session:
             del self.session['lfmSession']
 

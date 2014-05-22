@@ -34,3 +34,7 @@ h2 {
 .step-disabled {
     color: #ccc;
 }
+
+.error-text {
+    color: #f33;
+}

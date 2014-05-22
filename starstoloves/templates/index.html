@@ -3,7 +3,7 @@
 {% block content %}
 
         {% if not lfmUsername %}
-            <h2>Step 1: <a href="{{lfmConnectUrl}}">Connect to Last.fm</a></h2>
+            <h2>Step 1: {% if lfmConnectFailure %}<em class="error-text">Authentication failed</em> {% endif %}<a href="{{lfmConnectUrl}}">Connect to Last.fm</a></h2>
         {% else %}
             <h2>Step 1: Connected to Last.fm as <strong>{{lfmUsername}}</strong>
             {% if not spUsername %}
