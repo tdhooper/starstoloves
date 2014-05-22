@@ -5,16 +5,18 @@ from django.shortcuts import redirect
 from django.utils.decorators import decorator_from_middleware
 
 from starstoloves import middleware
-from helpers import lastfm_connection
+from helpers.lastfm_connection import LastfmConnectionHelper
 from helpers import spotify_connection
 
+@decorator_from_middleware(middleware.LastfmApp)
 @decorator_from_middleware(middleware.SpotifySession)
 def index(request):
     context = {}
     session = request.session
+    lastfm_connection = LastfmConnectionHelper(session, request.lastfmApp)
 
-    if lastfm_connection.is_connected(session):
-        context['lfmUsername'] = lastfm_connection.get_username(session)
+    if lastfm_connection.is_connected():
+        context['lfmUsername'] = lastfm_connection.get_username()
         context['lfmDisconnectUrl'] = reverse('disconnect_lastfm')
         context['showSpotifyForm'] = True
     else:
@@ -40,18 +42,19 @@ def index(request):
 
 @decorator_from_middleware(middleware.LastfmApp)
 def connectLastfm(request):
-    session = request.session
-    lastfmApp = request.lastfmApp
-    if lastfm_connection.is_connected(session):
+    lastfm_connection = LastfmConnectionHelper(request.session, request.lastfmApp)
+    if lastfm_connection.is_connected():
         return redirect(reverse('index'))
     token = request.GET.get('token')
     if token:
-        lastfm_connection.connect(session, lastfmApp, token)
+        lastfm_connection.connect(token)
         return redirect(reverse('index'))
-    return redirect(lastfm_connection.get_auth_url(request, lastfmApp))
+    return redirect(lastfm_connection.get_auth_url(request))
 
+@decorator_from_middleware(middleware.LastfmApp)
 def disconnectLastfm(request):
-    lastfm_connection.disconnect(request.session)
+    lastfm_connection = LastfmConnectionHelper(request.session, request.lastfmApp)
+    lastfm_connection.disconnect()
     return redirect(reverse('index'))
 
 def disconnectSpotify(request):
