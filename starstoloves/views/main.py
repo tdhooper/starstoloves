@@ -49,7 +49,9 @@ def connectLastfm(request):
     if token:
         request.lastfm_connection.connect(token)
         return redirect(reverse('index'))
-    return redirect(request.lastfm_connection.get_auth_url(request))
+    callback_url = request.build_absolute_uri(reverse('connect_lastfm'))
+    auth_url = request.lastfm_connection.get_auth_url(callback_url)
+    return redirect(auth_url)
 
 @decorator_from_middleware(middleware.LastfmApp)
 def disconnectLastfm(request):

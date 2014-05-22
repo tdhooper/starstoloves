@@ -24,8 +24,8 @@ class LastfmConnectionHelper:
         except:
             self.session['lfm_connection_failed'] = True
 
-    def get_auth_url(self, request):
-        return self.lastfmApp.auth.get_url('http://' + request.get_host() + reverse('connect_lastfm'))
+    def get_auth_url(self, callback_url):
+        return self.lastfmApp.auth.get_url(callback_url)
 
     def get_connection_state(self):
         if 'lfmSession' in self.session:
