@@ -6,9 +6,9 @@ class LastfmConnectionHelper:
     CONNECTED = 1;
     FAILED = 2;
 
-    def __init__(self, session, lastfmApp):
+    def __init__(self, session, lastfm_app):
         self.session = session
-        self.lastfmApp = lastfmApp
+        self.lastfm_app = lastfm_app
 
     def get_username(self):
         lfmSession = self.session.get('lfmSession')
@@ -17,7 +17,7 @@ class LastfmConnectionHelper:
 
     def connect(self, token):
         try:
-            lfmSession = self.lastfmApp.auth.get_session(str(token))
+            lfmSession = self.lastfm_app.auth.get_session(str(token))
             self.session['lfmSession'] = lfmSession
             if 'lfm_connection_failed' in self.session:
                 del self.session['lfm_connection_failed']
@@ -25,7 +25,7 @@ class LastfmConnectionHelper:
             self.session['lfm_connection_failed'] = True
 
     def get_auth_url(self, callback_url):
-        return self.lastfmApp.auth.get_url(callback_url)
+        return self.lastfm_app.auth.get_url(callback_url)
 
     def get_connection_state(self):
         if 'lfmSession' in self.session:

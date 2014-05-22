@@ -7,7 +7,7 @@ from django.utils.decorators import decorator_from_middleware
 from starstoloves import middleware
 from helpers import spotify_connection
 
-@decorator_from_middleware(middleware.LastfmApp)
+@decorator_from_middleware(middleware.LastfmApi)
 @decorator_from_middleware(middleware.SpotifySession)
 def index(request):
     context = {}
@@ -41,7 +41,7 @@ def index(request):
 
     return render_to_response('index.html', context_instance=RequestContext(request, context))
 
-@decorator_from_middleware(middleware.LastfmApp)
+@decorator_from_middleware(middleware.LastfmApi)
 def connectLastfm(request):
     if request.lastfm_connection.is_connected():
         return redirect(reverse('index'))
@@ -53,7 +53,7 @@ def connectLastfm(request):
     auth_url = request.lastfm_connection.get_auth_url(callback_url)
     return redirect(auth_url)
 
-@decorator_from_middleware(middleware.LastfmApp)
+@decorator_from_middleware(middleware.LastfmApi)
 def disconnectLastfm(request):
     request.lastfm_connection.disconnect()
     return redirect(reverse('index'))

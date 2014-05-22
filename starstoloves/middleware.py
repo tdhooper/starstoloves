@@ -25,11 +25,11 @@ class SpotifySession:
 from lastfm import lfm
 from views.helpers.lastfm_connection import LastfmConnectionHelper
 
-class LastfmApp:
+class LastfmApi:
 
     def __init__(self):
         self.app = lfm.App(settings.LASTFM['key'], settings.LASTFM['secret'])
 
     def process_request(self, request):
-        request.lastfmApp = self.app
+        request.lastfm_api = self.app
         request.lastfm_connection = LastfmConnectionHelper(request.session, self.app)
