@@ -7,21 +7,32 @@ from django.utils.decorators import decorator_from_middleware
 from starstoloves import middleware
 from helpers import spotify_connection
 
+def lastfm_connection_ui_context(request):
+    if request.lastfm_connection.is_connected():
+        context = {
+            'lfmUsername': request.lastfm_connection.get_username(),
+            'lfmDisconnectUrl': reverse('disconnect_lastfm'),
+        }
+    else:
+        context = {
+            'lfmConnectUrl': reverse('connect_lastfm'),
+        }
+    if request.lastfm_connection.get_connection_state() is request.lastfm_connection.FAILED:
+        context.update({
+            'lfmConnectFailure': True
+        })
+    return context
+
 @decorator_from_middleware(middleware.LastfmApi)
 @decorator_from_middleware(middleware.SpotifySession)
 def index(request):
     context = {}
     session = request.session
 
-    if request.lastfm_connection.is_connected():
-        context['lfmUsername'] = request.lastfm_connection.get_username()
-        context['lfmDisconnectUrl'] = reverse('disconnect_lastfm')
-        context['showSpotifyForm'] = True
-    else:
-        context['lfmConnectUrl'] = reverse('connect_lastfm')
+    context.update(lastfm_connection_ui_context(request))
 
-    if request.lastfm_connection.get_connection_state() is request.lastfm_connection.FAILED:
-        context['lfmConnectFailure'] = True
+    if request.lastfm_connection.is_connected():
+        context['showSpotifyForm'] = True
 
     spotify_connection.negotiate_connection(request, context)
 
