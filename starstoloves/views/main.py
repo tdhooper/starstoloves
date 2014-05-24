@@ -56,18 +56,17 @@ def index(request):
         context.update(spotify_connection_ui_context(request, form))
 
     if request.spotify_connection.is_connected():
-        spSession = session.get('spSession')
-        if spSession and spSession['userUri']:
-            def get_tracks(item):
-                return {
-                    'name': item.track.load().name,
-                    'date': item.create_time,
-                }
-            
-            user = request.spotify_session.get_user(spSession['userUri'])
-            starred = user.load().starred
-            tracks = starred.load().tracks_with_metadata
-            context['starred'] = map(get_tracks, tracks)
+        user_uri = request.spotify_connection.get_user_uri()
+        def get_tracks(item):
+            return {
+                'name': item.track.load().name,
+                'date': item.create_time,
+            }
+        
+        user = request.spotify_session.get_user(user_uri)
+        starred = user.load().starred
+        tracks = starred.load().tracks_with_metadata
+        context['starred'] = map(get_tracks, tracks)
 
     return render_to_response('index.html', context_instance=RequestContext(request, context))
 

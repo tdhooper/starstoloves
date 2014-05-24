@@ -16,6 +16,11 @@ class SpotifyConnectionHelper:
         if spSession:
             return spSession['username']
 
+    def get_user_uri(self):
+        spSession = self.session.get('spSession')
+        if spSession:
+            return spSession['userUri']
+
     def connect(self, username):
         userUri = 'spotify:user:' + username
         # for now the only way I know of validating a user exists is to try and load a playlist
