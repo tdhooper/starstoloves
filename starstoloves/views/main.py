@@ -2,9 +2,9 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
-from django.utils.decorators import decorator_from_middleware
 
 from starstoloves import middleware
+from starstoloves import forms
 from helpers import spotify_connection
 
 def lastfm_connection_ui_context(request):
@@ -23,8 +23,35 @@ def lastfm_connection_ui_context(request):
         })
     return context
 
-@decorator_from_middleware(middleware.LastfmApi)
-@decorator_from_middleware(middleware.SpotifySession)
+# TODO: Find a way of posting to a diferent view so the connection logic can be separated
+# while still keeping form and it's error messages on the index page
+def spotify_connection_ui_context(request):
+    if request.spotify_connection.is_connected():
+        context = {
+            'spUsername': request.spotify_connection.get_username(),
+            'spDisconnectUrl': reverse('disconnect_spotify'),
+        }
+    else:
+        if request.method == 'POST':
+            form = forms.SpotifyConnectForm(request.POST)
+            if form.is_valid():
+                username = form.cleaned_data.get('username')
+                request.spotify_connection.connect(username)
+                if request.spotify_connection.get_connection_state() is request.spotify_connection.FAILED:
+                    form.set_connection_error()
+                else:
+                    return {
+                       'spUsername': request.spotify_connection.get_username(),
+                        'spDisconnectUrl': reverse('disconnect_spotify'),
+                    }
+        else:
+            form = forms.SpotifyConnectForm()
+        context = {
+            'spForm': form,
+            'spConnectUrl': reverse('index'),
+        }
+    return context
+
 def index(request):
     context = {}
     session = request.session
@@ -34,9 +61,9 @@ def index(request):
     if request.lastfm_connection.is_connected():
         context['showSpotifyForm'] = True
 
-    spotify_connection.negotiate_connection(request, context)
+    context.update(spotify_connection_ui_context(request))
 
-    if spotify_connection.is_connected(session):
+    if request.spotify_connection.is_connected():
         spSession = session.get('spSession')
         if spSession and spSession['userUri']:
             def get_tracks(item):
@@ -45,14 +72,13 @@ def index(request):
                     'date': item.create_time,
                 }
             
-            user = request.spotifySession.get_user(spSession['userUri'])
+            user = request.spotify_session.get_user(spSession['userUri'])
             starred = user.load().starred
             tracks = starred.load().tracks_with_metadata
             context['starred'] = map(get_tracks, tracks)
 
     return render_to_response('index.html', context_instance=RequestContext(request, context))
 
-@decorator_from_middleware(middleware.LastfmApi)
 def connectLastfm(request):
     if request.lastfm_connection.is_connected():
         return redirect(reverse('index'))
@@ -64,12 +90,11 @@ def connectLastfm(request):
     auth_url = request.lastfm_connection.get_auth_url(callback_url)
     return redirect(auth_url)
 
-@decorator_from_middleware(middleware.LastfmApi)
 def disconnectLastfm(request):
     request.lastfm_connection.disconnect()
     return redirect(reverse('index'))
 
 def disconnectSpotify(request):
-    spotify_connection.disconnect(request.session)
+    request.spotify_connection.disconnect()
     return redirect(reverse('index'))
     

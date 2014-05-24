@@ -1,25 +1,18 @@
 import settings
-import spotify
-from lib import spotify_auth
 from django.http import HttpResponse
+from views.helpers.spotify_connection import SpotifyConnectionHelper
 
 class SpotifySession:
 
     def __init__(self):
-        config = spotify.Config()
-        config.user_agent = settings.SPOTIFY['user_agent']
-        config.load_application_key_file(settings.SPOTIFY['key_file'])
-        self.spotifySession = spotify.Session(config=config)
-
-        auth = spotify_auth.SpotifyAuth(self.spotifySession);
-        username = settings.SPOTIFY['username']
-        password = settings.SPOTIFY['password']
-        self.success = auth.login(username, password)
+        # see startup.py
+        self.spotify_session = spotify_session
 
     def process_request(self, request):
-        if not self.success:
+        if not self.spotify_session:
             return HttpResponse('Spotify authentication failed')
-        request.spotifySession = self.spotifySession
+        request.spotify_session = self.spotify_session
+        request.spotify_connection = SpotifyConnectionHelper(request.session, self.spotify_session)
 
 
 from lastfm import lfm

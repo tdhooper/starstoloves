@@ -1,44 +1,48 @@
 from django.core.urlresolvers import reverse
-from starstoloves import forms
+import spotify
 
-def _get_session_context(spSession):
-    return {
-        'spUsername': spSession['username'],
-        'spDisconnectUrl': reverse('disconnect_spotify'),
-    }
+class SpotifyConnectionHelper:
 
-def _get_connect_context(form):
-    return {
-        'spForm': form,
-        'spConnectUrl': reverse('index'),
-    }
+    DISCONNECTED = 0;
+    CONNECTED = 1;
+    FAILED = 2;
 
-def negotiate_connection(request, context):
-    spSession = request.session.get('spSession')
-    if spSession:
-        context.update(_get_session_context(spSession))
-    else:
-        if request.method == 'POST':
-            form = forms.SpotifyConnectForm(request.POST, spotifySession=request.spotifySession);
-            if form.is_valid():
-                userUri = form.cleaned_data.get('userUri')
-                user = request.spotifySession.get_user(userUri)
-                username = user.load().display_name
-                spSession = {
+    def __init__(self, session, spotify_session):
+        self.session = session
+        self.spotify_session = spotify_session
+
+    def get_username(self):
+        spSession = self.session.get('spSession')
+        if spSession:
+            return spSession['username']
+
+    def connect(self, username):
+        userUri = 'spotify:user:' + username
+        # for now the only way I know of validating a user exists is to try and load a playlist
+        if username:
+            user = self.spotify_session.get_user(userUri)
+            starred = user.load().starred
+            try:
+                tracks = starred.load().tracks_with_metadata
+                self.session['spSession'] = {
                     'username': username,
                     'userUri': userUri,
                 }
-                context.update(_get_session_context(spSession))
-                request.session['spSession'] = spSession
-            else:
-                context.update(_get_connect_context(form))
-        else:
-            form = forms.SpotifyConnectForm(spotifySession=request.spotifySession);
-            context.update(_get_connect_context(form))
+                if 'sp_connection_failed' in self.session:
+                    del self.session['sp_connection_failed']
+            except spotify.Error:
+                self.session['sp_connection_failed'] = True
 
-def is_connected(session):
-    return session.has_key('spSession')
+    def get_connection_state(self):
+        if 'spSession' in self.session:
+            return self.CONNECTED
+        elif 'sp_connection_failed' in self.session:
+            return self.FAILED
+        return self.DISCONNECTED
 
-def disconnect(session):
-    if is_connected(session):
-        del session['spSession']
+    def is_connected(self):
+        return self.get_connection_state() is self.CONNECTED
+
+    def disconnect(self):
+        if 'spSession' in self.session:
+            del self.session['spSession']

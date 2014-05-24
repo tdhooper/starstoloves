@@ -110,6 +110,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+
+    'starstoloves.middleware.SpotifySession',
+    'starstoloves.middleware.LastfmApi',
 )
 
 ROOT_URLCONF = 'starstoloves.urls'
