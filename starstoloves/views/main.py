@@ -41,7 +41,7 @@ def spotify_connection_ui_context(request):
                     form.set_connection_error()
                 else:
                     return {
-                       'spUsername': request.spotify_connection.get_username(),
+                        'spUsername': request.spotify_connection.get_username(),
                         'spDisconnectUrl': reverse('disconnect_spotify'),
                     }
         else:
@@ -59,9 +59,7 @@ def index(request):
     context.update(lastfm_connection_ui_context(request))
 
     if request.lastfm_connection.is_connected():
-        context['showSpotifyForm'] = True
-
-    context.update(spotify_connection_ui_context(request))
+        context.update(spotify_connection_ui_context(request))
 
     if request.spotify_connection.is_connected():
         spSession = session.get('spSession')

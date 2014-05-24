@@ -2,18 +2,18 @@
 
 {% block content %}
 
-        {% if not lfmUsername %}
-            <h2>Step 1: {% if lfmConnectFailure %}<em class="error-text">Authentication failed</em> {% endif %}<a href="{{lfmConnectUrl}}">Connect to Last.fm</a></h2>
-        {% else %}
+        {% if lfmUsername %}
             <h2>Step 1: Connected to Last.fm as <strong>{{lfmUsername}}</strong>
             {% if not spUsername %}
                 (<a href="{{lfmDisconnectUrl}}">disconnect</a>)</h2>
             {% endif %}    
+        {% else %}
+            <h2>Step 1: {% if lfmConnectFailure %}<em class="error-text">Authentication failed</em> {% endif %}<a href="{{lfmConnectUrl}}">Connect to Last.fm</a></h2>
         {% endif %}
-
-        {% if not showSpotifyForm %}
-            <h2 class="sp-connect-heading step-disabled">Step 2: Connect to Spotify</h2>
-        {% elif not spUsername %}
+            
+        {% if spUsername %}
+            <h2>Step 2: Connected to Spotify as <strong>{{spUsername}}</strong> (<a href="{{spDisconnectUrl}}">disconnect</a>)</h2>
+        {% elif spForm %}
             <h2 class="sp-connect-heading">Step 2: Connect to Spotify:</h2>
             <form action="{{spConnectUrl}}" method="POST" class="sp-connect-form">
                 {% csrf_token %}
@@ -21,7 +21,7 @@
                 <input type="submit" />
             </form>
         {% else %}
-            <h2>Step 2: Connected to Spotify as <strong>{{spUsername}}</strong> (<a href="{{spDisconnectUrl}}">disconnect</a>)</h2>
+            <h2 class="sp-connect-heading step-disabled">Step 2: Connect to Spotify</h2>
         {% endif %}
 
         {% if not starred %}
