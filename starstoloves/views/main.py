@@ -23,34 +23,27 @@ def lastfm_connection_ui_context(request):
         })
     return context
 
-# TODO: Find a way of posting to a diferent view so the connection logic can be separated
-# while still keeping form and it's error messages on the index page
-def spotify_connection_ui_context(request):
+def spotify_connection_form(request):
+    if request.method == 'POST':
+        form = forms.SpotifyConnectForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            request.spotify_connection.connect(username)
+            if request.spotify_connection.get_connection_state() is request.spotify_connection.FAILED:
+                form.set_connection_error()
+        return form
+    return forms.SpotifyConnectForm()
+
+def spotify_connection_ui_context(request, form):
     if request.spotify_connection.is_connected():
-        context = {
+        return {
             'spUsername': request.spotify_connection.get_username(),
             'spDisconnectUrl': reverse('disconnect_spotify'),
         }
-    else:
-        if request.method == 'POST':
-            form = forms.SpotifyConnectForm(request.POST)
-            if form.is_valid():
-                username = form.cleaned_data.get('username')
-                request.spotify_connection.connect(username)
-                if request.spotify_connection.get_connection_state() is request.spotify_connection.FAILED:
-                    form.set_connection_error()
-                else:
-                    return {
-                        'spUsername': request.spotify_connection.get_username(),
-                        'spDisconnectUrl': reverse('disconnect_spotify'),
-                    }
-        else:
-            form = forms.SpotifyConnectForm()
-        context = {
-            'spForm': form,
-            'spConnectUrl': reverse('index'),
-        }
-    return context
+    return {
+        'spForm': form,
+        'spConnectUrl': reverse('index'),
+    }
 
 def index(request):
     context = {}
@@ -59,7 +52,8 @@ def index(request):
     context.update(lastfm_connection_ui_context(request))
 
     if request.lastfm_connection.is_connected():
-        context.update(spotify_connection_ui_context(request))
+        form = spotify_connection_form(request)
+        context.update(spotify_connection_ui_context(request, form))
 
     if request.spotify_connection.is_connected():
         spSession = session.get('spSession')
