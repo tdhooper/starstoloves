@@ -2,6 +2,9 @@
 
 # Script to set up a Django project on Vagrant.
 
+# Print commands
+set -x
+
 # Installation settings
 
 PROJECT_NAME=$1
@@ -63,8 +66,14 @@ sudo wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/mopid
 sudo apt-get update
 sudo apt-get install -y libspotify-dev
 
-#from http://stackoverflow.com/questions/21158317/ioerror-on-production-server
+# from http://stackoverflow.com/questions/21158317/ioerror-on-production-server
 sudo apt-get install libffi-dev
+
+# Install RabbitMQ
+sudo apt-get install -y rabbitmq-server
+
+# Install screen
+sudo apt-get install -y screen
 
 # ---
 
@@ -83,3 +92,21 @@ chmod a+x $PROJECT_DIR/manage.py
 
 # Django project setup
 su - vagrant -c "source $VIRTUALENV_DIR/bin/activate && cd $PROJECT_DIR && ./manage.py syncdb --noinput && ./manage.py migrate"
+
+# Start the Django development server in screen
+sudo -u vagrant screen -S "djangoServer" -X quit
+sudo -u vagrant screen -dmS "djangoServer"
+sudo -u vagrant screen -S "djangoServer" -p 0 -X stuff "source $VIRTUALENV_DIR/bin/activate && cd $PROJECT_DIR && ./manage.py runserver 0.0.0.0:8000"
+# Sends return command
+sudo -u vagrant screen -S "djangoServer" -p 0 -X stuff "$(printf \\r)"
+
+# Start the Celery worker process in screen
+sudo -u vagrant screen -S "celeryWorker" -X quit
+sudo -u vagrant screen -dmS "celeryWorker"
+sudo -u vagrant screen -S "celeryWorker" -p 0 -X stuff "source $VIRTUALENV_DIR/bin/activate && cd $PROJECT_DIR && celery -A starstoloves worker -l info"
+# Sends return command
+sudo -u vagrant screen -S "celeryWorker" -p 0 -X stuff "$(printf \\r)"
+
+echo 'The site should be accessible at http://localhost:8081'
+
+

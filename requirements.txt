@@ -7,3 +7,5 @@ gunicorn==18.0
 Fabric==1.8.1
 pyspotify==2.0.0b2
 lfmh==1.1.1
+celery==3.1.11
+django-celery==3.1.10

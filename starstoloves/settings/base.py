@@ -142,6 +142,7 @@ INSTALLED_APPS = (
     'debug_toolbar',
 
     'django.contrib.admin',
+    'djcelery',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
