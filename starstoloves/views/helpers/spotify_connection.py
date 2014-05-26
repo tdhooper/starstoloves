@@ -1,25 +1,24 @@
+from .connection import ConnectionHelper
+
 from django.core.urlresolvers import reverse
 import spotify
 
-class SpotifyConnectionHelper:
+class SpotifyConnectionHelper(ConnectionHelper):
 
-    DISCONNECTED = 0;
-    CONNECTED = 1;
-    FAILED = 2;
-
-    def __init__(self, session, spotify_session):
-        self.session = session
+    def __init__(self, session_storage, spotify_session):
+        super(SpotifyConnectionHelper, self).__init__(session_storage)
         self.spotify_session = spotify_session
 
+    def _get_session_key(self):
+        return 'spotify_connection'
+
     def get_username(self):
-        spSession = self.session.get('spSession')
-        if spSession:
-            return spSession['username']
+        session = self._get_session()
+        return session.get('username')
 
     def get_user_uri(self):
-        spSession = self.session.get('spSession')
-        if spSession:
-            return spSession['userUri']
+        session = self._get_session()
+        return session.get('userUri')
 
     def connect(self, username):
         userUri = 'spotify:user:' + username
@@ -29,25 +28,11 @@ class SpotifyConnectionHelper:
             starred = user.load().starred
             try:
                 tracks = starred.load().tracks_with_metadata
-                self.session['spSession'] = {
+                session = self._get_session()
+                session.update({
                     'username': username,
                     'userUri': userUri,
-                }
-                if 'sp_connection_failed' in self.session:
-                    del self.session['sp_connection_failed']
+                })
+                self._set_state(self.CONNECTED)
             except spotify.Error:
-                self.session['sp_connection_failed'] = True
-
-    def get_connection_state(self):
-        if 'spSession' in self.session:
-            return self.CONNECTED
-        elif 'sp_connection_failed' in self.session:
-            return self.FAILED
-        return self.DISCONNECTED
-
-    def is_connected(self):
-        return self.get_connection_state() is self.CONNECTED
-
-    def disconnect(self):
-        if 'spSession' in self.session:
-            del self.session['spSession']
+                self._set_state(self.FAILED)

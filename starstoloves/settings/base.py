@@ -115,6 +115,8 @@ MIDDLEWARE_CLASSES = (
     'starstoloves.middleware.LastfmApi',
 )
 
+SESSION_SAVE_EVERY_REQUEST=True
+
 ROOT_URLCONF = 'starstoloves.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.

@@ -1,43 +1,28 @@
+from .connection import ConnectionHelper
+
 from django.core.urlresolvers import reverse
 
-class LastfmConnectionHelper:
+class LastfmConnectionHelper(ConnectionHelper):
 
-    DISCONNECTED = 0;
-    CONNECTED = 1;
-    FAILED = 2;
+    def __init__(self, session_storage, app):
+        super(LastfmConnectionHelper, self).__init__(session_storage)
+        self.app = app
 
-    def __init__(self, session, lastfm_app):
-        self.session = session
-        self.lastfm_app = lastfm_app
+    def _get_session_key(self):
+        return 'dsjjsdjhdsjkh'
 
     def get_username(self):
-        lfmSession = self.session.get('lfmSession')
-        if lfmSession:
-            return lfmSession['name']
+        session = self._get_session()
+        return session.get('name')
+
+    def get_auth_url(self, callback_url):
+        return self.app.auth.get_url(callback_url)
 
     def connect(self, token):
         try:
-            lfmSession = self.lastfm_app.auth.get_session(str(token))
-            self.session['lfmSession'] = lfmSession
-            if 'lfm_connection_failed' in self.session:
-                del self.session['lfm_connection_failed']
+            app_session = self.app.auth.get_session(str(token))
+            session = self._get_session()
+            session.update(app_session)
+            self._set_state(self.CONNECTED)
         except:
-            self.session['lfm_connection_failed'] = True
-
-    def get_auth_url(self, callback_url):
-        return self.lastfm_app.auth.get_url(callback_url)
-
-    def get_connection_state(self):
-        if 'lfmSession' in self.session:
-            return self.CONNECTED
-        elif 'lfm_connection_failed' in self.session:
-            return self.FAILED
-        return self.DISCONNECTED
-
-    def is_connected(self):
-        return self.get_connection_state() is self.CONNECTED
-
-    def disconnect(self):
-        if 'lfmSession' in self.session:
-            del self.session['lfmSession']
-
+            self._set_state(self.FAILED)
