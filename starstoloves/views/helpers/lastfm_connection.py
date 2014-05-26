@@ -9,7 +9,7 @@ class LastfmConnectionHelper(ConnectionHelper):
         self.app = app
 
     def _get_session_key(self):
-        return 'dsjjsdjhdsjkh'
+        return 'lastfm_connection'
 
     def get_username(self):
         session = self._get_session()
