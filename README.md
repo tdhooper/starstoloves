@@ -18,9 +18,11 @@ Setup
     3. The site should be available at http://localhost:8111
 
 The Django server will be running in a screen and can be accessed like so
+
     $ vagrant ssh
     $ screen -r djangoServer
 
 For the Celery worker do
+
     $ vagrant ssh
     $ screen -r celeryWorker
