@@ -33,6 +33,8 @@ def spotify_connection_form(request):
             request.spotify_connection.connect(username)
             if request.spotify_connection.get_connection_state() is request.spotify_connection.FAILED:
                 form.set_connection_error()
+            else:
+                form.connection_success = True
         return form
     return forms.SpotifyConnectForm()
 
@@ -60,6 +62,9 @@ def index(request):
 
     if request.lastfm_connection.is_connected():
         form = spotify_connection_form(request)
+        if form.connection_success:
+            # Stop double POST on refresh
+            return redirect('index')
         context.update(spotify_connection_ui_context(request, form))
 
     if request.spotify_connection.is_connected():
@@ -98,22 +103,22 @@ def index(request):
 
 def connectLastfm(request):
     if request.lastfm_connection.is_connected():
-        return redirect(reverse('index'))
+        return redirect('index')
     token = request.GET.get('token')
     if token:
         request.lastfm_connection.connect(token)
-        return redirect(reverse('index'))
+        return redirect('index')
     callback_url = request.build_absolute_uri(reverse('connect_lastfm'))
     auth_url = request.lastfm_connection.get_auth_url(callback_url)
     return redirect(auth_url)
 
 def disconnectLastfm(request):
     request.lastfm_connection.disconnect()
-    return redirect(reverse('index'))
+    return redirect('index')
 
 def disconnectSpotify(request):
     request.spotify_connection.disconnect()
     if 'tracks' in request.session:
         del request.session['tracks']
-    return redirect(reverse('index'))
+    return redirect('index')
     
