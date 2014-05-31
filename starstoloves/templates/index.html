@@ -31,10 +31,16 @@
             <ul>
             {% for item in tracks %}
                 <li>
-                    <pre>
-{{ item }}
-                    </pre>
                     <strong>{{item.spotify_track.artist_name}} - {{item.spotify_track.track_name}}</strong> - {{item.spotify_track.date}}
+                    {% if item.lastfm_tracks %}
+                        <ul>
+                            {% for lastfm_track in item.lastfm_tracks %}
+                                <li><a href="{{ lastfm_track.url }}">{{lastfm_track.artist_name}} - {{lastfm_track.track_name}}</a></li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No Last.fm tracks found</p>
+                    {% endif %}
                 </li>
             {% endfor %}
             </ul>

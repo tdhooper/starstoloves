@@ -72,7 +72,7 @@ def index(request):
             tracks = []
             user_uri = request.spotify_connection.get_user_uri()
             starred_tracks = get_starred_tracks(spotify_session, user_uri)
-            starred_tracks = starred_tracks[:5]
+            starred_tracks = starred_tracks
             for item in starred_tracks:
                 track = item.track.load()
                 track_name = track.name
@@ -94,10 +94,24 @@ def index(request):
             result = AsyncResult(track['task_id'])
             track['result_state'] = result.state
             if result.ready():
-                track['search_result'] = result.info
+                try:
+                    if result.info['opensearch:totalResults'] is not '0':
+                        track_results = result.info['trackmatches']['track']
+                        if isinstance(track_results, dict):
+                            track_results = [track_results]
+                        track['lastfm_tracks'] = [
+                            {
+                                'track_name': track['name'],
+                                'artist_name': track['artist'],
+                                'url': track['url'],
+                            }
+                            for track in track_results
+                        ]
+                except TypeError:
+                    print('Last.fm API error')
             return track
 
-        context['tracks'] = map(hydrate_tasks, tracks)
+        context['tracks'] = list(map(hydrate_tasks, tracks))
 
     return render_to_response('index.html', context_instance=RequestContext(request, context))
 
