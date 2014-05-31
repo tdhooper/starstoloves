@@ -1,5 +1,5 @@
-starstoloves
-============
+Stars to Loves
+==============
 
 Migrate Spotify stars to Last.fm loves
 
@@ -12,10 +12,15 @@ Migrate Spotify stars to Last.fm loves
 Setup
 -----
     
-    $ vagrant up
-    $ vagrant ssh
-      (then, within the SSH session:)
-    $ ./manage.py runserver 0.0.0.0:8000
+    1. Install Vagrant 
+    2. Start vagrant
+        $ vagrant up
+    3. The site should be available at http://localhost:8111
 
-This will make the app accessible on the host machine as http://localhost:8111/ . The codebase is located on the host
-machine, exported to the VM as a shared folder; code editing and Git operations will generally be done on the host.
+The Django server will be running in a screen and can be accessed like so
+    $ vagrant ssh
+    $ screen -r djangoServer
+
+For the Celery worker do
+    $ vagrant ssh
+    $ screen -r celeryWorker
