@@ -3,9 +3,11 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 
-from starstoloves import middleware
+from celery.result import AsyncResult
+
 from starstoloves import forms
-from helpers import spotify_connection
+from starstoloves.views.helpers import spotify_connection
+from starstoloves.tasks import search_lastfm
 
 def lastfm_connection_ui_context(request):
     if request.lastfm_connection.is_connected():
@@ -45,6 +47,11 @@ def spotify_connection_ui_context(request, form):
         'spConnectUrl': reverse('index'),
     }
 
+def get_starred_tracks(spotify_session, user_uri):    
+    user = spotify_session.get_user(user_uri)
+    starred = user.load().starred
+    return starred.load().tracks_with_metadata
+
 def index(request):
     context = {}
     session = request.session
@@ -56,17 +63,36 @@ def index(request):
         context.update(spotify_connection_ui_context(request, form))
 
     if request.spotify_connection.is_connected():
-        user_uri = request.spotify_connection.get_user_uri()
-        def get_tracks(item):
-            return {
-                'name': item.track.load().name,
-                'date': item.create_time,
-            }
-        
-        user = request.spotify_session.get_user(user_uri)
-        starred = user.load().starred
-        tracks = starred.load().tracks_with_metadata
-        context['starred'] = map(get_tracks, tracks)
+        if not 'tracks' in request.session:
+            tracks = []
+            user_uri = request.spotify_connection.get_user_uri()
+            starred_tracks = get_starred_tracks(spotify_session, user_uri)
+            starred_tracks = starred_tracks[:5]
+            for item in starred_tracks:
+                track = item.track.load()
+                track_name = track.name
+                artist_name = track.artists[0].load().name
+                search_task = search_lastfm.delay(request.lastfm_app, track_name, artist_name)
+                tracks.append({
+                    'task_id': search_task.id,
+                    'spotify_track': {
+                        'track_name': track_name,
+                        'artist_name': artist_name,
+                        'date': item.create_time,
+                    },
+                })
+            request.session['tracks'] = tracks
+        else:
+            tracks = request.session['tracks']
+
+        def hydrate_tasks(track):
+            result = AsyncResult(track['task_id'])
+            track['result_state'] = result.state
+            if result.ready():
+                track['search_result'] = result.info
+            return track
+
+        context['tracks'] = map(hydrate_tasks, tracks)
 
     return render_to_response('index.html', context_instance=RequestContext(request, context))
 
@@ -87,5 +113,7 @@ def disconnectLastfm(request):
 
 def disconnectSpotify(request):
     request.spotify_connection.disconnect()
+    if 'tracks' in request.session:
+        del request.session['tracks']
     return redirect(reverse('index'))
     

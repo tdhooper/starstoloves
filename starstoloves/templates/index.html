@@ -24,13 +24,18 @@
             <h2 class="sp-connect-heading step-disabled">Step 2: Connect to Spotify</h2>
         {% endif %}
 
-        {% if not starred %}
+        {% if not tracks %}
             <h2 class="step-disabled">Step 3: Select tracks</h2>
         {% else %}
             <h2>Step 3: Select tracks</h2>
             <ul>
-            {% for track in starred %}
-                <li>{{track.name}} - {{track.date}}</li>
+            {% for item in tracks %}
+                <li>
+                    <pre>
+{{ item }}
+                    </pre>
+                    <strong>{{item.spotify_track.artist_name}} - {{item.spotify_track.track_name}}</strong> - {{item.spotify_track.date}}
+                </li>
             {% endfor %}
             </ul>
         {% endif %}

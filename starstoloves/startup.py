@@ -2,9 +2,9 @@
 # or use https://docs.djangoproject.com/en/dev/ref/applications/#django.apps.AppConfig.ready
 
 import spotify
-import settings
-from lib import spotify_auth
-import __builtin__
+from starstoloves import settings
+from starstoloves.lib import spotify_auth
+import builtins
 
 def run():
     config = spotify.Config()
@@ -18,4 +18,4 @@ def run():
     success = auth.login(username, password)
 
     if success:
-        __builtin__.spotify_session = sp_session
+        builtins.spotify_session = sp_session

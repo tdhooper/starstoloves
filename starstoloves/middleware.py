@@ -1,6 +1,6 @@
-import settings
+from starstoloves import settings
 from django.http import HttpResponse
-from views.helpers.spotify_connection import SpotifyConnectionHelper
+from starstoloves.views.helpers.spotify_connection import SpotifyConnectionHelper
 
 class SpotifySession:
 
@@ -16,7 +16,7 @@ class SpotifySession:
 
 
 from lastfm import lfm
-from views.helpers.lastfm_connection import LastfmConnectionHelper
+from starstoloves.views.helpers.lastfm_connection import LastfmConnectionHelper
 
 class LastfmApi:
 
@@ -24,5 +24,5 @@ class LastfmApi:
         self.app = lfm.App(settings.LASTFM['key'], settings.LASTFM['secret'])
 
     def process_request(self, request):
-        request.lastfm_api = self.app
+        request.lastfm_app = self.app
         request.lastfm_connection = LastfmConnectionHelper(request.session, self.app)

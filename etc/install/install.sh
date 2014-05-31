@@ -13,52 +13,29 @@ DB_NAME=$PROJECT_NAME
 VIRTUALENV_NAME=$PROJECT_NAME
 
 PROJECT_DIR=/home/vagrant/$PROJECT_NAME
-VIRTUALENV_DIR=/home/vagrant/.virtualenvs/$PROJECT_NAME
 
-PGSQL_VERSION=9.1
-
-# Need to fix locale so that Postgres creates databases in UTF-8
-cp -p $PROJECT_DIR/etc/install/etc-bash.bashrc /etc/bash.bashrc
-locale-gen en_GB.UTF-8
-dpkg-reconfigure locales
-
-export LANGUAGE=en_GB.UTF-8
-export LANG=en_GB.UTF-8
-export LC_ALL=en_GB.UTF-8
+PGSQL_VERSION=9.3
 
 # Install essential packages from Apt
-apt-get update -y
-# Python dev packages
-apt-get install -y build-essential python python-dev
-# python-setuptools being installed manually
-wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | python
-# Dependencies for image processing with Pillow (drop-in replacement for PIL)
-# supporting: jpeg, tiff, png, freetype, littlecms
-# (pip install pillow to get pillow itself, it is not in requirements.txt)
-apt-get install -y libjpeg-dev libtiff-dev zlib1g-dev libfreetype6-dev liblcms2-dev
-# Git (we'd rather avoid people keeping credentials for git commits in the repo, but sometimes we need it for pip requirements that aren't in PyPI)
-apt-get install -y git
+sudo apt-get update -y
+
+# Install PIP
+sudo apt-get install -y python-pip
+sudo apt-get install -y python3-pip
 
 # Postgresql
 if ! command -v psql; then
-    apt-get install -y postgresql-$PGSQL_VERSION libpq-dev
-    cp $PROJECT_DIR/etc/install/pg_hba.conf /etc/postgresql/$PGSQL_VERSION/main/
-    /etc/init.d/postgresql reload
+    sudo apt-get install -y postgresql-$PGSQL_VERSION libpq-dev
+    sudo cp $PROJECT_DIR/etc/install/pg_hba.conf /etc/postgresql/$PGSQL_VERSION/main/
+    sudo /etc/init.d/postgresql reload
 fi
 
-# virtualenv global setup
-if ! command -v pip; then
-    easy_install -U pip
-fi
-if [[ ! -f /usr/local/bin/virtualenv ]]; then
-    pip install virtualenv virtualenvwrapper stevedore virtualenv-clone
-fi
-
-# bash environment global setup
-cp -p $PROJECT_DIR/etc/install/bashrc /home/vagrant/.bashrc
-su - vagrant -c "mkdir -p /home/vagrant/.pip_download_cache"
+# postgresql setup for project
+createdb -Upostgres $DB_NAME
 
 # Install libspotify
+
+sudo apt-get install -y build-essential python-dev
 
 # from http://pyspotify.mopidy.com/en/latest/installation/
 wget -q -O - https://apt.mopidy.com/mopidy.gpg | sudo apt-key add -
@@ -72,40 +49,55 @@ sudo apt-get install libffi-dev
 # Install RabbitMQ
 sudo apt-get install -y rabbitmq-server
 
-# Install screen
-sudo apt-get install -y screen
+# Install and configure virtualenvwrapper
+sudo pip install virtualenvwrapper
+export WORKON_HOME=$HOME/.virtualenvs
+export PROJECT_HOME=$PROJECT_DIR
+source `which virtualenvwrapper.sh`
+mkvirtualenv $VIRTUALENV_NAME -p `which python3`
 
-# ---
+cp $PROJECT_DIR/etc/install/bashrc ~/.bashrc
+echo "export WORKON_HOME=$HOME/.virtualenvs" >> ~/.bashrc
+echo "export PROJECT_HOME=$PROJECT_DIR" >> ~/.bashrc
+echo "source `which virtualenvwrapper.sh`" >> ~/.bashrc
 
-# postgresql setup for project
-createdb -Upostgres $DB_NAME
+# Change to the project directory
+cd $PROJECT_DIR
+workon $VIRTUALENV_NAME
 
-# virtualenv setup for project
-su - vagrant -c "/usr/local/bin/virtualenv $VIRTUALENV_DIR && \
-    echo $PROJECT_DIR > $VIRTUALENV_DIR/.project && \
-    PIP_DOWNLOAD_CACHE=/home/vagrant/.pip_download_cache $VIRTUALENV_DIR/bin/pip install -r $PROJECT_DIR/requirements.txt"
-
-echo "workon $VIRTUALENV_NAME" >> /home/vagrant/.bashrc
-
-# Set execute permissions on manage.py, as they get lost if we build from a zip file
-chmod a+x $PROJECT_DIR/manage.py
+# Install the requirements
+pip install -r requirements.txt
 
 # Django project setup
-su - vagrant -c "source $VIRTUALENV_DIR/bin/activate && cd $PROJECT_DIR && ./manage.py syncdb --noinput && ./manage.py migrate"
+./manage.py syncdb --noinput
+./manage.py migrate
+
+# Kill and restart screen
+screen -S "djangoServer" -X quit
+screen -dmS "djangoServer"
+
+screen -S "celeryWorker" -X quit
+screen -dmS "celeryWorker"
+
+sleep 5
 
 # Start the Django development server in screen
-sudo -u vagrant screen -S "djangoServer" -X quit
-sudo -u vagrant screen -dmS "djangoServer"
-sudo -u vagrant screen -S "djangoServer" -p 0 -X stuff "source $VIRTUALENV_DIR/bin/activate && cd $PROJECT_DIR && ./manage.py runserver 0.0.0.0:8000"
-# Sends return command
-sudo -u vagrant screen -S "djangoServer" -p 0 -X stuff "$(printf \\r)"
+
+# Use virtual environment
+screen -S "djangoServer" -p 0 -X stuff "cd $PROJECT_DIR && workon $VIRTUALENV_NAME
+"
+# Start python server
+screen -S "djangoServer" -p 0 -X stuff "python ./manage.py runserver 0.0.0.0:8000
+"
 
 # Start the Celery worker process in screen
-sudo -u vagrant screen -S "celeryWorker" -X quit
-sudo -u vagrant screen -dmS "celeryWorker"
-sudo -u vagrant screen -S "celeryWorker" -p 0 -X stuff "source $VIRTUALENV_DIR/bin/activate && cd $PROJECT_DIR && celery -A starstoloves worker -l info"
-# Sends return command
-sudo -u vagrant screen -S "celeryWorker" -p 0 -X stuff "$(printf \\r)"
+
+# Use virtual environment
+screen -S "celeryWorker" -p 0 -X stuff "cd $PROJECT_DIR && workon $VIRTUALENV_NAME
+"
+# Start python server
+screen -S "celeryWorker" -p 0 -X stuff "celery -A starstoloves worker -l info
+"
 
 echo 'The site should be accessible at http://localhost:8081'
 

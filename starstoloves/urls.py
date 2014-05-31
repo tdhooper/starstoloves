@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, include, url
-from views import main
+from starstoloves.views import main
 
 urlpatterns = patterns('',
     url(r'^$',                      main.index, name='index'),
