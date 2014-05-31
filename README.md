@@ -6,8 +6,8 @@ Migrate Spotify stars to Last.fm loves
 * Runs in a Vagrant box
 * Based on https://github.com/torchbox/vagrant-django-template
 * Includes extra dependencies:
-** libspotify and pyspotify (http://pyspotify.mopidy.com)
-** lfmh (https://bitbucket.org/hauzer/lfm/)
+    * libspotify and pyspotify (http://pyspotify.mopidy.com)
+    * lfmh (https://bitbucket.org/hauzer/lfm/)
 
 Setup
 -----
@@ -18,6 +18,9 @@ Setup
         $ vagrant up
         
 3. The site should be available at [http://localhost:8111/](http://localhost:8111)
+
+Debugging
+---------
 
 The Django server will be running in a screen and can be accessed like so
 
