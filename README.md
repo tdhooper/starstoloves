@@ -12,10 +12,12 @@ Migrate Spotify stars to Last.fm loves
 Setup
 -----
     
-    1. Install Vagrant 
-    2. Start vagrant
+1. Install Vagrant 
+2. Start vagrant
+    
         $ vagrant up
-    3. The site should be available at http://localhost:8111
+        
+3. The site should be available at [http://localhost:8111/](http://localhost:8111)
 
 The Django server will be running in a screen and can be accessed like so
 
