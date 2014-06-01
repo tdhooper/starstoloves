@@ -93,4 +93,53 @@ class TestLastfmSearchResult(unittest.TestCase):
     def test_data_doesnt_have_tracks_when_ready_and_result_is_error(self):
         self.mock_async_result.ready = MagicMock(return_value=True)
         self.mock_async_result.info = TypeError
-        self.assertFalse('tracks' in self.result.data)      
+        self.assertFalse('tracks' in self.result.data)
+
+from starstoloves.lib.search import LastfmSearchResultWithLoves
+
+
+class TestLastfmSearchResultWithLoves(unittest.TestCase):
+
+    def setUp(self):
+        self.patcher = patch('starstoloves.lib.search.AsyncResult', autospec=True)
+        self.MockAsyncResult = self.patcher.start()
+        self.mock_async_result = self.MockAsyncResult.return_value
+        self.loved_tracks_urls = ['urlA', 'urlC']
+        self.result = LastfmSearchResultWithLoves('some_id', self.loved_tracks_urls)
+
+    def tearDown(self):
+        self.patcher.stop()
+
+    def test_data_tracks_are_marked_as_loved_when_they_match_a_loved_track(self):
+        result_data = {
+            'trackmatches': {
+                'track': [
+                    {
+                        'name': 'trackA',
+                        'artist': 'artistA',
+                        'url': 'urlA',
+                    },{
+                        'name': 'trackB',
+                        'artist': 'artistB',
+                        'url': 'urlB',
+                    },
+                ]
+            }
+        }
+        expected_tracks = [
+            {
+                'track_name': 'trackA',
+                'artist_name': 'artistA',
+                'url': 'urlA',
+                'loved': True,
+            },{
+                'track_name': 'trackB',
+                'artist_name': 'artistB',
+                'url': 'urlB',
+                'loved': False,
+            },
+        ]
+        self.mock_async_result.ready = MagicMock(return_value=True)
+        self.mock_async_result.info = result_data
+        self.assertEqual(self.result.data['tracks'], expected_tracks)
+

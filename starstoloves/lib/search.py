@@ -2,19 +2,23 @@ from starstoloves.tasks import search_lastfm
 
 from celery.result import AsyncResult
 
-class LastfmSearch:
+class LastfmSearch(object):
 
     def __init__(self, lastfm_app):
         self.lastfm_app = lastfm_app
 
     def search(self, track_name, artist_name):
         async_result = search_lastfm.delay(self.lastfm_app, track_name, artist_name)
-        return LastfmSearchResult(async_result.id)
+        return self.factory_result(async_result.id)
 
     def result(self, id):
-        return LastfmSearchResult(id)
+        return self.factory_result(id)
 
-class LastfmSearchResult:
+    def factory_result(self, id):
+        return LastfmSearchResult(id)    
+
+
+class LastfmSearchResult(object):
 
     def __init__(self, id):
         self.async_result = AsyncResult(id)
@@ -47,5 +51,30 @@ class LastfmSearchResult:
             if tracks:
                 data['tracks'] = tracks
         return data
+
+
+class LastfmSearchWithLoves(LastfmSearch):
+
+    def __init__(self, lastfm_app, loved_tracks_urls):
+        super(LastfmSearchWithLoves, self).__init__(lastfm_app)
+        self.loved_tracks_urls = loved_tracks_urls
+
+    def factory_result(self, id):
+        return LastfmSearchResultWithLoves(id, self.loved_tracks_urls)
+
+
+class LastfmSearchResultWithLoves(LastfmSearchResult):
+
+    def __init__(self, id, loved_tracks_urls):
+        super(LastfmSearchResultWithLoves, self).__init__(id)
+        self.loved_tracks_urls = loved_tracks_urls
+
+    def _extract_tracks_from_result(self, result):
+        tracks = super(LastfmSearchResultWithLoves, self)._extract_tracks_from_result(result)
+        if isinstance(tracks, list):
+            for track in tracks:
+                track['loved'] = track['url'] in self.loved_tracks_urls
+        return tracks
+
 
 

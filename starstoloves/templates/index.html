@@ -36,7 +36,7 @@
                         {% if track.search.tracks %}
                             <ul>
                                 {% for search_track in track.search.tracks %}
-                                    <li><a href="{{ lastfm_track.url }}">{{search_track.artist_name}} - {{search_track.track_name}}</a></li>
+                                    <li>{% if search_track.loved %}♥ {% endif %}<a href="{{ search_track.url }}">{{search_track.artist_name}} - {{search_track.track_name}}</a></li>
                                 {% endfor %}
                             </ul>
                         {% else %}
