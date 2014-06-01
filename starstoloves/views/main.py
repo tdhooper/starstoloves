@@ -3,11 +3,10 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 
-from celery.result import AsyncResult
-
 from starstoloves import forms
 from starstoloves.views.helpers import spotify_connection
-from starstoloves.tasks import search_lastfm
+from starstoloves.lib.search import LastfmSearch
+from starstoloves.lib.track import SearchingTrack
 
 def lastfm_connection_ui_context(request):
     if request.lastfm_connection.is_connected():
@@ -68,50 +67,26 @@ def index(request):
         context.update(spotify_connection_ui_context(request, form))
 
     if request.spotify_connection.is_connected():
-        if not 'tracks' in request.session:
-            tracks = []
+        tracks = []
+        searcher = LastfmSearch(request.lastfm_app)
+        if not 'tracks_data' in request.session:
             user_uri = request.spotify_connection.get_user_uri()
             starred_tracks = get_starred_tracks(spotify_session, user_uri)
-            starred_tracks = starred_tracks
             for item in starred_tracks:
                 track = item.track.load()
                 track_name = track.name
                 artist_name = track.artists[0].load().name
-                search_task = search_lastfm.delay(request.lastfm_app, track_name, artist_name)
-                tracks.append({
-                    'task_id': search_task.id,
-                    'spotify_track': {
-                        'track_name': track_name,
-                        'artist_name': artist_name,
-                        'date': item.create_time,
-                    },
-                })
-            request.session['tracks'] = tracks
+                track = SearchingTrack(track_name, artist_name, item.create_time, searcher)
+                tracks.append(track)
         else:
-            tracks = request.session['tracks']
+            tracks = [
+                SearchingTrack(track['track_name'], track['artist_name'], track['date_saved'], searcher, track['search'])
+                for track in request.session['tracks_data']
+            ]
 
-        def hydrate_tasks(track):
-            result = AsyncResult(track['task_id'])
-            track['result_state'] = result.state
-            if result.ready():
-                try:
-                    if result.info['opensearch:totalResults'] is not '0':
-                        track_results = result.info['trackmatches']['track']
-                        if isinstance(track_results, dict):
-                            track_results = [track_results]
-                        track['lastfm_tracks'] = [
-                            {
-                                'track_name': track['name'],
-                                'artist_name': track['artist'],
-                                'url': track['url'],
-                            }
-                            for track in track_results
-                        ]
-                except TypeError:
-                    print('Last.fm API error')
-            return track
-
-        context['tracks'] = list(map(hydrate_tasks, tracks))
+        tracks_data = [track.data for track in tracks]
+        request.session['tracks_data'] = tracks_data
+        context['tracks'] = tracks_data
 
     return render_to_response('index.html', context_instance=RequestContext(request, context))
 

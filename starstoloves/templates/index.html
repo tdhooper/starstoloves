@@ -29,17 +29,19 @@
         {% else %}
             <h2>Step 3: Select tracks</h2>
             <ul>
-            {% for item in tracks %}
+            {% for track in tracks %}
                 <li>
-                    <strong>{{item.spotify_track.artist_name}} - {{item.spotify_track.track_name}}</strong> - {{item.spotify_track.date}}
-                    {% if item.lastfm_tracks %}
-                        <ul>
-                            {% for lastfm_track in item.lastfm_tracks %}
-                                <li><a href="{{ lastfm_track.url }}">{{lastfm_track.artist_name}} - {{lastfm_track.track_name}}</a></li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>No Last.fm tracks found</p>
+                    <strong>{{track.artist_name}} - {{track.track_name}}</strong> - {{track.date_saved}}
+                    {% if track.search.status == 'SUCCESS' %}
+                        {% if track.search.tracks %}
+                            <ul>
+                                {% for search_track in track.search.tracks %}
+                                    <li><a href="{{ lastfm_track.url }}">{{search_track.artist_name}} - {{search_track.track_name}}</a></li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No Last.fm tracks found</p>
+                        {% endif %}
                     {% endif %}
                 </li>
             {% endfor %}
