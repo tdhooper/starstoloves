@@ -40,8 +40,10 @@
                                 {% endfor %}
                             </ul>
                         {% else %}
-                            <p>No Last.fm tracks found</p>
+                            <p>No Last.fm tracks found, <a href="http://www.last.fm/search?q={{track.artist_name}} {{track.track_name}}&amp;type=track">try searching manually</a></p>
                         {% endif %}
+                    {% elif track.search.status == 'FAILURE' %}
+                        <p>Last.fm search failed, <a href="http://www.last.fm/search?q={{track.artist_name}} {{track.track_name}}&amp;type=track">try searching manually</a></p>
                     {% endif %}
                 </li>
             {% endfor %}
