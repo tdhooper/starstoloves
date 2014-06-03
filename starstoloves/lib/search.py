@@ -1,6 +1,7 @@
 from starstoloves.tasks import search_lastfm
 
 from celery.result import AsyncResult
+from celery.task.control import revoke
 
 class LastfmSearch(object):
 
@@ -10,6 +11,9 @@ class LastfmSearch(object):
     def search(self, track_name, artist_name):
         async_result = search_lastfm.delay(self.lastfm_app, track_name, artist_name)
         return self.factory_result(async_result.id)
+
+    def stop(self, ids):
+        revoke(ids)
 
     def result(self, id):
         return self.factory_result(id)

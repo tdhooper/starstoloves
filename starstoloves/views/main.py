@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 
 from starstoloves import forms
 from starstoloves.views.helpers import spotify_connection
-from starstoloves.lib.search import LastfmSearchWithLoves
+from starstoloves.lib.search import LastfmSearch, LastfmSearchWithLoves
 from starstoloves.lib.track import SearchingTrack
 
 def lastfm_connection_ui_context(request):
@@ -94,6 +94,9 @@ def get_searching_tracks_data(request, searcher):
 
 def forget_searching_tracks_data(request):
     if 'tracks_data' in request.session:
+        searcher = LastfmSearch(request.lastfm_app)
+        ids = [track['search']['task_id'] for track in request.session['tracks_data']]
+        searcher.stop(ids)
         del request.session['tracks_data']
 
 def index(request):
