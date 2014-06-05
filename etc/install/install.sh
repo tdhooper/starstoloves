@@ -35,7 +35,7 @@ createdb -Upostgres $DB_NAME
 
 # Install libspotify
 
-sudo apt-get install -y build-essential python-dev
+sudo apt-get install -y build-essential python-dev wget
 
 # from http://pyspotify.mopidy.com/en/latest/installation/
 wget -q -O - https://apt.mopidy.com/mopidy.gpg | sudo apt-key add -
@@ -68,9 +68,14 @@ workon $VIRTUALENV_NAME
 # Install the requirements
 pip install -r requirements.txt
 
+# Install bower, git, and javascript dependencies
+sudo npm install -g bower
+sudo apt-get install -y git
+bower install --config.interactive=false
+
 # Django project setup
 ./manage.py syncdb --noinput
-./manage.py migrate
+./manage.py syncdb
 
 # Kill and restart screen
 screen -S "djangoServer" -X quit

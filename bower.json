@@ -1,0 +1,15 @@
+{
+    "name": "starstoloves",
+    "version": "0.0.1",
+    "homepage": "https://github.com/tdhooper/starstoloves",
+    "authors": [
+        "Thomas Hooper"
+    ],
+    "license": "MIT",
+    "private": true,
+    "dependencies": {
+        "requirejs": "2.1.14",
+        "jquery": "2.1.1",
+        "jasmine": "2.0.0"
+    }
+}
