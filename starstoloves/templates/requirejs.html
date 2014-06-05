@@ -1,0 +1,14 @@
+{% load staticfiles %}
+<script src="{% static 'js/lib/bower_components/requirejs/require.js' %}"></script>
+<script>
+    require.config({
+        baseUrl: '{% static 'js' %}',
+        paths: {
+            'jquery': 'lib/bower_components/jquery/dist/jquery.min',
+        },
+        map: {
+            '*': {'jquery': 'lib/shim/jquery'},
+            'lib/shim/jquery': {'jquery': 'jquery'}
+        }
+    });
+</script>
