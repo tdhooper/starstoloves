@@ -10,6 +10,7 @@
     "dependencies": {
         "requirejs": "2.1.14",
         "jquery": "2.1.1",
-        "jasmine": "2.0.0"
+        "jasmine": "2.0.0",
+        "squire": "0.2.0"
     }
 }
