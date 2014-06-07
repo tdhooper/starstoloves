@@ -7,17 +7,15 @@
     {% with jasminecore='js/lib/bower_components/jasmine/lib/jasmine-core/' %}
         <link rel="shortcut icon" type="image/png" href="{% static jasminecore|add:'jasmine_favicon.png' %}">
         <link rel="stylesheet" type="text/css" href="{% static jasminecore|add:'jasmine.css' %}">
-
-        <script type="text/javascript" src="{% static jasminecore|add:'jasmine.js' %}"></script>
-        <script type="text/javascript" src="{% static jasminecore|add:'jasmine-html.js' %}"></script>
     {% endwith %}
-    <script type="text/javascript" src="{% static 'js/jasmine/boot.js' %}"></script>
 
     {% include 'requirejs.html' %}
     
     <script type="text/javascript">
-        require({{ specs|safe }}, function () {
-            window.executeTests();
+        require(['jasmine/boot'], function() {
+            require({{ specs|safe }}, function(spec) {
+                window.executeTests();
+            });
         });
     </script>
 </head>

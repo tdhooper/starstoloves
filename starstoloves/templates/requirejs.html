@@ -5,6 +5,8 @@
         baseUrl: '{% static 'js' %}',
         paths: {
             'jquery': 'lib/bower_components/jquery/dist/jquery.min',
+            'lib/jasmine': 'lib/bower_components/jasmine/lib/jasmine-core/jasmine',
+            'lib/jasmine-html': 'lib/bower_components/jasmine/lib/jasmine-core/jasmine-html',
             'Squire': 'lib/bower_components/squire/src/Squire',
             'backbone': 'lib/bower_components/backbone/backbone',
             'underscore': 'lib/bower_components/underscore/underscore'
@@ -18,6 +20,15 @@
             'lib/shim/jquery': {'jquery': 'jquery'},
             'lib/shim/underscore': {'underscore': 'underscore'},
             'lib/shim/backbone': {'backbone': 'backbone'}
+        },
+        shim: {
+            'lib/jasmine': {
+                exports: 'jasmineRequire'
+            },
+            'lib/jasmine-html': {
+                deps: ['lib/jasmine'],
+                exports: 'jasmineRequire'
+            }
         }
     });
 </script>

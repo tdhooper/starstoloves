@@ -12,7 +12,7 @@
  [jasmine-gem]: http://github.com/pivotal/jasmine-gem
  */
 
-(function() {
+define(['lib/jasmine-html'], function(jasmineRequire) {
 
   /**
    * ## Require &amp; Instantiate
@@ -104,6 +104,7 @@
   /**
    * Expose the mock interface for the JavaScript timeout functions
    */
+   
   jasmine.clock = function() {
     return env.clock;
   };
@@ -179,4 +180,4 @@
     return destination;
   }
 
-}());
+});
