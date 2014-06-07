@@ -12,9 +12,14 @@
     {% include 'requirejs.html' %}
     
     <script type="text/javascript">
-        require(['jasmine/boot'], function() {
-            require({{ specs|safe }}, function(spec) {
-                window.executeTests();
+        require(['jquery', 'jasmine/boot'], function($) {
+            window.jQuery = $;
+            require(['lib/jasmine-jquery'], function() {
+                jasmine.getFixtures().fixturesPath = "{% static 'js/_spec/fixtures' %}";
+                delete window.jQuery;
+                require({{ specs|safe }}, function(spec) {
+                    window.executeTests();
+                });
             });
         });
     </script>

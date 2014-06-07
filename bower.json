@@ -11,6 +11,7 @@
         "requirejs": "2.1.14",
         "jquery": "2.1.1",
         "jasmine": "2.0.0",
+        "jasmine-jquery": "tepez-opensource/jasmine-jquery#35adb19bbcc9ace929e20b2a841c23a216760448",
         "squire": "0.2.0",
         "backbone": "1.1.2"
     }
