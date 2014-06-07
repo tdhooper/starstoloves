@@ -6,10 +6,18 @@
         paths: {
             'jquery': 'lib/bower_components/jquery/dist/jquery.min',
             'Squire': 'lib/bower_components/squire/src/Squire',
+            'backbone': 'lib/bower_components/backbone/backbone',
+            'underscore': 'lib/bower_components/underscore/underscore'
         },
         map: {
-            '*': {'jquery': 'lib/shim/jquery'},
-            'lib/shim/jquery': {'jquery': 'jquery'}
+            '*': {
+                'jquery': 'lib/shim/jquery',
+                'underscore': 'lib/shim/underscore',
+                'backbone': 'lib/shim/backbone'
+            },
+            'lib/shim/jquery': {'jquery': 'jquery'},
+            'lib/shim/underscore': {'underscore': 'underscore'},
+            'lib/shim/backbone': {'backbone': 'backbone'}
         }
     });
 </script>
