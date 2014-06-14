@@ -59,6 +59,9 @@ define([
                 results.fetch({
                     success: function() {
                         setTimeout(update, 100);
+                    },
+                    data: {
+                        state: results.toJSON()
                     }
                 });
             };

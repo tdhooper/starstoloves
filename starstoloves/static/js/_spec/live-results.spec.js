@@ -64,6 +64,16 @@ define(['Squire', 'jquery'], function(Squire, $) {
                 expect(results.fetch).toHaveBeenCalled();
             });
 
+            it('sends the current state with the fetch', function() {
+                var options = results.fetch.calls.mostRecent().args[0]
+                expect(options.data.state).toEqual([
+                    {status: 'SUCCESS'},
+                    {status: 'FAILED'},
+                    {status: 'SUCCESS'},
+                    {status: 'PENDING'}
+                ]);
+            });
+
             describe('when the fetch succeeds', function() {
 
                 beforeEach(function() {
