@@ -1,4 +1,4 @@
-define(['Squire', 'jquery'], function(Squire, $) {
+define(['Squire', 'jquery', 'backbone'], function(Squire, $, Backbone) {
     "use strict";
 
     describe("Live Results", function() {
@@ -13,15 +13,18 @@ define(['Squire', 'jquery'], function(Squire, $) {
             resultElements = $('.js-result', $el);
             var injector = new Squire();
 
+            spyOn(Backbone, 'sync');
+
             ResultView = jasmine.createSpy('ResultView');
-            injector.mock('result.view', ResultView);            
-            
+            injector.mock('result.view', ResultView);
+            injector.mock('backbone', Backbone);
+
             injector.require(['live-results'], function(LiveResults) {
                 liveResults = new LiveResults($el, 'some-url');
                 var createResults = liveResults.createResults;
                 spyOn(liveResults, 'createResults').and.callFake(function() {
                     results = createResults();
-                    spyOn(results, 'fetch');
+                    spyOn(results, 'fetch').and.callThrough();
                     return results;
                 });
                 done();
@@ -38,13 +41,11 @@ define(['Squire', 'jquery'], function(Squire, $) {
 
             it("initialises a Results collection with Result models for the existing html", function() {
                 expect(liveResults.createResults).toHaveBeenCalled();
-                var modelsData = results.models.map(function(model) {
-                    return model.toJSON();
-                });
-                expect(modelsData).toEqual([
+                expect(results.toJSON()).toEqual([
                     {status: 'SUCCESS'},
                     {status: 'FAILED'},
                     {status: 'SUCCESS'},
+                    {status: 'PENDING'},
                     {status: 'PENDING'}
                 ]);
             });
@@ -70,19 +71,43 @@ define(['Squire', 'jquery'], function(Squire, $) {
                     {status: 'SUCCESS'},
                     {status: 'FAILED'},
                     {status: 'SUCCESS'},
+                    {status: 'PENDING'},
                     {status: 'PENDING'}
                 ]);
             });
 
             describe('when the fetch succeeds', function() {
 
+                var triggerSuccess = function(data) {
+                    Backbone.sync.calls.mostRecent().args[2].success(data);
+                }
+
+                var responseData;
+
                 beforeEach(function() {
                     jasmine.clock().install();
-                    results.fetch.calls.mostRecent().args[0].success();
+                    responseData = [
+                        {status: 'SUCCESS'},
+                        {status: 'FAILED'},
+                        {status: 'SUCCESS'},
+                        {status: 'SUCCESS'},
+                        {status: 'PENDING'}
+                    ];
+                    triggerSuccess(responseData);
                 });
 
                 afterEach(function() {
                     jasmine.clock().uninstall();
+                });
+
+                it('updates the models', function() {
+                    expect(results.toJSON()).toEqual([
+                        {status: 'SUCCESS'},
+                        {status: 'FAILED'},
+                        {status: 'SUCCESS'},
+                        {status: 'SUCCESS'},
+                        {status: 'PENDING'}
+                    ]);
                 });
 
                 it('does not immediately do another fetch', function() {
@@ -96,9 +121,9 @@ define(['Squire', 'jquery'], function(Squire, $) {
 
                 it('continues to fetch at intervals', function() {
                     jasmine.clock().tick(101);
-                    results.fetch.calls.mostRecent().args[0].success();
+                    triggerSuccess(responseData);
                     jasmine.clock().tick(101);
-                    results.fetch.calls.mostRecent().args[0].success();
+                    triggerSuccess(responseData);
                     jasmine.clock().tick(101);
                     expect(results.fetch.calls.count()).toBe(4)
                 });
@@ -106,11 +131,13 @@ define(['Squire', 'jquery'], function(Squire, $) {
                 describe('when no more models are pending', function() {
 
                     beforeEach(function() {
-                        results.models.forEach(function(model) {
-                            model.set({
-                                status: 'not pending'
-                            });
-                        });
+                        triggerSuccess([
+                            {status: 'SUCCESS'},
+                            {status: 'FAILED'},
+                            {status: 'SUCCESS'},
+                            {status: 'SUCCESS'},
+                            {status: 'FAILED'}
+                        ]);
                     });
 
                     it('stops fetching', function() {
