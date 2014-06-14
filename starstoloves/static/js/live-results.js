@@ -31,7 +31,8 @@ define([
             $('.js-result', $el).each(function(index, result) {
                 $result = $(result);
                 model = new ResultModel({
-                    status: $result.data('status')
+                    status: $result.data('status'),
+                    id: String($result.data('id'))
                 });
                 view = new ResultView({
                     el: result,
@@ -62,7 +63,8 @@ define([
                     },
                     data: {
                         state: results.toJSON()
-                    }
+                    },
+                    remove: false
                 });
             };
 

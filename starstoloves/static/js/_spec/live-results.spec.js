@@ -42,11 +42,11 @@ define(['Squire', 'jquery', 'backbone'], function(Squire, $, Backbone) {
             it("initialises a Results collection with Result models for the existing html", function() {
                 expect(liveResults.createResults).toHaveBeenCalled();
                 expect(results.toJSON()).toEqual([
-                    {status: 'SUCCESS'},
-                    {status: 'FAILED'},
-                    {status: 'SUCCESS'},
-                    {status: 'PENDING'},
-                    {status: 'PENDING'}
+                    {status: 'SUCCESS', id: '0'},
+                    {status: 'FAILED',  id: '1'},
+                    {status: 'SUCCESS', id: '2'},
+                    {status: 'PENDING', id: '3'},
+                    {status: 'PENDING', id: '4'}
                 ]);
             });
 
@@ -68,11 +68,11 @@ define(['Squire', 'jquery', 'backbone'], function(Squire, $, Backbone) {
             it('sends the current state with the fetch', function() {
                 var options = results.fetch.calls.mostRecent().args[0]
                 expect(options.data.state).toEqual([
-                    {status: 'SUCCESS'},
-                    {status: 'FAILED'},
-                    {status: 'SUCCESS'},
-                    {status: 'PENDING'},
-                    {status: 'PENDING'}
+                    {status: 'SUCCESS', id: '0'},
+                    {status: 'FAILED',  id: '1'},
+                    {status: 'SUCCESS', id: '2'},
+                    {status: 'PENDING', id: '3'},
+                    {status: 'PENDING', id: '4'}
                 ]);
             });
 
@@ -87,11 +87,7 @@ define(['Squire', 'jquery', 'backbone'], function(Squire, $, Backbone) {
                 beforeEach(function() {
                     jasmine.clock().install();
                     responseData = [
-                        {status: 'SUCCESS'},
-                        {status: 'FAILED'},
-                        {status: 'SUCCESS'},
-                        {status: 'SUCCESS'},
-                        {status: 'PENDING'}
+                        {status: 'SUCCESS', id: '3'}
                     ];
                     triggerSuccess(responseData);
                 });
@@ -102,11 +98,11 @@ define(['Squire', 'jquery', 'backbone'], function(Squire, $, Backbone) {
 
                 it('updates the models', function() {
                     expect(results.toJSON()).toEqual([
-                        {status: 'SUCCESS'},
-                        {status: 'FAILED'},
-                        {status: 'SUCCESS'},
-                        {status: 'SUCCESS'},
-                        {status: 'PENDING'}
+                        {status: 'SUCCESS', id: '0'},
+                        {status: 'FAILED',  id: '1'},
+                        {status: 'SUCCESS', id: '2'},
+                        {status: 'SUCCESS', id: '3'},
+                        {status: 'PENDING', id: '4'}
                     ]);
                 });
 
@@ -132,11 +128,7 @@ define(['Squire', 'jquery', 'backbone'], function(Squire, $, Backbone) {
 
                     beforeEach(function() {
                         triggerSuccess([
-                            {status: 'SUCCESS'},
-                            {status: 'FAILED'},
-                            {status: 'SUCCESS'},
-                            {status: 'SUCCESS'},
-                            {status: 'FAILED'}
+                            {status: 'FAILED', id: '4'}
                         ]);
                     });
 
