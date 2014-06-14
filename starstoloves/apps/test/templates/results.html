@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <ul class="js-results-list">
+        <li>
+            <strong>Modeselektor - Das Claudia Woelky Massaker</strong>
+            <div class="js-result" data-status="SUCCESS">
+                <ul>
+                    <li>
+                        <a href="http://www.last.fm/music/Modeselektor/_/Das+Claudia+Woelky+Massaker">Modeselektor - Das Claudia Woelky Massaker</a>
+                    </li>
+                    <li>
+                        <a href="http://www.last.fm/music/Modeselektor/_/01+das+claudia+woelky+massaker">Modeselektor - 01 das claudia woelky massaker</a>
+                    </li>
+                    <li>
+                        <a href="http://www.last.fm/music/Modeselektor/_/Das+Claudia+Woelky+Massaker+-+Original+Mix">Modeselektor - Das Claudia Woelky Massaker - Original Mix</a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+        <li>
+            <strong>The Bloody Beetroots - It’s Better A DJ On 2 turntables</strong>
+            <div class="js-result" data-status="FAILED">
+                <p>
+                    Last.fm search failed, <a href="http://www.last.fm/search?q=The%20Bloody%20Beetroots%20It%E2%80%99s%20Better%20A%20DJ%20On%202%20turntables&amp;type=track">try searching manually</a>
+                </p>
+            </div>
+        </li>
+        <li>
+            <strong>A.S.Y.S. - No More Fucking Rock´n´ Roll</strong>
+            <div class="js-result" data-status="SUCCESS">
+                <p>
+                    No Last.fm tracks found, <a href="http://www.last.fm/search?q=A.S.Y.S.%20No%20More%20Fucking%20Rock%C2%B4n%C2%B4%20Roll&amp;type=track">try searching manually</a>
+                </p>
+            </div>
+        </li>
+        <li>
+            <strong>Booka Shade - Karma Car</strong>
+            <div class="js-result" data-status="PENDING"></div>
+        </li>
+    </ul>
+
+    <script>
+        require(['jquery', 'live-results'], function($, LiveResults) {
+            $el = $('.js-results-list');
+            var liveResults = new LiveResults($el, 'someurl');
+            liveResults.start();
+        });
+    </script>
+
+{% endblock %}

@@ -8,4 +8,5 @@ urlpatterns = patterns('',
     url(r'^disconnect-spotify/$',   main.disconnectSpotify, name='disconnect_spotify'),
 
     url(r'^specs/', include('starstoloves.apps.jasmine.urls', namespace='specs')),
+    url(r'^test/', include('starstoloves.apps.test.urls', namespace='test')),
 )
