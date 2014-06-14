@@ -1,7 +1,11 @@
+import json
+import re
+
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
+from django.http import HttpResponse, HttpResponseServerError
 
 from starstoloves import forms
 from starstoloves.views.helpers import spotify_connection
@@ -99,6 +103,11 @@ def forget_searching_tracks_data(request):
         searcher.stop(ids)
         del request.session['tracks_data']
 
+def get_tracks(request):
+    loved_tracks_urls = get_loved_tracks_urls(request)
+    searcher = LastfmSearchWithLoves(request.lastfm_app, loved_tracks_urls)
+    return get_searching_tracks_data(request, searcher)
+
 def index(request):
     context = {}
     session = request.session
@@ -113,11 +122,28 @@ def index(request):
         context.update(spotify_connection_ui_context(request, form))
 
     if request.spotify_connection.is_connected():
-        loved_tracks_urls = get_loved_tracks_urls(request)
-        searcher = LastfmSearchWithLoves(request.lastfm_app, loved_tracks_urls)
-        context['tracks'] = get_searching_tracks_data(request, searcher)
+        context['tracks'] = get_tracks(request)
 
     return render_to_response('index.html', context_instance=RequestContext(request, context))
+
+def resultUpdate(request):
+    if request.spotify_connection.is_connected():
+        tracks = get_tracks(request)
+        results = [track['search'] for track in tracks]
+        status_by_id = {
+            re.search('status\[(.+)\]', key).groups()[0]: value
+            for key, value in request.GET.items()
+        }
+        if status_by_id:
+            results = [
+                result
+                for result in results
+                if
+                    not result['id'] in status_by_id
+                    or result['status'] != status_by_id[result['id']]
+            ]
+        return HttpResponse(json.dumps(results), content_type="application/json")
+    return HttpResponse('No results', status=401)
 
 def connectLastfm(request):
     if request.lastfm_connection.is_connected():

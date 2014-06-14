@@ -57,12 +57,16 @@ define([
                 if (isComplete()) {
                     return;
                 }
+                var status = {};
+                results.forEach(function(model) {
+                    status[model.get('id')] = model.get('status')
+                });
                 results.fetch({
                     success: function() {
                         setTimeout(update, 100);
                     },
                     data: {
-                        state: results.toJSON()
+                        status: status
                     },
                     remove: false
                 });

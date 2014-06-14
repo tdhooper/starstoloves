@@ -1,0 +1,39 @@
+[
+  {
+    "date_saved": 1273805904,
+    "search": {
+      "status": "SUCCESS",
+      "tracks": "sometracks",
+      "id": "0"
+    },
+    "artist_name": "Modeselektor",
+    "track_name": "Das Claudia Woelky Massaker"
+  },
+  {
+    "date_saved": 1275498329,
+    "search": {
+      "status": "FAILURE",
+      "id": "1"
+    },
+    "artist_name": "The Bloody Beetroots",
+    "track_name": "It’s Better A DJ On 2 turntables"
+  },
+  {
+    "date_saved": 1276307158,
+    "search": {
+      "status": "SUCCESS",
+      "id": "2"
+    },
+    "artist_name": "A.S.Y.S.",
+    "track_name": "No More Fucking Rock´n´ Roll"
+  },
+  {
+    "date_saved": 1291293467,
+    "search": {
+      "status": "PENDING",
+      "id": "3"
+    },
+    "artist_name": "Booka Shade",
+    "track_name": "No Difference"
+  }
+]

@@ -65,15 +65,15 @@ define(['Squire', 'jquery', 'backbone'], function(Squire, $, Backbone) {
                 expect(results.fetch).toHaveBeenCalled();
             });
 
-            it('sends the current state with the fetch', function() {
+            it('sends the current status state with the fetch', function() {
                 var options = results.fetch.calls.mostRecent().args[0]
-                expect(options.data.state).toEqual([
-                    {status: 'SUCCESS', id: '0'},
-                    {status: 'FAILED',  id: '1'},
-                    {status: 'SUCCESS', id: '2'},
-                    {status: 'PENDING', id: '3'},
-                    {status: 'PENDING', id: '4'}
-                ]);
+                expect(options.data.status).toEqual({
+                    '0': 'SUCCESS',
+                    '1': 'FAILED',
+                    '2': 'SUCCESS',
+                    '3': 'PENDING',
+                    '4': 'PENDING',
+                });
             });
 
             describe('when the fetch succeeds', function() {
