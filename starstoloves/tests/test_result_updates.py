@@ -26,9 +26,7 @@ class TestResultUpdate(TestCase):
         self.patcher.stop()
 
     def test_returns_all_search_results_by_default(self):
-        request = self.factory.get('/update-tracks')
-        request.spotify_connection = MagicMock(SpotifyConnectionHelper)
-        response = main.resultUpdate(request)
+        response = self.makeRequest('/update-tracks')
         response_data = json.loads(response.content.decode("utf-8"))
         expected_data = [
             {'status': 'SUCCESS', 'id': '0', 'tracks': 'sometracks'},
@@ -45,9 +43,7 @@ class TestResultUpdate(TestCase):
             'status[2]': 'SUCCESS',
             'status[3]': 'PENDING',
         })
-        request = self.factory.get('/update-tracks?' + query)
-        request.spotify_connection = MagicMock(SpotifyConnectionHelper)
-        response = main.resultUpdate(request)
+        response = self.makeRequest('/update-tracks?' + query)
         response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual(response_data, [])
 
@@ -58,9 +54,7 @@ class TestResultUpdate(TestCase):
             'status[2]': 'PENDING',
             'status[3]': 'PENDING',
         })
-        request = self.factory.get('/update-tracks?' + query)
-        request.spotify_connection = MagicMock(SpotifyConnectionHelper)
-        response = main.resultUpdate(request)
+        response = self.makeRequest('/update-tracks?' + query)
         response_data = json.loads(response.content.decode("utf-8"))
         expected_data = [
             {'status': 'FAILURE', 'id': '1'},
@@ -74,9 +68,7 @@ class TestResultUpdate(TestCase):
             'status[1]': 'PENDING',
             'status[2]': 'PENDING',
         })
-        request = self.factory.get('/update-tracks?' + query)
-        request.spotify_connection = MagicMock(SpotifyConnectionHelper)
-        response = main.resultUpdate(request)
+        response = self.makeRequest('/update-tracks?' + query)
         response_data = json.loads(response.content.decode("utf-8"))
         expected_data = [
             {'status': 'FAILURE', 'id': '1'},
@@ -84,3 +76,9 @@ class TestResultUpdate(TestCase):
             {'status': 'PENDING', 'id': '3'},
         ]
         self.assertEqual(response_data, expected_data)
+
+    def makeRequest(self, url):
+        request = self.factory.get(url)
+        request.spotify_connection = MagicMock(SpotifyConnectionHelper)
+        return main.resultUpdate(request)
+
