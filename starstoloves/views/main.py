@@ -4,7 +4,7 @@ import re
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.http import HttpResponse, HttpResponseServerError
 
 from starstoloves import forms
@@ -129,19 +129,26 @@ def index(request):
 def resultUpdate(request):
     if request.spotify_connection.is_connected():
         tracks = get_tracks(request)
-        results = [track['search'] for track in tracks]
         status_by_id = {
             re.search('status\[(.+)\]', key).groups()[0]: value
-            for key, value in request.GET.items()
+            for key, value in request.POST.items()
         }
         if status_by_id:
-            results = [
-                result
-                for result in results
+            tracks = [
+                track
+                for track in tracks
                 if
-                    not result['id'] in status_by_id
-                    or result['status'] != status_by_id[result['id']]
+                    not track['search']['id'] in status_by_id
+                    or track['search']['status'] != status_by_id[track['search']['id']]
             ]
+        results = [
+            {
+                'id': track['search']['id'],
+                'status': track['search']['status'],
+                'html': render(request, 'result.html', {'track': track}).content.decode("utf-8"),
+            }
+            for track in tracks
+        ]
         return HttpResponse(json.dumps(results), content_type="application/json")
     return HttpResponse('No results', status=401)
 
