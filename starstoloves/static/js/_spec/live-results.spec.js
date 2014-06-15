@@ -63,6 +63,8 @@ define(['Squire', 'jquery', 'backbone'], function(Squire, $, Backbone) {
 
             it('fetches the latest results', function() {
                 expect(results.fetch).toHaveBeenCalled();
+                expect(results.fetch.calls.mostRecent().args[0].type).toBe('POST');
+                expect(results.fetch.calls.mostRecent().args[0].headers['X-CSRFToken']).toBe('sometoken');
             });
 
             it('sends the current status state with the fetch', function() {

@@ -45,6 +45,7 @@ define([
         };
 
         that.update = function() {
+            var token = $el.data('csrf-token');
 
             var isComplete = function() {
                 var pending = results.detect(function(model) {
@@ -62,6 +63,10 @@ define([
                     status[model.get('id')] = model.get('status')
                 });
                 results.fetch({
+                    type: 'POST',
+                    headers: {
+                        'X-CSRFToken': token
+                    },
                     success: function() {
                         setTimeout(update, 100);
                     },
