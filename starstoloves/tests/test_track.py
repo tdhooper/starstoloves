@@ -14,7 +14,7 @@ class TestSearchingTrack(unittest.TestCase):
 
         MockLastfmSearchResult = MagicMock(spec=LastfmSearchResult)
         self.search_result = MockLastfmSearchResult('some_id')
-        self.search_result.data = {'task_id': 'some_id', 'status': 'PENDING'}
+        self.search_result.data = {'id': 'some_id', 'status': 'PENDING'}
 
         def search_side_effect(track_name, artist_name):
             return self.search_result
@@ -43,7 +43,7 @@ class TestSearchingTrack(unittest.TestCase):
         self.assertEqual(self.search.search.call_count, 1)
 
     def test_search_doesnt_create_a_new_search_when_given_result_data(self):
-        result_data = {'task_id': 'some_id', 'status': 'PENDING'}
+        result_data = {'id': 'some_id', 'status': 'PENDING'}
         track = SearchingTrack('some_track_name', 'some_artist_name', 1275493486, self.search, result_data)
         track.search
         self.assertFalse(self.search.search.called)
@@ -54,7 +54,7 @@ class TestSearchingTrack(unittest.TestCase):
         self.search.result.assert_called_with('some_id')
 
     def test_search_retrieves_the_search_result_when_given_result_data(self):
-        result_data = {'task_id': 'some_other_id', 'status': 'PENDING'}
+        result_data = {'id': 'some_other_id', 'status': 'PENDING'}
         track = SearchingTrack('some_track_name', 'some_artist_name', 1275493486, self.search, result_data)
         track.search
         self.search.result.assert_called_with('some_other_id')

@@ -20,9 +20,9 @@ class TestLastfmSearchResult(unittest.TestCase):
     def test_data_fetches_the_async_result(self):
         self.MockAsyncResult.assert_called_with('some_id')
 
-    def test_data_has_a_task_id(self):
+    def test_data_has_an_id(self):
         self.mock_async_result.id = 'some_id'
-        self.assertEqual(self.result.data['task_id'], 'some_id')
+        self.assertEqual(self.result.data['id'], 'some_id')
 
     def test_data_has_a_status(self):
         self.mock_async_result.status = 'SOME_STATUS'

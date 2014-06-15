@@ -99,7 +99,7 @@ def get_searching_tracks_data(request, searcher):
 def forget_searching_tracks_data(request):
     if 'tracks_data' in request.session:
         searcher = LastfmSearch(request.lastfm_app)
-        ids = [track['search']['task_id'] for track in request.session['tracks_data']]
+        ids = [track['search']['id'] for track in request.session['tracks_data']]
         searcher.stop(ids)
         del request.session['tracks_data']
 

@@ -13,7 +13,7 @@ class SearchingTrack:
             search_result = self.searcher.search(self.track_name, self.artist_name)
             self.search_result_data = search_result.data
         elif self.search_result_data['status'] not in ['SUCCESS', 'FAILURE']:
-            search_result = self.searcher.result(self.search_result_data['task_id'])
+            search_result = self.searcher.result(self.search_result_data['id'])
             self.search_result_data = search_result.data
         return self.search_result_data
 

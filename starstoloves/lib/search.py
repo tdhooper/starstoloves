@@ -47,7 +47,7 @@ class LastfmSearchResult(object):
     @property
     def data(self):
         data = {
-            'task_id': self.async_result.id,
+            'id': self.async_result.id,
             'status': self.async_result.status
         }
         if self.async_result.ready():
