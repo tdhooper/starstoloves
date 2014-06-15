@@ -28,7 +28,7 @@
             <h2 class="step-disabled">Step 3: Select tracks</h2>
         {% else %}
             <h2>Step 3: Select tracks</h2>
-            <ul class="js-results-list">
+            <ul class="js-results-list" data-csrf-token="{{ csrf_token }}">
             {% for track in tracks %}
                 <li>
                     <strong>{{track.artist_name}} - {{track.track_name}}</strong> - {{track.date_saved}}
@@ -36,6 +36,14 @@
                 </li>
             {% endfor %}
             </ul>
+
+            <script>
+                require(['jquery', 'live-results'], function($, LiveResults) {
+                    $el = $('.js-results-list');
+                    var liveResults = new LiveResults($el, 'result-update');
+                    liveResults.start();
+                });
+            </script>
         {% endif %}
 
 {% endblock %}
