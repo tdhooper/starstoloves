@@ -3,21 +3,27 @@ define(['Squire', 'jquery', 'backbone'], function(Squire, $, Backbone) {
 
     describe("Live Results", function() {
 
-        var results,
+        var $el,
+            results,
             ResultView,
+            ToggleMore,
+            toggleMore,
             liveResults,
             resultElements;
 
         beforeEach(function(done) {
-            var $el = $(jasmine.getFixtures().read('results-list.html'));
+            $el = $(jasmine.getFixtures().read('results-list.html'));
             resultElements = $('.js-result', $el);
             var injector = new Squire();
 
             spyOn(Backbone, 'sync');
-
             ResultView = jasmine.createSpy('ResultView');
+            toggleMore = jasmine.createSpyObj('toggleMore', ['start', 'update']);
+            ToggleMore = jasmine.createSpy('ToggleMore').and.returnValue(toggleMore);
+
             injector.mock('result.view', ResultView);
             injector.mock('backbone', Backbone);
+            injector.mock('toggle-more', ToggleMore);
 
             injector.require(['live-results'], function(LiveResults) {
                 liveResults = new LiveResults($el, 'some-url');
@@ -31,6 +37,10 @@ define(['Squire', 'jquery', 'backbone'], function(Squire, $, Backbone) {
             });
         });
 
+        it('creates a Toggle More', function() {
+            expect(ToggleMore).toHaveBeenCalledWith($el);
+        });
+
         describe("when start is called", function() {
 
             var models;
@@ -39,14 +49,19 @@ define(['Squire', 'jquery', 'backbone'], function(Squire, $, Backbone) {
                 liveResults.start();
             });
 
+            it('starts the Toggle More', function() {
+                expect(toggleMore.start).toHaveBeenCalled();
+            });
+
             it("initialises a Results collection with Result models for the existing html", function() {
                 expect(liveResults.createResults).toHaveBeenCalled();
                 expect(results.toJSON()).toEqual([
                     {status: 'SUCCESS', id: '0'},
-                    {status: 'FAILED',  id: '1'},
-                    {status: 'SUCCESS', id: '2'},
-                    {status: 'PENDING', id: '3'},
-                    {status: 'PENDING', id: '4'}
+                    {status: 'SUCCESS', id: '1'},
+                    {status: 'FAILED',  id: '2'},
+                    {status: 'SUCCESS', id: '3'},
+                    {status: 'PENDING', id: '4'},
+                    {status: 'PENDING', id: '5'}
                 ]);
             });
 
@@ -71,10 +86,11 @@ define(['Squire', 'jquery', 'backbone'], function(Squire, $, Backbone) {
                 var options = results.fetch.calls.mostRecent().args[0]
                 expect(options.data.status).toEqual({
                     '0': 'SUCCESS',
-                    '1': 'FAILED',
-                    '2': 'SUCCESS',
-                    '3': 'PENDING',
+                    '1': 'SUCCESS',
+                    '2': 'FAILED',
+                    '3': 'SUCCESS',
                     '4': 'PENDING',
+                    '5': 'PENDING',
                 });
             });
 
@@ -89,7 +105,7 @@ define(['Squire', 'jquery', 'backbone'], function(Squire, $, Backbone) {
                 beforeEach(function() {
                     jasmine.clock().install();
                     responseData = [
-                        {status: 'SUCCESS', id: '3'}
+                        {status: 'SUCCESS', id: '4'}
                     ];
                     triggerSuccess(responseData);
                 });
@@ -101,11 +117,16 @@ define(['Squire', 'jquery', 'backbone'], function(Squire, $, Backbone) {
                 it('updates the models', function() {
                     expect(results.toJSON()).toEqual([
                         {status: 'SUCCESS', id: '0'},
-                        {status: 'FAILED',  id: '1'},
-                        {status: 'SUCCESS', id: '2'},
+                        {status: 'SUCCESS', id: '1'},
+                        {status: 'FAILED',  id: '2'},
                         {status: 'SUCCESS', id: '3'},
-                        {status: 'PENDING', id: '4'}
+                        {status: 'SUCCESS', id: '4'},
+                        {status: 'PENDING', id: '5'}
                     ]);
+                });
+
+                it('updates the Toggle More', function() {
+                    expect(toggleMore.update).toHaveBeenCalled();
                 });
 
                 it('does not immediately do another fetch', function() {
@@ -130,7 +151,7 @@ define(['Squire', 'jquery', 'backbone'], function(Squire, $, Backbone) {
 
                     beforeEach(function() {
                         triggerSuccess([
-                            {status: 'FAILED', id: '4'}
+                            {status: 'FAILED', id: '5'}
                         ]);
                     });
 

@@ -38,3 +38,7 @@ h2 {
 .error-text {
     color: #f33;
 }
+
+.hide {
+    display: none;
+}

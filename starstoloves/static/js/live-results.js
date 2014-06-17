@@ -2,12 +2,14 @@ define([
     'jquery',
     'result.model',
     'result.view',
-    'results.collection'
+    'results.collection',
+    'toggle-more'
 ], function(
     $,
     ResultModel,
     ResultView,
-    Results
+    Results,
+    ToggleMore
 ) {
     "use strict";
 
@@ -15,11 +17,14 @@ define([
 
         var that = this;
         var results;
+        var toggleMore = new ToggleMore($el);
 
         that.start = function() {
+            toggleMore.start();
             results = that.createResults();
             results.url = url;
             that.update();
+            results.on('change', toggleMore.update);
         };
 
         that.createResults = function() {
