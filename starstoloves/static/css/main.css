@@ -1,22 +1,76 @@
 html {
-    font-family: Helvetica, Arial, sans-serif;
+    font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
     font-size: 14px;
+    line-height: 24px;
+}
+
+body {
+    color: #1b1b1b;
+}
+
+.main {
+    margin: 0 40px;
+}
+
+header {
+    position: relative;
+    margin: 30px 0 50px;
+    font-size: 35px;
+}
+
+header:before {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: 0.14em;
+    width: 100%;
+    height: 3px;
+    background-color: #1b1b1b;
+}
+
+h1 {
+    text-align: center;
+    font-weight: normal;
+    background: #fff;
+    display: inline;
+    position: relative;
+    padding-right: 0.3em;
+    margin-right: 0.6em;
+    line-height: 1;
+    vertical-align: text-bottom;
+    font-size: 1em;
 }
 
 h2 {
     font-weight: normal;
-    font-size: 20px;
+    margin: 0;
 }
 
-.sp-connect-heading,
-.sp-connect-form,
+.step-disabled {
+    color: #aaa;
+}
+
+.step {
+    margin: 0 0 24px;
+    font-size: 20px;
+    line-height: 30px;
+}
+
+.step h2 {
+    font-size: inherit;
+}
+
+.step-counter {
+    display: block;
+    color: #aaa;
+}
+
+.instruction {
+    display: block;
+}
+
 .sp-connect-form p {
-    display: inline;
-}
-
-.sp-connect-form input {
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: 20px;
+    margin: 6px 0 12px;
 }
 
 /* .visuallyhidden */
@@ -31,14 +85,74 @@ h2 {
     width: 1px;
 }
 
-.step-disabled {
-    color: #ccc;
+.step-error,
+.errorlist {
+    margin: 6px 0 0;
+    color: #f33;
 }
 
-.error-text {
-    color: #f33;
+.errorlist {
+    margin-bottom: 12px;
 }
 
 .hide {
     display: none;
+}
+
+ul {
+    padding: 0;
+    list-style-type: none;
+    margin-bottom: 12px;
+}
+
+@media (min-width: 450px) {
+
+    .main {
+        padding-left: 100px;
+    }
+
+    .step-counter {
+        float: left;
+        margin-left: -100px;
+    }
+}
+
+@media (min-width: 550px) {
+
+    header {
+        font-size: 45px;
+    }
+
+    .sp-connect-form p {
+        display: inline-block;
+        margin-bottom: 0;
+    }
+}
+
+@media (min-width: 650px) {
+
+    header {
+        font-size: 60px;
+    }
+}
+
+@media (min-width: 780px) {
+
+    .main {
+        margin: 0 auto;
+        width: 600px;
+    }
+
+    .instruction {
+        display: inline;
+    }
+
+    .sp-connect-form p {
+        margin: 0;
+    }
+
+    .sp-connect-heading,
+    .sp-connect-form {
+        display: inline;
+    }
 }

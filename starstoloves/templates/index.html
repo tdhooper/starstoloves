@@ -2,48 +2,55 @@
 
 {% block content %}
 
-        {% if lfmUsername %}
-            <h2>Step 1: Connected to Last.fm as <strong>{{lfmUsername}}</strong>
-            {% if not spUsername %}
-                (<a href="{{lfmDisconnectUrl}}">disconnect</a>)</h2>
-            {% endif %}    
-        {% else %}
-            <h2>Step 1: {% if lfmConnectFailure %}<em class="error-text">Authentication failed</em> {% endif %}<a href="{{lfmConnectUrl}}">Connect to Last.fm</a></h2>
-        {% endif %}
+        <div class="step">
+            {% if lfmUsername %}
+                <h2><span class="step-counter">Step 1:</span> <span class="instruction">Connected to Last.fm as</span> <strong>{{lfmUsername}}</strong>
+                {% if not spUsername %}
+                    (<a href="{{lfmDisconnectUrl}}">disconnect</a>)</h2>
+                {% endif %}    
+            {% else %}
+                <h2><span class="step-counter">Step 1:</span> <a href="{{lfmConnectUrl}}">Connect to Last.fm</a></h2>
+                {% if lfmConnectFailure %}<p class="step-error">Authentication failed</p> {% endif %}
+            {% endif %}
+        </div>
             
-        {% if spUsername %}
-            <h2>Step 2: Connected to Spotify as <strong>{{spUsername}}</strong> (<a href="{{spDisconnectUrl}}">disconnect</a>)</h2>
-        {% elif spForm %}
-            <h2 class="sp-connect-heading">Step 2: Connect to Spotify:</h2>
-            <form action="{{spConnectUrl}}" method="POST" class="sp-connect-form">
-                {% csrf_token %}
-                {{spForm.as_p}}
-                <input type="submit" />
-            </form>
-        {% else %}
-            <h2 class="sp-connect-heading step-disabled">Step 2: Connect to Spotify</h2>
-        {% endif %}
+        <div class="step">
+            {% if spUsername %}
+                <h2><span class="step-counter">Step 2:</span> <span class="instruction">Connected to Spotify as</span> <strong>{{spUsername}}</strong> (<a href="{{spDisconnectUrl}}">disconnect</a>)</h2>
+            {% elif spForm %}
+                <h2 class="sp-connect-heading"><span class="step-counter">Step 2:</span> Connect to Spotify:</h2>
+                <form action="{{spConnectUrl}}" method="POST" class="sp-connect-form">
+                    {% csrf_token %}
+                    {{spForm.as_p}}
+                    <input type="submit" />
+                </form>
+            {% else %}
+                <h2 class="sp-connect-heading step-disabled"><span class="step-counter">Step 3:</span> Connect to Spotify</h2>
+            {% endif %}
+        </div>
 
-        {% if not tracks %}
-            <h2 class="step-disabled">Step 3: Select tracks</h2>
-        {% else %}
-            <h2>Step 3: Select tracks</h2>
-            <ul class="js-results-list" data-csrf-token="{{ csrf_token }}">
-            {% for track in tracks %}
-                <li>
-                    <strong>{{track.artist_name}} - {{track.track_name}}</strong> - {{track.date_saved}}
-                    {% include 'result.html' %}
-                </li>
-            {% endfor %}
-            </ul>
+        <div class="step">
+            {% if not tracks %}
+                <h2 class="step-disabled"><span class="step-counter">Step 3:</span> Select tracks</h2>
+            {% else %}
+                <h2><span class="step-counter">Step 3:</span> Select tracks</h2>
+                <ul class="js-results-list" data-csrf-token="{{ csrf_token }}">
+                {% for track in tracks %}
+                    <li>
+                        <strong>{{track.artist_name}} - {{track.track_name}}</strong> - {{track.date_saved}}
+                        {% include 'result.html' %}
+                    </li>
+                {% endfor %}
+                </ul>
 
-            <script>
-                require(['jquery', 'live-results'], function($, LiveResults) {
-                    $el = $('.js-results-list');
-                    var liveResults = new LiveResults($el, 'result-update');
-                    liveResults.start();
-                });
-            </script>
-        {% endif %}
+                <script>
+                    require(['jquery', 'live-results'], function($, LiveResults) {
+                        $el = $('.js-results-list');
+                        var liveResults = new LiveResults($el, 'result-update');
+                        liveResults.start();
+                    });
+                </script>
+            {% endif %}
+        </div>
 
 {% endblock %}
