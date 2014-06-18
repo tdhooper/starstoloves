@@ -57,7 +57,13 @@ h2 {
 }
 
 .step h2 {
+    display: inline;
     font-size: inherit;
+}
+
+.step-disconnect {
+    margin: 0;
+    display: inline;
 }
 
 .step-counter {
@@ -151,7 +157,6 @@ ul {
         margin: 0;
     }
 
-    .sp-connect-heading,
     .sp-connect-form {
         display: inline;
     }
