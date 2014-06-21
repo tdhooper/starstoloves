@@ -111,6 +111,38 @@ ul {
     margin-bottom: 12px;
 }
 
+.result-list {
+    margin-bottom: 36px;
+    position: relative;
+}
+
+.result {
+    margin-bottom: 0;
+}
+
+.toggle-more {
+    border-bottom: 1px solid #aaa;
+    text-align: right;
+    position: absolute;
+    bottom: -12px;
+    width: 100%;
+}
+
+.toggle-more a {
+    position: relative;
+    bottom: -13px;
+    background: #fff;
+    padding: 5px 0 5px 10px;
+    text-decoration: none;
+    color: #1b1b1b;
+    font-size: 12px;
+}
+
+.toggle-more a:hover,
+.toggle-more a:focus {
+    text-decoration: underline;
+}
+
 @media (min-width: 450px) {
 
     .main {

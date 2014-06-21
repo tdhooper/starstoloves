@@ -25,7 +25,7 @@ define(['jquery'], function($) {
 
         that.add = function($group) {
             $group.data('toggleMoreActive', true);
-            $('.js-toggle-more-item', $group).eq(0).after('<li><a href="#" class="js-toggle-more-toggle"></a></li>');
+            $('.js-toggle-more-item', $group).eq(0).after('<li class="toggle-more"><a href="#" class="js-toggle-more-toggle"></a></li>');
             that.hide($group);
         };
 

@@ -1,9 +1,14 @@
 <div class="js-result" data-status="{{ track.search.status }}" data-id="{{ track.search.id }}">
     {% if track.search.status == 'SUCCESS' %}
         {% if track.search.tracks %}
-            <ul class="js-toggle-more">
+            <ul class="js-toggle-more result-list">
                 {% for search_track in track.search.tracks %}
-                    <li class="js-toggle-more-item">{% if search_track.loved %}♥ {% endif %}<a href="{{ search_track.url }}">{{search_track.artist_name}} - {{search_track.track_name}}</a></li>
+                    <li class="js-toggle-more-item result">
+                        {% if search_track.loved %}♥ {% endif %}
+                        <a href="{{ search_track.url }}">
+                            {{search_track.artist_name}} - {{search_track.track_name}}
+                        </a>
+                    </li>
                 {% endfor %}
             </ul>
         {% else %}
