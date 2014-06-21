@@ -9,7 +9,7 @@ body {
 }
 
 .main {
-    margin: 0 40px;
+    margin: 0 20px;
 }
 
 header {
@@ -141,6 +141,14 @@ ul {
 .toggle-more a:hover,
 .toggle-more a:focus {
     text-decoration: underline;
+}
+
+@media (min-width: 400px) {
+
+    .main {
+        margin: 0 40px;
+    }
+
 }
 
 @media (min-width: 450px) {
