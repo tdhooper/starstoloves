@@ -15,14 +15,14 @@ class LastfmSearch(object):
     def stop(self, ids):
         revoke(ids)
 
-    def result(self, id):
-        return self.factory_result(id)
+    def query(self, id):
+        return self.factory_query(id)
 
     def factory_result(self, id):
-        return LastfmSearchResult(id)    
+        return LastfmSearchQuery(id)    
 
 
-class LastfmSearchResult(object):
+class LastfmSearchQuery(object):
 
     def __init__(self, id):
         self.async_result = AsyncResult(id)
@@ -66,18 +66,18 @@ class LastfmSearchWithLoves(LastfmSearch):
         super(LastfmSearchWithLoves, self).__init__(lastfm_app)
         self.loved_tracks_urls = loved_tracks_urls
 
-    def factory_result(self, id):
-        return LastfmSearchResultWithLoves(id, self.loved_tracks_urls)
+    def factory_query(self, id):
+        return LastfmSearchQueryWithLoves(id, self.loved_tracks_urls)
 
 
-class LastfmSearchResultWithLoves(LastfmSearchResult):
+class LastfmSearchQueryWithLoves(LastfmSearchQuery):
 
     def __init__(self, id, loved_tracks_urls):
-        super(LastfmSearchResultWithLoves, self).__init__(id)
+        super(LastfmSearchQueryWithLoves, self).__init__(id)
         self.loved_tracks_urls = loved_tracks_urls
 
     def _extract_tracks_from_result(self, result):
-        tracks = super(LastfmSearchResultWithLoves, self)._extract_tracks_from_result(result)
+        tracks = super(LastfmSearchQueryWithLoves, self)._extract_tracks_from_result(result)
         if isinstance(tracks, list):
             for track in tracks:
                 track['loved'] = track['url'] in self.loved_tracks_urls
