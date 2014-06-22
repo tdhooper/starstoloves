@@ -69,14 +69,6 @@ class LastfmSearchQuery(object):
             'result': self.result,
         }
 
-    @property
-    def data(self):
-        return {
-            'id': self.id,
-            'status': self.status,
-            'tracks': self.result
-        }
-
 
 class LastfmSearchWithLoves(LastfmSearch):
 

@@ -107,6 +107,21 @@ def get_tracks(request):
     track_factory = SearchingTrackFactory(searcher)
     return get_searching_tracks(request, track_factory)
 
+def get_tracks_data(request):
+    return [
+        {
+            'track_name': track.track_name,
+            'artist_name': track.artist_name,
+            'date_saved': track.date_saved,
+            'search': {
+                'id': track.search.id,
+                'status': track.search.status,
+                'tracks': track.search.result,
+            },
+        }
+        for track in get_tracks(request)
+    ]
+
 def index(request):
     context = {}
     session = request.session
@@ -121,13 +136,13 @@ def index(request):
         context.update(spotify_connection_ui_context(request, form))
 
     if request.spotify_connection.is_connected():
-        context['tracks'] = [track.data for track in get_tracks(request)]
+        context['tracks'] = get_tracks_data(request)
 
     return render_to_response('index.html', context_instance=RequestContext(request, context))
 
 def resultUpdate(request):
     if request.spotify_connection.is_connected():
-        tracks = [track.data for track in get_tracks(request)]
+        tracks = get_tracks_data(request)
         status_by_id = {
             re.search('status\[(.+)\]', key).groups()[0]: value
             for key, value in request.POST.items()

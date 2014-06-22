@@ -15,7 +15,7 @@ class TestResultUpdate(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
 
-        self.tracksPatcher = patch('starstoloves.views.main.get_tracks')
+        self.tracksPatcher = patch('starstoloves.views.main.get_tracks_data')
         self.tracks = self.tracksPatcher.start()
 
         self.renderPatcher = patch('starstoloves.views.main.render')
