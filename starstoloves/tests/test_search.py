@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 from unittest.mock import MagicMock
 
-from starstoloves.lib.search import LastfmSearchQuery, deserialise_lastfm_search_query
+from starstoloves.lib.search import LastfmSearchQuery, LastfmSearch
 
 from celery.result import AsyncResult
 
@@ -15,6 +15,7 @@ class TestLastfmSearchQuery(unittest.TestCase):
         self.revoke = self.revoke_patcher.start()
         self.mock_async_result = self.MockAsyncResult.return_value
         self.query = LastfmSearchQuery('some_id')
+        self.searcher = LastfmSearch('some_lastfm_app')
 
     def tearDown(self):
         self.async_result_patcher.stop()
@@ -137,7 +138,7 @@ class TestLastfmSearchQuery(unittest.TestCase):
             'status': 'PENDING',
             'result': None,
         }
-        query = deserialise_lastfm_search_query(serialised)
+        query = self.searcher.deserialise(serialised)
         result_data = {
             'trackmatches': {
                 'track': {
@@ -165,7 +166,7 @@ class TestLastfmSearchQuery(unittest.TestCase):
             'status': 'SUCCESS',
             'result': 'some_result',
         }
-        query = deserialise_lastfm_search_query(serialised)
+        query = self.searcher.deserialise(serialised)
         self.assertEqual(query.id, 'some_id')
         self.assertEqual(query.status, 'SUCCESS')
         self.assertEqual(query.result, 'some_result')
@@ -176,7 +177,7 @@ class TestLastfmSearchQuery(unittest.TestCase):
             'status': 'FAILURE',
             'result': None,
         }
-        query = deserialise_lastfm_search_query(serialised)
+        query = self.searcher.deserialise(serialised)
         self.assertEqual(query.id, 'some_id')
         self.assertEqual(query.status, 'FAILURE')
         self.assertEqual(query.result, None)
@@ -187,7 +188,7 @@ class TestLastfmSearchQuery(unittest.TestCase):
             'status': 'SUCCESS',
             'result': 'some_result',
         }
-        query = deserialise_lastfm_search_query(serialised)
+        query = self.searcher.deserialise(serialised)
         self.assertEqual(self.MockAsyncResult.call_count, 1)
 
     def test_doesnt_create_an_AsyncResult_when_deserialising_a_failed_query(self):
@@ -196,7 +197,7 @@ class TestLastfmSearchQuery(unittest.TestCase):
             'status': 'FAILURE',
             'result': None,
         }
-        query = deserialise_lastfm_search_query(serialised)
+        query = self.searcher.deserialise(serialised)
         self.assertEqual(self.MockAsyncResult.call_count, 1)
 
 

@@ -15,8 +15,8 @@ class LastfmSearch(object):
     def stop(self, ids):
         revoke(ids)
 
-    def query(self, id):
-        return self.factory_query(id)
+    def deserialise(self, query):
+        return LastfmSearchQuery(query['id'], query['status'], query['result'])
 
     def factory_result(self, id):
         return LastfmSearchQuery(id)    
@@ -80,8 +80,6 @@ class LastfmSearchQuery(object):
             'tracks': self.result
         }
 
-def deserialise_lastfm_search_query(query):
-    return LastfmSearchQuery(query['id'], query['status'], query['result'])
 
 class LastfmSearchWithLoves(LastfmSearch):
 

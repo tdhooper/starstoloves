@@ -1,21 +1,20 @@
 class SearchingTrack:
 
-    def __init__(self, track_name, artist_name, date_saved, searcher, search_query_data = None):
+    def __init__(self, track_name, artist_name, date_saved, searcher, serialised_query=None):
         self.track_name = track_name
         self.artist_name = artist_name
         self.date_saved = date_saved
         self.searcher = searcher
-        self.search_query_data = search_query_data
+        self.serialised_query = serialised_query
 
     @property
     def search(self):
-        if not self.search_query_data:
-            search_query = self.searcher.search(self.track_name, self.artist_name)
-            self.search_query_data = search_query.data
-        elif self.search_query_data['status'] not in ['SUCCESS', 'FAILURE']:
-            search_query = self.searcher.query(self.search_query_data['id'])
-            self.search_query_data = search_query.data
-        return self.search_query_data
+        if not self.serialised_query:
+            query = self.searcher.search(self.track_name, self.artist_name)
+            self.serialised_query = query.serialise()
+        else:
+            query = self.searcher.deserialise(self.serialised_query)
+        return query.data
 
     @property
     def data(self):
