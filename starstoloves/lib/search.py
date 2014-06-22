@@ -26,9 +26,11 @@ class LastfmSearchQuery(object):
 
     def __init__(self, id, status=None, result=None):
         self.id = id
-        self.async_result = AsyncResult(id)
-        self._status = status
-        self._result = result
+        if status in ['SUCCESS', 'FAILURE']:
+            self._status = status
+            self._result = result
+        else:
+            self.async_result = AsyncResult(id)
 
     def stop(self):
         revoke(self.id)
@@ -52,13 +54,13 @@ class LastfmSearchQuery(object):
 
     @property
     def status(self):
-        if self._status:
+        if hasattr(self, '_status'):
             return self._status
         return self.async_result.status
 
     @property
     def result(self):
-        if self._result:
+        if hasattr(self, '_result'):
             return self._result
         if self.async_result.ready():
             return self._extract_tracks_from_result(self.async_result.info)

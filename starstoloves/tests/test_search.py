@@ -131,24 +131,74 @@ class TestLastfmSearchQuery(unittest.TestCase):
         }
         self.assertEqual(self.query.serialise(), expected)
 
-    def test_can_be_deserialised(self):
+    def test_pending_query_can_be_deserialised_and_will_update(self):
         serialised = {
             'id': 'some_id',
-            'status': 'SOME_STATUS',
-            'result': [{
-                'track_name': 'trackA',
-                'artist_name': 'artistA',
-                'url': 'urlA'
-            }],
+            'status': 'PENDING',
+            'result': None,
         }
         query = deserialise_lastfm_search_query(serialised)
-        self.assertEqual(query.id, 'some_id')
-        self.assertEqual(query.status, 'SOME_STATUS')
-        self.assertEqual(query.result, [{
+        result_data = {
+            'trackmatches': {
+                'track': {
+                    'name': 'trackA',
+                    'artist': 'artistA',
+                    'url': 'urlA',
+                }
+            }
+        }
+        self.mock_async_result.ready = MagicMock(return_value=True)
+        self.mock_async_result.info = result_data
+        self.mock_async_result.status = 'SUCCESS'
+        expected_tracks = [{
             'track_name': 'trackA',
             'artist_name': 'artistA',
             'url': 'urlA'
-        }])
+        }]
+        self.assertEqual(query.id, 'some_id')
+        self.assertEqual(query.status, 'SUCCESS')
+        self.assertEqual(query.result, expected_tracks)
+
+    def test_sucessful_query_can_be_deserialised(self):
+        serialised = {
+            'id': 'some_id',
+            'status': 'SUCCESS',
+            'result': 'some_result',
+        }
+        query = deserialise_lastfm_search_query(serialised)
+        self.assertEqual(query.id, 'some_id')
+        self.assertEqual(query.status, 'SUCCESS')
+        self.assertEqual(query.result, 'some_result')
+    
+    def test_failed_query_can_be_deserialised(self):
+        serialised = {
+            'id': 'some_id',
+            'status': 'FAILURE',
+            'result': None,
+        }
+        query = deserialise_lastfm_search_query(serialised)
+        self.assertEqual(query.id, 'some_id')
+        self.assertEqual(query.status, 'FAILURE')
+        self.assertEqual(query.result, None)
+
+    def test_doesnt_create_an_AsyncResult_when_deserialising_a_successful_query(self):
+        serialised = {
+            'id': 'some_id',
+            'status': 'SUCCESS',
+            'result': 'some_result',
+        }
+        query = deserialise_lastfm_search_query(serialised)
+        self.assertEqual(self.MockAsyncResult.call_count, 1)
+
+    def test_doesnt_create_an_AsyncResult_when_deserialising_a_failed_query(self):
+        serialised = {
+            'id': 'some_id',
+            'status': 'FAILURE',
+            'result': None,
+        }
+        query = deserialise_lastfm_search_query(serialised)
+        self.assertEqual(self.MockAsyncResult.call_count, 1)
+
 
 from starstoloves.lib.search import LastfmSearchQueryWithLoves
 
