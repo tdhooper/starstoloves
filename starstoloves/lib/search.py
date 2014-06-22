@@ -24,11 +24,14 @@ class LastfmSearch(object):
 
 class LastfmSearchQuery(object):
 
-    def __init__(self, id):
+    def __init__(self, id, status=None, result=None):
+        self.id = id
         self.async_result = AsyncResult(id)
+        self._status = status
+        self._result = result
 
     def stop(self):
-        revoke(self.async_result.id)
+        revoke(self.id)
 
     def _extract_tracks_from_result(self, result):
         try:
@@ -48,10 +51,30 @@ class LastfmSearchQuery(object):
             pass
 
     @property
+    def status(self):
+        if self._status:
+            return self._status
+        return self.async_result.status
+
+    @property
+    def result(self):
+        if self._result:
+            return self._result
+        if self.async_result.ready():
+            return self._extract_tracks_from_result(self.async_result.info)
+
+    def serialise(self):
+        return {
+            'id': self.id,
+            'status': self.status,
+            'result': self.result,
+        }
+
+    @property
     def data(self):
         data = {
-            'id': self.async_result.id,
-            'status': self.async_result.status
+            'id': self.id,
+            'status': self.status
         }
         if self.async_result.ready():
             tracks = self._extract_tracks_from_result(self.async_result.info)
@@ -59,6 +82,9 @@ class LastfmSearchQuery(object):
                 data['tracks'] = tracks
         return data
 
+
+def deserialise_lastfm_search_query(query):
+    return LastfmSearchQuery(query['id'], query['status'], query['result'])
 
 class LastfmSearchWithLoves(LastfmSearch):
 

@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 from unittest.mock import MagicMock
 
-from starstoloves.lib.search import LastfmSearchQuery
+from starstoloves.lib.search import LastfmSearchQuery, deserialise_lastfm_search_query
 
 from celery.result import AsyncResult
 
@@ -27,23 +27,27 @@ class TestLastfmSearchQuery(unittest.TestCase):
         self.mock_async_result.id = 'some_id'
         self.assertEqual(self.query.data['id'], 'some_id')
 
+    def test_status_is_result_status(self):
+        self.mock_async_result.status = 'SOME_STATUS'
+        self.assertEqual(self.query.status, 'SOME_STATUS')
+
     def test_data_has_a_status(self):
         self.mock_async_result.status = 'SOME_STATUS'
         self.assertEqual(self.query.data['status'], 'SOME_STATUS')
 
-    def test_data_doesnt_have_tracks_when_not_ready(self):
+    def test_result_doesnt_have_tracks_when_not_ready(self):
         self.mock_async_result.ready = MagicMock(return_value=False)
-        self.assertFalse('tracks' in self.query.data)
+        self.assertFalse(self.query.result)
 
-    def test_data_doesnt_have_tracks_when_ready_but_no_results(self):
+    def test_result_doesnt_have_tracks_when_ready_but_no_results(self):
         result_data = {
             'trackmatches': "\n"
         }
         self.mock_async_result.ready = MagicMock(return_value=True)
         self.mock_async_result.info = result_data
-        self.assertFalse('tracks' in self.query.data)
+        self.assertFalse(self.query.result)
 
-    def test_data_has_tracks_when_ready(self):
+    def test_result_has_tracks_when_ready(self):
         result_data = {
             'trackmatches': {
                 'track': [
@@ -72,9 +76,9 @@ class TestLastfmSearchQuery(unittest.TestCase):
         ]
         self.mock_async_result.ready = MagicMock(return_value=True)
         self.mock_async_result.info = result_data
-        self.assertEqual(self.query.data['tracks'], expected_tracks)
+        self.assertEqual(self.query.result, expected_tracks)
 
-    def test_data_has_tracks_when_ready_and_there_is_only_one_result(self):
+    def test_result_has_tracks_when_ready_and_there_is_only_one_result(self):
         result_data = {
             'trackmatches': {
                 'track': {
@@ -91,18 +95,60 @@ class TestLastfmSearchQuery(unittest.TestCase):
         }]
         self.mock_async_result.ready = MagicMock(return_value=True)
         self.mock_async_result.info = result_data
-        self.assertEqual(self.query.data['tracks'], expected_tracks)
+        self.assertEqual(self.query.result, expected_tracks)
 
     def test_data_doesnt_have_tracks_when_ready_and_result_is_error(self):
         self.mock_async_result.ready = MagicMock(return_value=True)
         self.mock_async_result.info = TypeError
-        self.assertFalse('tracks' in self.query.data)
+        self.assertFalse(self.query.result)
 
     def test_stops_the_task_when_requested(self):
         self.mock_async_result.id = 'some_id'
         self.query.stop()
         self.revoke.assert_called_with('some_id')
 
+    def test_can_be_serialised(self):
+        self.mock_async_result.status = 'SOME_STATUS'
+        result_data = {
+            'trackmatches': {
+                'track': {
+                    'name': 'trackA',
+                    'artist': 'artistA',
+                    'url': 'urlA',
+                }
+            }
+        }
+        self.mock_async_result.ready = MagicMock(return_value=True)
+        self.mock_async_result.info = result_data
+        expected = {
+            'id': 'some_id',
+            'status': 'SOME_STATUS',
+            'result': [{
+                'track_name': 'trackA',
+                'artist_name': 'artistA',
+                'url': 'urlA'
+            }],
+        }
+        self.assertEqual(self.query.serialise(), expected)
+
+    def test_can_be_deserialised(self):
+        serialised = {
+            'id': 'some_id',
+            'status': 'SOME_STATUS',
+            'result': [{
+                'track_name': 'trackA',
+                'artist_name': 'artistA',
+                'url': 'urlA'
+            }],
+        }
+        query = deserialise_lastfm_search_query(serialised)
+        self.assertEqual(query.id, 'some_id')
+        self.assertEqual(query.status, 'SOME_STATUS')
+        self.assertEqual(query.result, [{
+            'track_name': 'trackA',
+            'artist_name': 'artistA',
+            'url': 'urlA'
+        }])
 
 from starstoloves.lib.search import LastfmSearchQueryWithLoves
 
@@ -118,7 +164,7 @@ class TestLastfmSearchQueryWithLoves(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
-    def test_data_tracks_are_marked_as_loved_when_they_match_a_loved_track(self):
+    def test_result_tracks_are_marked_as_loved_when_they_match_a_loved_track(self):
         result_data = {
             'trackmatches': {
                 'track': [
@@ -149,5 +195,5 @@ class TestLastfmSearchQueryWithLoves(unittest.TestCase):
         ]
         self.mock_async_result.ready = MagicMock(return_value=True)
         self.mock_async_result.info = result_data
-        self.assertEqual(self.query.data['tracks'], expected_tracks)
+        self.assertEqual(self.query.result, expected_tracks)
 
