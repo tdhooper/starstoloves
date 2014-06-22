@@ -12,9 +12,6 @@ class LastfmSearch(object):
         async_result = search_lastfm.delay(self.lastfm_app, track_name, artist_name)
         return self.factory_result(async_result.id)
 
-    def stop(self, ids):
-        revoke(ids)
-
     def deserialise(self, query):
         return LastfmSearchQuery(query['id'], query['status'], query['result'])
 

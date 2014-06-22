@@ -80,33 +80,31 @@ def forget_loved_tracks_urls(request):
     if 'loved_tracks_urls' in request.session:
         del request.session['loved_tracks_urls']
 
-def get_searching_tracks_data(request, searcher):
+def get_searching_tracks(request, searcher):
     tracks = []
-    tracks_data = request.session.get('tracks_data', False)
-    if not tracks_data:
+    serialised_tracks = request.session.get('serialised_tracks', False)
+    if not serialised_tracks:
         starred_tracks = get_starred_tracks(request)
         for track in starred_tracks:
             tracks.append(SearchingTrack(track['track_name'], track['artist_name'], track['date_saved'], searcher))
     else:
         tracks = [
-            SearchingTrack(track['track_name'], track['artist_name'], track['date_saved'], searcher, track['search'])
-            for track in tracks_data
+            SearchingTrack(track['track_name'], track['artist_name'], track['date_saved'], searcher, track['serialised_query'])
+            for track in serialised_tracks
         ]
-    tracks_data = [track.data for track in tracks]
-    request.session['tracks_data'] = tracks_data
-    return tracks_data
+    request.session['serialised_tracks'] = [track.serialise() for track in tracks]
+    return tracks
 
-def forget_searching_tracks_data(request):
-    if 'tracks_data' in request.session:
-        searcher = LastfmSearch(request.lastfm_app)
-        ids = [track['search']['id'] for track in request.session['tracks_data']]
-        searcher.stop(ids)
-        del request.session['tracks_data']
+def forget_searching_tracks(request):
+    tracks = get_tracks(request)
+    for track in tracks:
+        track.search.stop()
+    del request.session['serialised_tracks']
 
 def get_tracks(request):
     loved_tracks_urls = get_loved_tracks_urls(request)
     searcher = LastfmSearchWithLoves(request.lastfm_app, loved_tracks_urls)
-    return get_searching_tracks_data(request, searcher)
+    return get_searching_tracks(request, searcher)
 
 def index(request):
     context = {}
@@ -122,13 +120,13 @@ def index(request):
         context.update(spotify_connection_ui_context(request, form))
 
     if request.spotify_connection.is_connected():
-        context['tracks'] = get_tracks(request)
+        context['tracks'] = [track.data for track in get_tracks(request)]
 
     return render_to_response('index.html', context_instance=RequestContext(request, context))
 
 def resultUpdate(request):
     if request.spotify_connection.is_connected():
-        tracks = get_tracks(request)
+        tracks = [track.data for track in get_tracks(request)]
         status_by_id = {
             re.search('status\[(.+)\]', key).groups()[0]: value
             for key, value in request.POST.items()
@@ -170,6 +168,6 @@ def disconnectLastfm(request):
 
 def disconnectSpotify(request):
     request.spotify_connection.disconnect()
-    forget_searching_tracks_data(request)
+    forget_searching_tracks(request)
     return redirect('index')
     

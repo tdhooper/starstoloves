@@ -14,7 +14,7 @@ class SearchingTrack:
             self.serialised_query = query.serialise()
         else:
             query = self.searcher.deserialise(self.serialised_query)
-        return query.data
+        return query
 
     @property
     def data(self):
@@ -22,5 +22,14 @@ class SearchingTrack:
             'track_name': self.track_name,
             'artist_name': self.artist_name,
             'date_saved': self.date_saved,
-            'search': self.search
+            'search': self.search.data,
         }
+
+    def serialise(self):
+        return {
+            'track_name': self.track_name,
+            'artist_name': self.artist_name,
+            'date_saved': self.date_saved,
+            'serialised_query': self.search.serialise(),
+        }
+
