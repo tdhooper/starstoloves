@@ -102,7 +102,7 @@ class TestResultUpdate(TestCase):
             '1': HttpResponse('rendered1'),
             '2': HttpResponse('rendered2')
         }
-        self.render.side_effect = lambda request, template, context: render_results[context['track']['search']['id']]
+        self.render.side_effect = lambda request, template, context: render_results[context['track']['id']]
         data = {
             'status[0]': 'SUCCESS',
             'status[1]': 'PENDING',

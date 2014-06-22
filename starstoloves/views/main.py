@@ -98,7 +98,7 @@ def get_searching_tracks(request, track_factory):
 def forget_searching_tracks(request):
     tracks = get_tracks(request)
     for track in tracks:
-        track.search.stop()
+        track.stop()
     del request.session['serialised_tracks']
 
 def get_tracks(request):
@@ -113,11 +113,9 @@ def get_tracks_data(request):
             'track_name': track.track_name,
             'artist_name': track.artist_name,
             'date_saved': track.date_saved,
-            'search': {
-                'id': track.search.id,
-                'status': track.search.status,
-                'tracks': track.search.result,
-            },
+            'id': track.id,
+            'status': track.status,
+            'results': track.results
         }
         for track in get_tracks(request)
     ]
@@ -152,13 +150,13 @@ def resultUpdate(request):
                 track
                 for track in tracks
                 if
-                    not track['search']['id'] in status_by_id
-                    or track['search']['status'] != status_by_id[track['search']['id']]
+                    not track['id'] in status_by_id
+                    or track['status'] != status_by_id[track['id']]
             ]
         results = [
             {
-                'id': track['search']['id'],
-                'status': track['search']['status'],
+                'id': track['id'],
+                'status': track['status'],
                 'html': render(request, 'result.html', {'track': track}).content.decode("utf-8"),
             }
             for track in tracks
