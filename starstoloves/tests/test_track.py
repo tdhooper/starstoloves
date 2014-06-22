@@ -17,15 +17,15 @@ class TestSearchingTrack(unittest.TestCase):
         self.uuid4.side_effect = lambda: self.uuids_clone.pop(0);
 
         MockLastfmSearch = MagicMock(spec=LastfmSearch)
-        self.search = MockLastfmSearch('some_lastfm_app')
+        self.searcher = MockLastfmSearch('some_lastfm_app')
 
         self.MockLastfmSearchQuery = MagicMock(spec=LastfmSearchQuery)
         self.search_query = self.MockLastfmSearchQuery('some_id')
         self.search_query.status = 'SOME_STATUS'
 
-        self.search.search.return_value = self.search_query
-        self.search.deserialise.return_value = self.search_query
-        self.factory = SearchingTrackFactory(self.search)
+        self.searcher.search.return_value = self.search_query
+        self.searcher.deserialise.return_value = self.search_query
+        self.factory = SearchingTrackFactory(self.searcher)
         self.track = self.factory.create('some_track_name', 'some_artist_name', 1275493486)
 
     def tearDown(self):
@@ -39,7 +39,7 @@ class TestSearchingTrack(unittest.TestCase):
 
     def test_search_creates_a_new_combined_search(self):
         self.track.search
-        self.search.search.assert_called_with('some_track_name some_artist_name')
+        self.searcher.search.assert_called_with('some_track_name some_artist_name')
 
     def test_search_returns_the_combined_search_query(self):
         self.assertIs(self.track.search['combined'], self.search_query)
@@ -47,7 +47,7 @@ class TestSearchingTrack(unittest.TestCase):
     def test_search_doesnt_create_a_new_search_when_called_twice(self):
         self.track.search
         self.track.search
-        self.assertEqual(self.search.search.call_count, 1)
+        self.assertEqual(self.searcher.search.call_count, 1)
 
     def test_results_returns_the_combined_search_result(self):
         self.assertEqual(self.track.results, self.search_query.result)
@@ -73,7 +73,7 @@ class TestSearchingTrack(unittest.TestCase):
         }
         track = self.factory.deserialise(serialised_track)
         track.search
-        self.assertFalse(self.search.search.called)
+        self.assertFalse(self.searcher.search.called)
 
     def test_search_deserialises_the_query_when_given_a_serialised_query(self):
         serialised_track = {
@@ -91,7 +91,7 @@ class TestSearchingTrack(unittest.TestCase):
             }
         }
         deserialised_query = self.MockLastfmSearchQuery('some_other_id')
-        self.search.deserialise.return_value = deserialised_query
+        self.searcher.deserialise.return_value = deserialised_query
         track = self.factory.deserialise(serialised_track)
         self.assertEqual(track.search['combined'], deserialised_query)
 
