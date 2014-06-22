@@ -20,7 +20,7 @@ class TestSearchingTrack(unittest.TestCase):
 
     def test_search_creates_a_new_search(self):
         self.track.search
-        self.search.search.assert_called_with('some_track_name', 'some_artist_name')
+        self.search.search.assert_called_with('some_track_name some_artist_name')
 
     def test_search_returns_the_search_query(self):
         self.assertIs(self.track.search, self.search_query)

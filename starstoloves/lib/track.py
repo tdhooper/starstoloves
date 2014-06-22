@@ -10,7 +10,7 @@ class SearchingTrack:
     @property
     def search(self):
         if not self.serialised_query:
-            query = self.searcher.search(self.track_name, self.artist_name)
+            query = self.searcher.search(self.track_name + ' ' + self.artist_name)
             self.serialised_query = query.serialise()
         else:
             query = self.searcher.deserialise(self.serialised_query)

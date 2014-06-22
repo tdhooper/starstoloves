@@ -8,7 +8,7 @@ class LastfmSearch(object):
     def __init__(self, lastfm_app):
         self.lastfm_app = lastfm_app
 
-    def search(self, track_name, artist_name):
+    def search(self, track_name, artist_name=None):
         async_result = search_lastfm.delay(self.lastfm_app, track_name, artist_name)
         return self.factory_result(async_result.id)
 
