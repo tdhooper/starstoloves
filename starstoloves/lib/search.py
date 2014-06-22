@@ -74,16 +74,11 @@ class LastfmSearchQuery(object):
 
     @property
     def data(self):
-        data = {
+        return {
             'id': self.id,
-            'status': self.status
+            'status': self.status,
+            'tracks': self.result
         }
-        if self.async_result.ready():
-            tracks = self._extract_tracks_from_result(self.async_result.info)
-            if tracks:
-                data['tracks'] = tracks
-        return data
-
 
 def deserialise_lastfm_search_query(query):
     return LastfmSearchQuery(query['id'], query['status'], query['result'])
