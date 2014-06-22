@@ -9,13 +9,16 @@ from celery.result import AsyncResult
 class TestLastfmSearchResult(unittest.TestCase):
 
     def setUp(self):
-        self.patcher = patch('starstoloves.lib.search.AsyncResult', autospec=True)
-        self.MockAsyncResult = self.patcher.start()
+        self.async_result_patcher = patch('starstoloves.lib.search.AsyncResult', autospec=True)
+        self.revoke_patcher = patch('starstoloves.lib.search.revoke')
+        self.MockAsyncResult = self.async_result_patcher.start()
+        self.revoke = self.revoke_patcher.start()
         self.mock_async_result = self.MockAsyncResult.return_value
         self.result = LastfmSearchResult('some_id')
 
     def tearDown(self):
-        self.patcher.stop()
+        self.async_result_patcher.stop()
+        self.revoke_patcher.stop()
 
     def test_data_fetches_the_async_result(self):
         self.MockAsyncResult.assert_called_with('some_id')
@@ -95,8 +98,13 @@ class TestLastfmSearchResult(unittest.TestCase):
         self.mock_async_result.info = TypeError
         self.assertFalse('tracks' in self.result.data)
 
-from starstoloves.lib.search import LastfmSearchResultWithLoves
+    def test_stops_the_task_when_requested(self):
+        self.mock_async_result.id = 'some_id'
+        self.result.stop()
+        self.revoke.assert_called_with('some_id')
 
+
+from starstoloves.lib.search import LastfmSearchResultWithLoves
 
 class TestLastfmSearchResultWithLoves(unittest.TestCase):
 

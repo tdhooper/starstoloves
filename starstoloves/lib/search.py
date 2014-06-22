@@ -27,6 +27,9 @@ class LastfmSearchResult(object):
     def __init__(self, id):
         self.async_result = AsyncResult(id)
 
+    def stop(self):
+        revoke(self.async_result.id)
+
     def _extract_tracks_from_result(self, result):
         try:
             if isinstance(result['trackmatches'], dict):
