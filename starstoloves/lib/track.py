@@ -33,3 +33,20 @@ class SearchingTrack:
             'serialised_query': self.search.serialise(),
         }
 
+
+class SearchingTrackFactory:
+
+    def __init__(self, searcher):
+        self.searcher = searcher
+
+    def create(self, track_name, artist_name, date_saved):
+        return SearchingTrack(track_name, artist_name, date_saved, self.searcher)
+
+    def deserialise(self, track):
+        return SearchingTrack(
+            track['track_name'],
+            track['artist_name'],
+            track['date_saved'],
+            self.searcher,
+            track['serialised_query']
+        )

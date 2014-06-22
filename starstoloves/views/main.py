@@ -10,7 +10,7 @@ from django.http import HttpResponse, HttpResponseServerError
 from starstoloves import forms
 from starstoloves.views.helpers import spotify_connection
 from starstoloves.lib.search import LastfmSearch, LastfmSearchWithLoves
-from starstoloves.lib.track import SearchingTrack
+from starstoloves.lib.track import SearchingTrackFactory
 
 def lastfm_connection_ui_context(request):
     if request.lastfm_connection.is_connected():
@@ -80,16 +80,16 @@ def forget_loved_tracks_urls(request):
     if 'loved_tracks_urls' in request.session:
         del request.session['loved_tracks_urls']
 
-def get_searching_tracks(request, searcher):
-    tracks = []
+def get_searching_tracks(request, track_factory):
     serialised_tracks = request.session.get('serialised_tracks', False)
     if not serialised_tracks:
-        starred_tracks = get_starred_tracks(request)
-        for track in starred_tracks:
-            tracks.append(SearchingTrack(track['track_name'], track['artist_name'], track['date_saved'], searcher))
+        tracks = [
+            track_factory.create(track['track_name'], track['artist_name'], track['date_saved'])
+            for track in get_starred_tracks(request)
+        ]
     else:
         tracks = [
-            SearchingTrack(track['track_name'], track['artist_name'], track['date_saved'], searcher, track['serialised_query'])
+            track_factory.deserialise(track)
             for track in serialised_tracks
         ]
     request.session['serialised_tracks'] = [track.serialise() for track in tracks]
@@ -104,7 +104,8 @@ def forget_searching_tracks(request):
 def get_tracks(request):
     loved_tracks_urls = get_loved_tracks_urls(request)
     searcher = LastfmSearchWithLoves(request.lastfm_app, loved_tracks_urls)
-    return get_searching_tracks(request, searcher)
+    track_factory = SearchingTrackFactory(searcher)
+    return get_searching_tracks(request, track_factory)
 
 def index(request):
     context = {}
