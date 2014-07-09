@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 from unittest.mock import MagicMock
 
-from starstoloves.lib.search import LastfmSearchQuery, LastfmSearch
+from starstoloves.lib.search import LastfmSearch
 
 from celery.result import AsyncResult
 
@@ -10,19 +10,29 @@ class TestLastfmSearchQuery(unittest.TestCase):
 
     def setUp(self):
         self.async_result_patcher = patch('starstoloves.lib.search.AsyncResult', autospec=True)
-        self.revoke_patcher = patch('starstoloves.lib.search.revoke')
         self.MockAsyncResult = self.async_result_patcher.start()
+        def get_async_result(id):
+            self.mock_async_result = MagicMock(spec=AsyncResult)
+            self.mock_async_result.id = id
+            return self.mock_async_result
+        self.MockAsyncResult.side_effect = get_async_result
+
+        self.revoke_patcher = patch('starstoloves.lib.search.revoke')
         self.revoke = self.revoke_patcher.start()
-        self.mock_async_result = self.MockAsyncResult.return_value
-        self.query = LastfmSearchQuery('some_id')
+
+        self.search_patcher = patch('starstoloves.lib.search.search_lastfm')
+        search_lastfm = self.search_patcher.start()
+        search_lastfm_async_result = MagicMock(spec=AsyncResult).return_value
+        search_lastfm_async_result.id = 'some_id'
+        search_lastfm.delay.return_value = search_lastfm_async_result
+
         self.searcher = LastfmSearch('some_lastfm_app')
+        self.query = self.searcher.search('track_name', 'artist_name')
 
     def tearDown(self):
         self.async_result_patcher.stop()
         self.revoke_patcher.stop()
-
-    def test_data_fetches_the_async_result(self):
-        self.MockAsyncResult.assert_called_with('some_id')
+        self.search_patcher.stop()
 
     def test_has_an_id(self):
         self.assertEqual(self.query.id, 'some_id')
