@@ -9,7 +9,7 @@ from django.http import HttpResponse, HttpResponseServerError
 
 from starstoloves import forms
 from starstoloves.views.helpers import spotify_connection
-from starstoloves.lib.search import LastfmSearch, LastfmSearchWithLoves
+from starstoloves.lib.search import LastfmSearcherWithLoves
 from starstoloves.lib.track import SearchingTrackFactory
 
 def lastfm_connection_ui_context(request):
@@ -103,7 +103,7 @@ def forget_searching_tracks(request):
 
 def get_tracks(request):
     loved_tracks_urls = get_loved_tracks_urls(request)
-    searcher = LastfmSearchWithLoves(request.lastfm_app, loved_tracks_urls)
+    searcher = LastfmSearcherWithLoves(request.lastfm_app, loved_tracks_urls)
     track_factory = SearchingTrackFactory(searcher)
     return get_searching_tracks(request, track_factory)
 

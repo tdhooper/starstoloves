@@ -3,7 +3,7 @@ from starstoloves.tasks import search_lastfm
 from celery.result import AsyncResult
 from celery.task.control import revoke
 
-class LastfmSearch(object):
+class LastfmSearcher(object):
 
     def __init__(self, lastfm_app):
         self.lastfm_app = lastfm_app
@@ -70,10 +70,10 @@ class LastfmSearchQuery(object):
         }
 
 
-class LastfmSearchWithLoves(LastfmSearch):
+class LastfmSearcherWithLoves(LastfmSearcher):
 
     def __init__(self, lastfm_app, loved_tracks_urls):
-        super(LastfmSearchWithLoves, self).__init__(lastfm_app)
+        super(LastfmSearcherWithLoves, self).__init__(lastfm_app)
         self.loved_tracks_urls = loved_tracks_urls
 
     def factory_query(self, id):

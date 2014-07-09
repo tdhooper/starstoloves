@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 from uuid import uuid4
 from copy import copy
 
-from starstoloves.lib.search import LastfmSearch, LastfmSearchQuery
+from starstoloves.lib.search import LastfmSearcher, LastfmSearchQuery
 from starstoloves.lib.track import SearchingTrackFactory
 
 class TestSearchingTrack(unittest.TestCase):
@@ -16,8 +16,8 @@ class TestSearchingTrack(unittest.TestCase):
         self.uuid4 = self.patcher.start()
         self.uuid4.side_effect = lambda: self.uuids_clone.pop(0);
 
-        MockLastfmSearch = MagicMock(spec=LastfmSearch)
-        self.searcher = MockLastfmSearch('some_lastfm_app')
+        MockLastfmSearcher = MagicMock(spec=LastfmSearcher)
+        self.searcher = MockLastfmSearcher('some_lastfm_app')
 
         self.MockLastfmSearchQuery = MagicMock(spec=LastfmSearchQuery)
         self.search_query = self.MockLastfmSearchQuery('some_id')

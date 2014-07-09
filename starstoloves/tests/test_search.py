@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 from unittest.mock import MagicMock
 
-from starstoloves.lib.search import LastfmSearch
+from starstoloves.lib.search import LastfmSearcher
 
 from celery.result import AsyncResult
 
@@ -26,7 +26,7 @@ class TestLastfmSearchQuery(unittest.TestCase):
         search_lastfm_async_result.id = 'some_id'
         search_lastfm.delay.return_value = search_lastfm_async_result
 
-        self.searcher = LastfmSearch('some_lastfm_app')
+        self.searcher = LastfmSearcher('some_lastfm_app')
         self.query = self.searcher.search('track_name', 'artist_name')
 
     def tearDown(self):
