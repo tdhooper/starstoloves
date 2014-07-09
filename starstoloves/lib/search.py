@@ -13,13 +13,13 @@ class LastfmSearcher(object):
         return self.factory_result(async_result.id)
 
     def deserialise(self, query):
-        return LastfmSearchQuery(query['id'], query['status'], query['result'])
+        return LastfmQuery(query['id'], query['status'], query['result'])
 
     def factory_result(self, id):
-        return LastfmSearchQuery(id)    
+        return LastfmQuery(id)
 
 
-class LastfmSearchQuery(object):
+class LastfmQuery(object):
 
     def __init__(self, id, status=None, result=None):
         self.id = id
@@ -77,17 +77,17 @@ class LastfmSearcherWithLoves(LastfmSearcher):
         self.loved_tracks_urls = loved_tracks_urls
 
     def factory_query(self, id):
-        return LastfmSearchQueryWithLoves(id, self.loved_tracks_urls)
+        return LastfmQueryWithLoves(id, self.loved_tracks_urls)
 
 
-class LastfmSearchQueryWithLoves(LastfmSearchQuery):
+class LastfmQueryWithLoves(LastfmQuery):
 
     def __init__(self, id, loved_tracks_urls):
-        super(LastfmSearchQueryWithLoves, self).__init__(id)
+        super(LastfmQueryWithLoves, self).__init__(id)
         self.loved_tracks_urls = loved_tracks_urls
 
     def _extract_tracks_from_result(self, result):
-        tracks = super(LastfmSearchQueryWithLoves, self)._extract_tracks_from_result(result)
+        tracks = super(LastfmQueryWithLoves, self)._extract_tracks_from_result(result)
         if isinstance(tracks, list):
             for track in tracks:
                 track['loved'] = track['url'] in self.loved_tracks_urls

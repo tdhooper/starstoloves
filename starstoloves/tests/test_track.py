@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 from uuid import uuid4
 from copy import copy
 
-from starstoloves.lib.search import LastfmSearcher, LastfmSearchQuery
+from starstoloves.lib.search import LastfmSearcher, LastfmQuery
 from starstoloves.lib.track import SearchingTrackFactory
 
 class TestSearchingTrack(unittest.TestCase):
@@ -19,8 +19,8 @@ class TestSearchingTrack(unittest.TestCase):
         MockLastfmSearcher = MagicMock(spec=LastfmSearcher)
         self.searcher = MockLastfmSearcher('some_lastfm_app')
 
-        self.MockLastfmSearchQuery = MagicMock(spec=LastfmSearchQuery)
-        self.search_query = self.MockLastfmSearchQuery('some_id')
+        self.MockLastfmQuery = MagicMock(spec=LastfmQuery)
+        self.search_query = self.MockLastfmQuery('some_id')
         self.search_query.status = 'SOME_STATUS'
 
         self.searcher.search.return_value = self.search_query
@@ -90,7 +90,7 @@ class TestSearchingTrack(unittest.TestCase):
                 }
             }
         }
-        deserialised_query = self.MockLastfmSearchQuery('some_other_id')
+        deserialised_query = self.MockLastfmQuery('some_other_id')
         self.searcher.deserialise.return_value = deserialised_query
         track = self.factory.deserialise(serialised_track)
         self.assertEqual(track.search['combined'], deserialised_query)

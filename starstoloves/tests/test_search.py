@@ -6,7 +6,7 @@ from starstoloves.lib.search import LastfmSearcher
 
 from celery.result import AsyncResult
 
-class TestLastfmSearchQuery(unittest.TestCase):
+class TestLastfmQuery(unittest.TestCase):
 
     def setUp(self):
         self.async_result_patcher = patch('starstoloves.lib.search.AsyncResult', autospec=True)
@@ -206,16 +206,16 @@ class TestLastfmSearchQuery(unittest.TestCase):
         self.assertEqual(self.MockAsyncResult.call_count, 1)
 
 
-from starstoloves.lib.search import LastfmSearchQueryWithLoves
+from starstoloves.lib.search import LastfmQueryWithLoves
 
-class TestLastfmSearchQueryWithLoves(unittest.TestCase):
+class TestLastfmQueryWithLoves(unittest.TestCase):
 
     def setUp(self):
         self.patcher = patch('starstoloves.lib.search.AsyncResult', autospec=True)
         self.MockAsyncResult = self.patcher.start()
         self.mock_async_result = self.MockAsyncResult.return_value
         self.loved_tracks_urls = ['urlA', 'urlC']
-        self.query = LastfmSearchQueryWithLoves('some_id', self.loved_tracks_urls)
+        self.query = LastfmQueryWithLoves('some_id', self.loved_tracks_urls)
 
     def tearDown(self):
         self.patcher.stop()
