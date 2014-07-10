@@ -75,6 +75,7 @@ bower install --config.interactive=false
 
 # Django project setup
 ./manage.py syncdb --noinput
+./manage.py migrate
 
 # Kill and restart screen
 screen -S "djangoServer" -X quit
