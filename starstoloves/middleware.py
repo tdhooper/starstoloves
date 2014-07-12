@@ -1,4 +1,15 @@
-from starstoloves import settings
+from starstoloves.models import User
+
+class SessionUser:
+
+    def process_request(self, request):
+        user = None
+        session_key = request.session.session_key
+        if session_key:
+            user, created = User.objects.get_or_create(session_key=session_key)
+        request.session_user = user
+
+
 from django.http import HttpResponse
 from starstoloves.views.helpers.spotify_connection import SpotifyConnectionHelper
 
@@ -16,6 +27,7 @@ class SpotifySession:
 
 
 from lastfm import lfm
+from starstoloves import settings
 from starstoloves.views.helpers.lastfm_connection import LastfmConnectionHelper
 
 class LastfmApi:
@@ -25,4 +37,4 @@ class LastfmApi:
 
     def process_request(self, request):
         request.lastfm_app = self.app
-        request.lastfm_connection = LastfmConnectionHelper(request.session, self.app)
+        request.lastfm_connection = LastfmConnectionHelper(request.session_user, self.app)

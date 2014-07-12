@@ -109,6 +109,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
+    'starstoloves.middleware.SessionUser',
     'starstoloves.middleware.SpotifySession',
     'starstoloves.middleware.LastfmApi',
 )
@@ -138,6 +139,8 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'djcelery',
     'south',
+
+    'starstoloves',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
