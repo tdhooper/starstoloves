@@ -64,6 +64,7 @@ class TestLastfmConnectionConnectSuccess(BaseTestLastfmConnectionWithUser):
         super().setUp()
         whenConnectSucceeds(self.app, self.connection)
         self.user = User.objects.get(session_key='some_key')
+        self.connection = LastfmConnectionHelper(self.user, self.app)
 
     def test_associates_a_LastfmConnection(self):
         self.assertIsInstance(self.user.lastfm_connection, LastfmConnection)
@@ -81,6 +82,7 @@ class TestLastfmConnectionConnectFail(BaseTestLastfmConnectionWithUser):
         super().setUp()
         whenConnectFails(self.app, self.connection)
         self.user = User.objects.get(session_key='some_key')
+        self.connection = LastfmConnectionHelper(self.user, self.app)
 
     def test_associates_a_LastfmConnection(self):
         self.assertIsInstance(self.user.lastfm_connection, LastfmConnection)
@@ -96,6 +98,7 @@ class TestLastfmConnectionDisconnect(BaseTestLastfmConnectionWithUser):
         whenConnectSucceeds(self.app, self.connection)
         self.connection.disconnect()
         self.user = User.objects.get(session_key='some_key')
+        self.connection = LastfmConnectionHelper(self.user, self.app)
 
     def test_there_is_no_longer_an_associated_lastfm_connection(self):
         with self.assertRaises(LastfmConnection.DoesNotExist):
