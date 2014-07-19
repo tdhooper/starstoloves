@@ -1,10 +1,5 @@
-from django.core.urlresolvers import reverse
-
-from .connection import DBConnectionHelper
+from .connection import DBConnectionHelper, MissingUserError
 from starstoloves.models import LastfmConnection
-
-class MissingUserError(Exception):
-    pass
 
 class LastfmConnectionHelper(DBConnectionHelper):
 

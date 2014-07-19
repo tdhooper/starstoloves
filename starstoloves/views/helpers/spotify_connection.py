@@ -1,38 +1,59 @@
-from .connection import ConnectionHelper
-
-from django.core.urlresolvers import reverse
 import spotify
 
-class SpotifyConnectionHelper(ConnectionHelper):
+from .connection import DBConnectionHelper, MissingUserError
+from starstoloves.models import SpotifyConnection
 
-    def __init__(self, session_storage, spotify_session):
-        super(SpotifyConnectionHelper, self).__init__(session_storage)
-        self.spotify_session = spotify_session
+class SpotifyConnectionHelper(DBConnectionHelper):
 
-    def _get_session_key(self):
-        return 'spotify_connection'
+    def __init__(self, user, session):
+        self.user = user
+        self.session = session
 
     def get_username(self):
-        session = self._get_session()
-        return session.get('username')
+        if (self.user):
+            try:
+                return self.user.spotify_connection.username
+            except SpotifyConnection.DoesNotExist:
+                pass
+        return None
 
     def get_user_uri(self):
-        session = self._get_session()
-        return session.get('userUri')
+        if (self.user):
+            try:
+                return self.user.spotify_connection.user_uri
+            except SpotifyConnection.DoesNotExist:
+                pass
+        return None
+
+    def get_connection_state(self):
+        if (self.user):
+            try:
+                return self.user.spotify_connection.state
+            except SpotifyConnection.DoesNotExist:
+                pass
+        return self.DISCONNECTED
 
     def connect(self, username):
-        userUri = 'spotify:user:' + username
+        if not self.user:
+            raise MissingUserError()
+
+        user_uri = 'spotify:user:' + username
         # for now the only way I know of validating a user exists is to try and load a playlist
+        connection = SpotifyConnection(user=self.user)
         if username:
-            user = self.spotify_session.get_user(userUri)
+            user = self.session.get_user(user_uri)
             starred = user.load().starred
             try:
                 tracks = starred.load().tracks_with_metadata
-                session = self._get_session()
-                session.update({
-                    'username': username,
-                    'userUri': userUri,
-                })
-                self._set_state(self.CONNECTED)
+                connection.username = username
+                connection.user_uri = user_uri
+                connection.state = self.CONNECTED
             except spotify.Error:
-                self._set_state(self.FAILED)
+                connection.state = self.FAILED
+        connection.save()
+
+    def disconnect(self):
+        try:
+            self.user.spotify_connection.delete()
+        except:
+            pass

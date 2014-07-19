@@ -5,7 +5,8 @@ from django.test import TestCase
 from lastfm import lfm
 
 from starstoloves.models import User, LastfmConnection
-from starstoloves.views.helpers.lastfm_connection import LastfmConnectionHelper, MissingUserError
+from starstoloves.views.helpers.connection import MissingUserError
+from starstoloves.views.helpers.lastfm_connection import LastfmConnectionHelper
 
 
 class BaseTestLastfmConnection(TestCase):

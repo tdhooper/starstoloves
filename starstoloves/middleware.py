@@ -23,7 +23,7 @@ class SpotifySession:
         if not self.spotify_session:
             return HttpResponse('Spotify authentication failed')
         request.spotify_session = self.spotify_session
-        request.spotify_connection = SpotifyConnectionHelper(request.session, self.spotify_session)
+        request.spotify_connection = SpotifyConnectionHelper(request.session_user, self.spotify_session)
 
 
 from lastfm import lfm

@@ -39,3 +39,7 @@ class DBConnectionHelper(object):
 
     def is_connected(self):
         return self.get_connection_state() is self.CONNECTED
+
+
+class MissingUserError(Exception):
+    pass
