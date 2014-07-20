@@ -1,9 +1,9 @@
 import spotify
 
-from .connection import DBConnectionHelper, MissingUserError
+from .connection import ConnectionHelper, MissingUserError
 from starstoloves.models import SpotifyConnection
 
-class SpotifyConnectionHelper(DBConnectionHelper):
+class SpotifyConnectionHelper(ConnectionHelper):
 
     def __init__(self, user, session):
         self.user = user

@@ -1,7 +1,7 @@
-from .connection import DBConnectionHelper, MissingUserError
+from .connection import ConnectionHelper, MissingUserError
 from starstoloves.models import LastfmConnection
 
-class LastfmConnectionHelper(DBConnectionHelper):
+class LastfmConnectionHelper(ConnectionHelper):
 
     def __init__(self, user, app):
         self.user = user
