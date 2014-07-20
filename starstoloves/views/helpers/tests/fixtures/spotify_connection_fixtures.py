@@ -49,3 +49,21 @@ class SpotifyConnectionFixtures(CommonConnectionFixtures):
         self.session.get_user.side_effect = get_user
 
         self.connection_with_user.connect('some_username')
+
+    def failed_connection(self):
+        starred = MagicMock(spec=Playlist)
+        # starred.load.return_value = starred
+        # starred.tracks_with_metadata.side_effect = spotify.Error()
+        starred.load.side_effect = spotify.Error()
+
+        user = MagicMock(spec=SpotifyUser).return_value
+        user.load.return_value = user
+
+        user.starred = starred
+
+        def get_user(user_uri):
+            if user_uri == 'spotify:user:some_username':
+                return user
+        self.session.get_user.side_effect = get_user
+
+        self.connection_with_user.connect('some_username')

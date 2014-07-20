@@ -18,14 +18,6 @@ def app(fixtures):
     return fixtures.app
 
 @pytest.fixture
-def failed_connection(app, connection_with_user):
-    def get_session(token):
-        if (token == 'some_token'):
-            raise Exception()
-    app.auth.get_session.side_effect = get_session
-    connection_with_user.connect('some_token')
-
-@pytest.fixture
 def disconnected_connection(app, connection_with_user):
     connection_with_user.disconnect()
 
@@ -38,17 +30,6 @@ def test_get_auth_url_proxies_to_app(connection, app):
     app.auth.get_url.side_effect = get_url
     auth_url = connection.get_auth_url('some_callback')
     assert auth_url == 'some_auth_url'
-
-
-@pytest.mark.lastfm_only
-@pytest.mark.usefixtures("failed_connection")
-class TestLastfmConnectionConnectFail():
-
-    def test_associates_a_LastfmConnection(self, fetch_user):
-        assert isinstance(fetch_user.lastfm_connection, LastfmConnection)
-
-    def test_sets_the_connection_state_as_failed(self, fetch_connection):
-        assert fetch_connection.get_connection_state() == fetch_connection.FAILED
 
 
 @pytest.mark.lastfm_only

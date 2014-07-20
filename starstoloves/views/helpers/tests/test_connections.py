@@ -33,3 +33,12 @@ class TestConnectionConnectSuccess():
     def test_sets_the_connection_state_as_connected(self, fetch_connection):
         assert fetch_connection.get_connection_state() == fetch_connection.CONNECTED
 
+
+@pytest.mark.usefixtures("failed_connection")
+class TestConnectionConnectFail():
+
+    def test_associates_a_connection(self, fetch_user, connection_name, connection_class):
+        assert isinstance(getattr(fetch_user, connection_name), connection_class)
+
+    def test_sets_the_connection_state_as_failed(self, fetch_connection):
+        assert fetch_connection.get_connection_state() == fetch_connection.FAILED
