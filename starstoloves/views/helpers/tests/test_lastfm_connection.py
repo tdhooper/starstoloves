@@ -2,12 +2,6 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from lastfm import lfm
-
-from starstoloves.models import User, LastfmConnection
-from starstoloves.views.helpers.connection import MissingUserError
-from starstoloves.views.helpers.lastfm_connection import LastfmConnectionHelper
-
 from .fixtures.connection_fixtures import *
 
 

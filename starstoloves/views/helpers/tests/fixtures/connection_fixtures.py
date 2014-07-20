@@ -9,6 +9,9 @@ def fixtures(request):
     if 'lastfm_only' in request.keywords and request.param is not LastfmConnectionFixtures:
         pytest.skip("Lastfm only")
 
+    if 'spotify_only' in request.keywords and request.param is not SpotifyConnectionFixtures:
+        pytest.skip("Spotify only")
+
     fixtures = request.param()
     request.addfinalizer(fixtures.finalizer)
     return fixtures;
