@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
 
 from starstoloves.views import main
-from starstoloves.views.helpers.spotify_connection import SpotifyConnectionHelper
+from starstoloves.lib.connection.spotify_connection import SpotifyConnectionHelper
 
 class TestResultUpdate(TestCase):
 

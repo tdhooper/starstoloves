@@ -8,7 +8,6 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponse, HttpResponseServerError
 
 from starstoloves import forms
-from starstoloves.views.helpers import spotify_connection
 from starstoloves.lib.search import LastfmSearcherWithLoves
 from starstoloves.lib.track import SearchingTrackFactory
 

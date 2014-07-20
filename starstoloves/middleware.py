@@ -11,7 +11,7 @@ class SessionUser:
 
 
 from django.http import HttpResponse
-from starstoloves.views.helpers.spotify_connection import SpotifyConnectionHelper
+from starstoloves.lib.connection.spotify_connection import SpotifyConnectionHelper
 
 class SpotifySession:
 
@@ -28,7 +28,7 @@ class SpotifySession:
 
 from lastfm import lfm
 from starstoloves import settings
-from starstoloves.views.helpers.lastfm_connection import LastfmConnectionHelper
+from starstoloves.lib.connection.lastfm_connection import LastfmConnectionHelper
 
 class LastfmApi:
 

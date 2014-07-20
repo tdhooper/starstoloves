@@ -7,7 +7,7 @@ from spotify import User as SpotifyUser
 from spotify import Playlist
 
 from starstoloves.models import SpotifyConnection
-from starstoloves.views.helpers.spotify_connection import SpotifyConnectionHelper
+from starstoloves.lib.connection.spotify_connection import SpotifyConnectionHelper
 
 from .common_connection_fixtures import CommonConnectionFixtures
 

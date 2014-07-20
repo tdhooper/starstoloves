@@ -5,7 +5,7 @@ import pytest
 from lastfm import lfm
 
 from starstoloves.models import LastfmConnection
-from starstoloves.views.helpers.lastfm_connection import LastfmConnectionHelper
+from starstoloves.lib.connection.lastfm_connection import LastfmConnectionHelper
 
 from .common_connection_fixtures import CommonConnectionFixtures
 

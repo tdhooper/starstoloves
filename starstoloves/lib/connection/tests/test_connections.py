@@ -1,6 +1,6 @@
 import pytest
 
-from starstoloves.views.helpers.connection import MissingUserError
+from starstoloves.lib.connection.connection import MissingUserError
 
 from .fixtures.connection_fixtures import *
 
