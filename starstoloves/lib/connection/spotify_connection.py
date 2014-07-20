@@ -5,33 +5,15 @@ from starstoloves.models import SpotifyConnection
 
 class SpotifyConnectionHelper(ConnectionHelper):
 
+    connection_name = 'spotify_connection'
+    connection_class = SpotifyConnection
+
     def __init__(self, user, session):
         self.user = user
         self.session = session
 
-    def get_username(self):
-        if (self.user):
-            try:
-                return self.user.spotify_connection.username
-            except SpotifyConnection.DoesNotExist:
-                pass
-        return None
-
     def get_user_uri(self):
-        if (self.user):
-            try:
-                return self.user.spotify_connection.user_uri
-            except SpotifyConnection.DoesNotExist:
-                pass
-        return None
-
-    def get_connection_state(self):
-        if (self.user):
-            try:
-                return self.user.spotify_connection.state
-            except SpotifyConnection.DoesNotExist:
-                pass
-        return self.DISCONNECTED
+        return self._get_from_connection('user_uri')
 
     def connect(self, username):
         if not self.user:
@@ -52,8 +34,3 @@ class SpotifyConnectionHelper(ConnectionHelper):
                 connection.state = self.FAILED
         connection.save()
 
-    def disconnect(self):
-        try:
-            self.user.spotify_connection.delete()
-        except:
-            pass
