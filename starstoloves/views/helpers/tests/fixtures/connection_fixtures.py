@@ -51,3 +51,7 @@ def successful_connection(fixtures):
 @pytest.fixture
 def failed_connection(fixtures):
     fixtures.failed_connection()
+
+@pytest.fixture
+def disconnected_connection(fixtures):
+    fixtures.disconnected_connection()

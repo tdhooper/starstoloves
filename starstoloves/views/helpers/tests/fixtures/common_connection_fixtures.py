@@ -15,3 +15,6 @@ class CommonConnectionFixtures():
     @property
     def fetch_user(self):
         return User.objects.get(session_key='some_key')
+
+    def disconnected_connection(self):
+        self.connection_with_user.disconnect()
