@@ -11,3 +11,7 @@ class CommonConnectionFixtures():
 
     def finalizer(self):
         self.user.delete()
+
+    @property
+    def fetch_user(self):
+        return User.objects.get(session_key='some_key')

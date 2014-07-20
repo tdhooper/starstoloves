@@ -27,3 +27,23 @@ def connection(request, connection_with_user, connection_without_user):
         return connection_with_user
     else:
         return connection_without_user
+
+@pytest.fixture
+def fetch_user(fixtures):
+    return fixtures.fetch_user
+
+@pytest.fixture
+def fetch_connection(fixtures):
+    return fixtures.fetch_connection
+
+@pytest.fixture
+def connection_name(fixtures):
+    return fixtures.connection_name
+
+@pytest.fixture
+def connection_class(fixtures):
+    return fixtures.connection_class
+
+@pytest.fixture
+def successful_connection(fixtures):
+    fixtures.successful_connection()

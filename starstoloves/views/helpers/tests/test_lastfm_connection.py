@@ -18,22 +18,6 @@ def app(fixtures):
     return fixtures.app
 
 @pytest.fixture
-def fetch_user():
-    return User.objects.get(session_key='some_key')
-
-@pytest.fixture
-def fetch_connection(fetch_user, app):
-    return LastfmConnectionHelper(fetch_user, app)
-
-@pytest.fixture
-def successful_connection(app, connection_with_user):
-    def get_session(token):
-        if (token == 'some_token'):
-            return {'name': 'some_username'}
-    app.auth.get_session.side_effect = get_session
-    connection_with_user.connect('some_token')
-
-@pytest.fixture
 def failed_connection(app, connection_with_user):
     def get_session(token):
         if (token == 'some_token'):
@@ -54,20 +38,6 @@ def test_get_auth_url_proxies_to_app(connection, app):
     app.auth.get_url.side_effect = get_url
     auth_url = connection.get_auth_url('some_callback')
     assert auth_url == 'some_auth_url'
-
-
-@pytest.mark.lastfm_only
-@pytest.mark.usefixtures("successful_connection")
-class TestLastfmConnectionConnectSuccess():
-
-    def test_associates_a_LastfmConnection(self, fetch_user):
-        assert isinstance(fetch_user.lastfm_connection, LastfmConnection)
-
-    def test_stores_the_username(self, fetch_connection):
-        assert fetch_connection.get_username() == 'some_username'
-
-    def test_sets_the_connection_state_as_connected(self, fetch_connection):
-        assert fetch_connection.get_connection_state() == fetch_connection.CONNECTED
 
 
 @pytest.mark.lastfm_only
