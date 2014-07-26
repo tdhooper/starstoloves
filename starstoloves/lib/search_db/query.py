@@ -14,10 +14,14 @@ class LastfmQuery(object):
         return self.async_result.status
 
     @property
-    def results(self):
+    def response_data(self):
         if self.async_result.ready():
-            data = self.async_result.info
-            parsed = self.parser.parse(data)
+            return self.async_result.info
+
+    @property
+    def results(self):
+        if self.response_data:
+            parsed = self.parser.parse(self.response_data)
             return parsed
 
     def stop(self):
