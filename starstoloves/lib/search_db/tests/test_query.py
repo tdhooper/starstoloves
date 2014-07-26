@@ -8,11 +8,7 @@ from .fixtures import *
 
 @pytest.fixture
 def AsyncResult_patch(request):
-    patcher = patch('starstoloves.lib.search_db.query.AsyncResult')
-    def fin():
-        patcher.stop()
-    request.addfinalizer(fin)
-    return patcher.start()
+    return create_patch(request, 'starstoloves.lib.search_db.query.AsyncResult')
 
 @pytest.fixture
 def query(parser):
@@ -20,11 +16,7 @@ def query(parser):
 
 @pytest.fixture
 def revoke_patch(request):
-    patcher = patch('starstoloves.lib.search_db.query.revoke')
-    def fin():
-        patcher.stop()
-    request.addfinalizer(fin)
-    return patcher.start()
+    return create_patch(request, 'starstoloves.lib.search_db.query.revoke')
 
 
 def test_fetches_async_result_on_init(AsyncResult_patch, query):
