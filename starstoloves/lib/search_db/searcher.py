@@ -8,8 +8,8 @@ class LastfmSearcher(object):
         self.lastfm_app = lastfm_app
         self.parser = parser
 
-    def search(self, track_name, artist_name=None):
+    def search(self, track):
         # change to take a spotify track, and do the separate searches itself
         # can be a search_or_get
-        async_result = search_lastfm.delay(self.lastfm_app, track_name, artist_name)
+        async_result = search_lastfm.delay(self.lastfm_app, track['track_name'], track['artist_name'])
         return LastfmQuery(async_result.id, self.parser)

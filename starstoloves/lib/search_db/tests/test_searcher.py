@@ -34,14 +34,20 @@ def LastfmQuery_patch(request):
 def searcher(parser):
     return LastfmSearcher('some_lastfm_app', parser)
 
+@pytest.fixture
+def track():
+    return {
+        'track_name': 'some_track',
+        'artist_name': 'some_artist',
+    }
 
-def test_search_creates_a_new_task(task_patch, searcher):
-    searcher.search('track_name', 'artist_name')
+def test_search_creates_a_new_task(task_patch, searcher, track):
+    searcher.search(track)
     assert task_patch.delay.call_count is 1
-    assert task_patch.delay.call_args == call('some_lastfm_app', 'track_name', 'artist_name')
+    assert task_patch.delay.call_args == call('some_lastfm_app', 'some_track', 'some_artist')
 
-def test_search_returns_a_new_query_created_with_the_task_id(task_result, searcher, parser, LastfmQuery_patch):
+def test_search_returns_a_new_query_created_with_the_task_id(task_result, searcher, parser, LastfmQuery_patch, track):
     task_result.id = 'some_id'
-    query = searcher.search('track_name', 'artist_name')
+    query = searcher.search(track)
     assert LastfmQuery_patch.call_args == call('some_id', parser)
     assert query is LastfmQuery_patch.return_value
