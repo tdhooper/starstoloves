@@ -8,8 +8,8 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponse, HttpResponseServerError
 
 from starstoloves import forms
-from starstoloves.lib.search import LastfmSearcherWithLoves
-from starstoloves.lib.track import SearchingTrackFactory
+from starstoloves.lib.user.spotify_user import SpotifyUser
+from starstoloves.lib.user.user import starred_track_searches
 
 def lastfm_connection_ui_context(request):
     if request.lastfm_connection.is_connected():
@@ -51,21 +51,6 @@ def spotify_connection_ui_context(request, form):
         'spConnectUrl': reverse('index'),
     }
 
-def get_starred_tracks(request):
-    tracks = []
-    user_uri = request.spotify_connection.get_user_uri()
-    user = request.spotify_session.get_user(user_uri)
-    starred = user.load().starred
-    playlist = starred.load().tracks_with_metadata
-    for item in playlist:
-        track = item.track.load()
-        tracks.append({
-            'track_name': track.name,
-            'artist_name': track.artists[0].load().name,
-            'date_saved': item.create_time,
-        })
-    return tracks
-
 def get_loved_tracks_urls(request):
     if 'loved_tracks_urls' in request.session:
         return request.session['loved_tracks_urls']
@@ -79,44 +64,22 @@ def forget_loved_tracks_urls(request):
     if 'loved_tracks_urls' in request.session:
         del request.session['loved_tracks_urls']
 
-def get_searching_tracks(request, track_factory):
-    serialised_tracks = request.session.get('serialised_tracks', False)
-    if not serialised_tracks:
-        tracks = [
-            track_factory.create(track['track_name'], track['artist_name'], track['date_saved'])
-            for track in get_starred_tracks(request)
-        ]
-    else:
-        tracks = [
-            track_factory.deserialise(track)
-            for track in serialised_tracks
-        ]
-    request.session['serialised_tracks'] = [track.serialise() for track in tracks]
-    return tracks
-
-def forget_searching_tracks(request):
-    tracks = get_tracks(request)
-    for track in tracks:
-        track.stop()
-    del request.session['serialised_tracks']
-
-def get_tracks(request):
-    loved_tracks_urls = get_loved_tracks_urls(request)
-    searcher = LastfmSearcherWithLoves(request.lastfm_app, loved_tracks_urls)
-    track_factory = SearchingTrackFactory(searcher)
-    return get_searching_tracks(request, track_factory)
+def get_searches(request):
+    sp_user = SpotifyUser(request.session_user, request.spotify_session, request.spotify_connection)
+    return starred_track_searches(sp_user, request.lastfm_app)
 
 def get_tracks_data(request):
     return [
         {
-            'track_name': track.track_name,
-            'artist_name': track.artist_name,
-            'date_saved': track.date_saved,
-            'id': track.id,
-            'status': track.status,
-            'results': track.results
+            'track_name': search['track']['track_name'],
+            'artist_name': search['track']['artist_name'],
+            # 'date_saved': track.date_saved,
+            'date_saved': 0,
+            'id': search['query'].id,
+            'status': search['query'].status,
+            'results': search['query'].results
         }
-        for track in get_tracks(request)
+        for search in get_searches(request)
     ]
 
 def index(request):
@@ -181,6 +144,5 @@ def disconnectLastfm(request):
 
 def disconnectSpotify(request):
     request.spotify_connection.disconnect()
-    forget_searching_tracks(request)
     return redirect('index')
     

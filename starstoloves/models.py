@@ -1,13 +1,13 @@
 from django.db import models
 
 class LastfmTrack(models.Model):
-    track_name = models.CharField(max_length=300, null=True)
-    artist_name = models.CharField(max_length=300, null=True)
-    url = models.URLField()
+    track_name = models.CharField(max_length=3000, null=True)
+    artist_name = models.CharField(max_length=3000, null=True)
+    url = models.URLField(max_length=3000)
 
 class SpotifyTrack(models.Model):
-    track_name = models.CharField(max_length=300, null=True)
-    artist_name = models.CharField(max_length=300, null=True)
+    track_name = models.CharField(max_length=3000, null=True)
+    artist_name = models.CharField(max_length=3000, null=True)
 
 class User(models.Model):
     session_key = models.CharField(max_length=300)
