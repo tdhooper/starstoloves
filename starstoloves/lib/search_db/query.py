@@ -4,13 +4,15 @@ from celery.task.control import revoke
 from starstoloves.models import LastfmQuery as LastfmQueryModel
 from starstoloves.models import LastfmTrack as LastfmTrackModel
 
+from .result import LastfmResultParser
+
 
 class LastfmQuery(object):
 
-    def __init__(self, id, parser):
+    def __init__(self, id):
         self.id = id
         self.async_result = AsyncResult(id)
-        self.parser = parser
+        self.parser = LastfmResultParser()
 
     @property
     def status(self):
@@ -33,8 +35,8 @@ class LastfmQuery(object):
 
 class LastfmCachingQuery(LastfmQuery):
 
-    def __init__(self, id, parser):
-        super().__init__(id, parser)
+    def __init__(self, id):
+        super().__init__(id)
         self.query_model, created = LastfmQueryModel.objects.get_or_create(task_id=id)
         self.query_model.save()
 

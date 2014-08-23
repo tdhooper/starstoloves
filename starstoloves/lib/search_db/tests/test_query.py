@@ -10,15 +10,20 @@ from .fixtures import *
 pytestmark = pytest.mark.django_db
 
 @pytest.fixture
+def parser(request):
+    patch = create_patch(request, 'starstoloves.lib.search_db.query.LastfmResultParser')
+    return patch.return_value
+
+@pytest.fixture
 def AsyncResult_patch(request):
     return create_patch(request, 'starstoloves.lib.search_db.query.AsyncResult')
 
 @pytest.fixture(params=[LastfmQuery, LastfmCachingQuery])
-def query(request, parser, LastfmQueryModel_patch, query_model_mocks):
+def query(request, LastfmQueryModel_patch, query_model_mocks):
     if 'caching_only' in request.keywords and request.param is not LastfmCachingQuery:
         pytest.skip("LastfmCachingQuery only")
 
-    return request.param('some_id', parser)
+    return request.param('some_id')
 
 @pytest.fixture
 def revoke_patch(request):
@@ -59,7 +64,7 @@ def test_results_is_none_when_not_ready(AsyncResult_patch, query):
     assert query.results is None
 
 @pytest.mark.usefixtures("async_result_has_data")
-def test_results_returns_parsed_AsynchResult_info(query, parser):
+def test_results_returns_parsed_AsynchResult_info(parser, query):
     parser.parse.return_value = 'parsed_tracks'
     assert query.results == 'parsed_tracks'
     assert parser.parse.call_args == call('some_data')

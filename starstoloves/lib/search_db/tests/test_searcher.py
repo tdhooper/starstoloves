@@ -50,8 +50,8 @@ def LastfmQuery_mock(LastfmQuery_patch):
     return LastfmQuery_patch
 
 @pytest.fixture
-def searcher(parser):
-    return LastfmSearcher('some_lastfm_app', parser)
+def searcher():
+    return LastfmSearcher('some_lastfm_app')
 
 @pytest.fixture
 def track():
@@ -66,10 +66,10 @@ def test_search_creates_a_new_task(task_patch, searcher, track):
     assert task_patch.delay.call_count is 1
     assert task_patch.delay.call_args == call('some_lastfm_app', 'some_track', 'some_artist')
 
-def test_search_returns_a_new_query_created_with_the_task_id(task_patch, searcher, parser, LastfmQuery_patch, LastfmSearch_patch, track):
+def test_search_returns_a_new_query_created_with_the_task_id(task_patch, searcher, LastfmQuery_patch, LastfmSearch_patch, track):
     LastfmSearch_patch.objects.get_or_create.return_value = (MagicMock(), True)
     query = searcher.search(track)
-    assert LastfmQuery_patch.call_args == call('some_id', parser)
+    assert LastfmQuery_patch.call_args == call('some_id')
     assert query is LastfmQuery_patch.return_value
 
 def test_search_stores_the_query_against_the_track(searcher, track):
@@ -87,8 +87,8 @@ def test_search_returns_a_query_when_called_twice(task_patch, searcher, track):
     query = searcher.search(track)
     assert isinstance(query, LastfmCachingQuery)
 
-def test_search_uses_the_same_task_when_called_twice(task_patch, searcher, parser, LastfmQuery_mock, track):
+def test_search_uses_the_same_task_when_called_twice(task_patch, searcher, LastfmQuery_mock, track):
     searcher.search(track)
     searcher.search(track)
-    assert LastfmQuery_mock.call_args_list[0] == call('some_id', parser)
-    assert LastfmQuery_mock.call_args_list[1] == call('some_id', parser)
+    assert LastfmQuery_mock.call_args_list[0] == call('some_id')
+    assert LastfmQuery_mock.call_args_list[1] == call('some_id')
