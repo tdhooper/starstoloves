@@ -27,3 +27,8 @@ class SpotifyConnection(models.Model):
 class LastfmQuery(models.Model):
     task_id = models.CharField(max_length=300)
     track_results = models.ManyToManyField(LastfmTrack, null=True)
+
+class LastfmSearch(models.Model):
+    track_name = models.CharField(max_length=300, null=True)
+    artist_name = models.CharField(max_length=300, null=True)
+    query = models.OneToOneField(LastfmQuery, related_name='search', null=True)

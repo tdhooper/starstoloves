@@ -1,6 +1,6 @@
 from starstoloves.tasks import search_lastfm
-from .query import LastfmQuery
-
+from starstoloves.models import LastfmSearch
+from .query import LastfmCachingQuery
 
 class LastfmSearcher(object):
 
@@ -9,7 +9,13 @@ class LastfmSearcher(object):
         self.parser = parser
 
     def search(self, track):
-        # change to take a spotify track, and do the separate searches itself
-        # can be a search_or_get
-        async_result = search_lastfm.delay(self.lastfm_app, track['track_name'], track['artist_name'])
-        return LastfmQuery(async_result.id, self.parser)
+        search, created = LastfmSearch.objects.get_or_create(track_name=track['track_name'], artist_name=track['artist_name'])
+        if created:
+            async_result = search_lastfm.delay(self.lastfm_app, track['track_name'], track['artist_name'])
+            query = LastfmCachingQuery(async_result.id, self.parser)
+            search.query = query.query_model
+            search.save()
+            return query
+        else:
+            query = LastfmCachingQuery(search.query.task_id, self.parser)
+        return query
