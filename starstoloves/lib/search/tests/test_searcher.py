@@ -13,7 +13,7 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture
 def task_patch(request, task_result):
-    patcher = patch('starstoloves.lib.search_db.searcher.search_lastfm')
+    patcher = patch('starstoloves.lib.search.searcher.search_lastfm')
     def fin():
         patcher.stop()
     request.addfinalizer(fin)
@@ -29,7 +29,7 @@ def task_result():
 
 @pytest.fixture
 def LastfmSearch_patch(request):
-    patcher = patch('starstoloves.lib.search_db.searcher.LastfmSearch')
+    patcher = patch('starstoloves.lib.search.searcher.LastfmSearch')
     def fin():
         patcher.stop()
     request.addfinalizer(fin)
@@ -37,7 +37,7 @@ def LastfmSearch_patch(request):
 
 @pytest.fixture
 def LastfmQuery_patch(request):
-    patcher = patch('starstoloves.lib.search_db.searcher.LastfmCachingQuery')
+    patcher = patch('starstoloves.lib.search.searcher.LastfmCachingQuery')
     def fin():
         patcher.stop()
     request.addfinalizer(fin)
