@@ -4,19 +4,18 @@ import pytest
 
 from starstoloves.models import LastfmQuery as LastfmQueryModel
 from ..query import LastfmQuery, LastfmCachingQuery
-from .fixtures import *
 
 
 pytestmark = pytest.mark.django_db
 
 @pytest.fixture
-def parser(request):
-    patch = create_patch(request, 'starstoloves.lib.search_db.query.LastfmResultParser')
+def parser(create_patch):
+    patch = create_patch('starstoloves.lib.search_db.query.LastfmResultParser')
     return patch.return_value
 
 @pytest.fixture
-def AsyncResult_patch(request):
-    return create_patch(request, 'starstoloves.lib.search_db.query.AsyncResult')
+def AsyncResult_patch(create_patch):
+    return create_patch('starstoloves.lib.search_db.query.AsyncResult')
 
 @pytest.fixture(params=[LastfmQuery, LastfmCachingQuery])
 def query(request, LastfmQueryModel_patch, query_model_mocks):
@@ -26,8 +25,8 @@ def query(request, LastfmQueryModel_patch, query_model_mocks):
     return request.param('some_id')
 
 @pytest.fixture
-def revoke_patch(request):
-    return create_patch(request, 'starstoloves.lib.search_db.query.revoke')
+def revoke_patch(create_patch):
+    return create_patch('starstoloves.lib.search_db.query.revoke')
 
 @pytest.fixture
 def async_result_has_data(AsyncResult_patch):
@@ -38,8 +37,8 @@ def parser_returns_tracks(request, parser):
     parser.parse.return_value = request.cls.parsed_tracks
 
 @pytest.fixture
-def LastfmQueryModel_patch(request):
-    return create_patch(request, 'starstoloves.lib.search_db.query.LastfmQueryModel')
+def LastfmQueryModel_patch(create_patch):
+    return create_patch('starstoloves.lib.search_db.query.LastfmQueryModel')
 
 @pytest.fixture
 def query_model_mocks(LastfmQueryModel_patch):

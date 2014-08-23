@@ -7,7 +7,6 @@ from celery.result import AsyncResult
 from ..searcher import LastfmSearcher
 from ..query import LastfmCachingQuery
 from starstoloves.models import LastfmSearch
-from .fixtures import *
 
 
 pytestmark = pytest.mark.django_db
