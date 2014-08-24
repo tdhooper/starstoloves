@@ -38,3 +38,11 @@ class LastfmApi:
     def process_request(self, request):
         request.lastfm_app = self.app
         request.lastfm_connection = LastfmConnectionHelper(request.session_user, self.app)
+
+
+from starstoloves.views.helpers.connection import ConnectionHelper
+
+class Connection:
+
+    def process_request(self, request):
+        request.connection_helper = ConnectionHelper(request.lastfm_connection, request.spotify_connection)

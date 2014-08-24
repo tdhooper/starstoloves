@@ -123,5 +123,5 @@ class TestResultUpdate(TestCase):
         else:
             request = self.factory.post(url)
         request.spotify_connection = MagicMock(SpotifyConnectionHelper)
-        return main.resultUpdate(request)
+        return main.result_update(request)
 
