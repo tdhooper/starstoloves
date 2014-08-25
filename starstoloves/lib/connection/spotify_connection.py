@@ -21,7 +21,7 @@ class SpotifyConnectionHelper(ConnectionHelper):
 
         user_uri = 'spotify:user:' + username
         # for now the only way I know of validating a user exists is to try and load a playlist
-        connection = SpotifyConnection(user=self.user)
+        connection, created = SpotifyConnection.objects.get_or_create(user=self.user)
         if username:
             user = self.session.get_user(user_uri)
             starred = user.load().starred
