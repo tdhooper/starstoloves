@@ -7,25 +7,14 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseServerError
 
 from starstoloves.lib.user.spotify_user import SpotifyUser
+from starstoloves.lib.user.lastfm_user import LastfmUser
 from starstoloves.lib.user.user import starred_track_searches
 from .connection import connection_index_decorator, connection_index_processor
 
-def get_loved_tracks_urls(request):
-    if 'loved_tracks_urls' in request.session:
-        return request.session['loved_tracks_urls']
-    username = request.lastfm_connection.get_username()
-    loved_tracks_response = request.lastfm_app.user.get_loved_tracks(username)
-    urls = [track['url'] for track in loved_tracks_response['track']]
-    request.session['loved_tracks_urls'] = urls
-    return urls
-
-def forget_loved_tracks_urls(request):
-    if 'loved_tracks_urls' in request.session:
-        del request.session['loved_tracks_urls']
 
 def get_searches(request):
     spotify_user = SpotifyUser(request.session_user)
-    return starred_track_searches(spotify_user, request.lastfm_app)
+    return starred_track_searches(spotify_user)
 
 def get_tracks_data(request):
     return [
@@ -44,7 +33,8 @@ def get_tracks_data(request):
 @connection_index_decorator
 def index(request):
     context = {}
-    if request.lastfm_connection.is_connected():
+    lastfm_user = LastfmUser(request.session_user)
+    if lastfm_user.connection.is_connected():
         spotify_user = SpotifyUser(request.session_user)
         if spotify_user.connection.is_connected():
             context['tracks'] = get_tracks_data(request)

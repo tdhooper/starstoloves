@@ -21,18 +21,3 @@ class SpotifySession:
     def process_request(self, request):
         if not self.spotify_session:
             return HttpResponse('Spotify authentication failed')
-
-
-from lastfm import lfm
-from starstoloves import settings
-from starstoloves.lib.connection.lastfm_connection import LastfmConnectionHelper
-
-class LastfmApi:
-
-    def __init__(self):
-        self.app = lfm.App(settings.LASTFM['key'], settings.LASTFM['secret'])
-
-    def process_request(self, request):
-        request.lastfm_app = self.app
-        request.lastfm_connection = LastfmConnectionHelper(request.session_user, self.app)
-

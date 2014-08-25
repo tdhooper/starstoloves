@@ -1,7 +1,8 @@
 from starstoloves.lib.search.searcher import LastfmSearcher
 
-def starred_track_searches(sp_user, lastfm_app):
-    searcher = LastfmSearcher(lastfm_app)
+
+def starred_track_searches(sp_user):
+    searcher = LastfmSearcher()
     searches = [
         {
             'track': track,

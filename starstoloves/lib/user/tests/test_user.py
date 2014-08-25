@@ -13,10 +13,6 @@ def sp_user():
     return MagicMock(spec=SpotifyUser).return_value
 
 @pytest.fixture
-def lastfm_app():
-    return MagicMock(spec=lfm.App).return_value
-
-@pytest.fixture
 def LastfmSearcher_patch(create_patch):
     return create_patch('starstoloves.lib.user.user.LastfmSearcher')
 
@@ -37,19 +33,19 @@ class TestStarredTrackSearches:
             }
         ]
 
-    def test_it_creates_a_searcher(self, sp_user, lastfm_app, LastfmSearcher_patch):
-        starred_track_searches(sp_user, lastfm_app)
-        assert LastfmSearcher_patch.call_args_list == [call(lastfm_app)]
+    def test_it_creates_a_searcher(self, sp_user, LastfmSearcher_patch):
+        starred_track_searches(sp_user)
+        assert LastfmSearcher_patch.call_count is 1
 
-    def test_it_starts_a_search_for_each_track(self, sp_user, lastfm_app, searcher):
+    def test_it_starts_a_search_for_each_track(self, sp_user, searcher):
         sp_user.starred_tracks = self.starred_tracks
-        starred_track_searches(sp_user, lastfm_app)
+        starred_track_searches(sp_user)
         assert searcher.search.call_args_list == [
             call(self.starred_tracks[0]),
             call(self.starred_tracks[1])
         ]
 
-    def test_it_returns_the_tracks_and_search_queries(self, sp_user, lastfm_app, searcher):
+    def test_it_returns_the_tracks_and_search_queries(self, sp_user, searcher):
         search_returns = []
         def search(track):
             search_returns.append(track['track_name'] + track['artist_name'])
@@ -57,7 +53,7 @@ class TestStarredTrackSearches:
         searcher.search.side_effect = search
 
         sp_user.starred_tracks = self.starred_tracks
-        searches = starred_track_searches(sp_user, lastfm_app)
+        searches = starred_track_searches(sp_user)
 
         assert searches == [
             {

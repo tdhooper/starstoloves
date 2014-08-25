@@ -4,12 +4,14 @@ from django.utils.decorators import decorator_from_middleware
 
 from starstoloves.forms import SpotifyConnectForm
 from starstoloves.lib.user.spotify_user import SpotifyUser
+from starstoloves.lib.user.lastfm_user import LastfmUser
 
 
 class ConnectionMiddleware:
 
     def process_request(self, request):
-        if not request.lastfm_connection.is_connected():
+        lastfm_user = LastfmUser(request.session_user)
+        if not lastfm_user.connection.is_connected():
             return
 
         spotify_user = SpotifyUser(request.session_user)
@@ -42,22 +44,24 @@ connection_index_decorator = decorator_from_middleware(ConnectionMiddleware)
 def connection_index_processor(request):
     context = {}
     add_lastfm_context(request, context)
-    if request.lastfm_connection.is_connected():
+    lastfm_user = LastfmUser(request.session_user)
+    if lastfm_user.connection.is_connected():
         add_spotify_context(request, context)
     return context
 
 
 def add_lastfm_context(request, context):
-    if request.lastfm_connection.is_connected():
+    lastfm_user = LastfmUser(request.session_user)
+    if lastfm_user.connection.is_connected():
         context.update({
-            'lfmUsername': request.lastfm_connection.get_username(),
+            'lfmUsername': lastfm_user.connection.get_username(),
             'lfmDisconnectUrl': reverse('disconnect_lastfm'),
         })
     else:
         context.update({
             'lfmConnectUrl': reverse('connect_lastfm'),
         })
-    if request.lastfm_connection.get_connection_state() is request.lastfm_connection.FAILED:
+    if lastfm_user.connection.get_connection_state() is lastfm_user.connection.FAILED:
         context.update({
             'lfmConnectFailure': True
         })
@@ -78,19 +82,21 @@ def add_spotify_context(request, context):
 
 
 def connect_lastfm(request):
-    if request.lastfm_connection.is_connected():
+    lastfm_user = LastfmUser(request.session_user)
+    if lastfm_user.connection.is_connected():
         return redirect('index')
     token = request.GET.get('token')
     if token:
-        request.lastfm_connection.connect(token)
+        lastfm_user.connection.connect(token)
         return redirect('index')
     callback_url = request.build_absolute_uri(reverse('connect_lastfm'))
-    auth_url = request.lastfm_connection.get_auth_url(callback_url)
+    auth_url = lastfm_user.connection.get_auth_url(callback_url)
     return redirect(auth_url)
 
 
 def disconnect_lastfm(request):
-    request.lastfm_connection.disconnect()
+    lastfm_user = LastfmUser(request.session_user)
+    lastfm_user.connection.disconnect()
     return redirect('index')
 
 

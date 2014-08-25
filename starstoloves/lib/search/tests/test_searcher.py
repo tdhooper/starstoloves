@@ -50,7 +50,7 @@ def LastfmQuery_mock(LastfmQuery_patch):
 
 @pytest.fixture
 def searcher():
-    return LastfmSearcher('some_lastfm_app')
+    return LastfmSearcher()
 
 @pytest.fixture
 def track():
@@ -63,7 +63,7 @@ def track():
 def test_search_creates_a_new_task(task_patch, searcher, track):
     searcher.search(track)
     assert task_patch.delay.call_count is 1
-    assert task_patch.delay.call_args == call('some_lastfm_app', 'some_track', 'some_artist')
+    assert task_patch.delay.call_args == call('some_track', 'some_artist')
 
 def test_search_returns_a_new_query_created_with_the_task_id(task_patch, searcher, LastfmQuery_patch, LastfmSearch_patch, track):
     LastfmSearch_patch.objects.get_or_create.return_value = (MagicMock(), True)
