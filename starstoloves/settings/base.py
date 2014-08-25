@@ -112,7 +112,6 @@ MIDDLEWARE_CLASSES = (
     'starstoloves.middleware.SessionUser',
     'starstoloves.middleware.SpotifySession',
     'starstoloves.middleware.LastfmApi',
-    'starstoloves.middleware.Connection',
 )
 
 SESSION_SAVE_EVERY_REQUEST=True

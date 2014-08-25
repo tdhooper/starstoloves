@@ -8,7 +8,7 @@ from django.http import HttpResponse, HttpResponseServerError
 
 from starstoloves.lib.user.spotify_user import SpotifyUser
 from starstoloves.lib.user.user import starred_track_searches
-
+from .connection import connection_index_decorator, connection_index_processor
 
 def get_loved_tracks_urls(request):
     if 'loved_tracks_urls' in request.session:
@@ -41,22 +41,12 @@ def get_tracks_data(request):
         for search in get_searches(request)
     ]
 
+@connection_index_decorator
 def index(request):
-    response, context = request.connection_helper.index(request)
-    if response:
-        return response
-    if request.connection_helper.is_connected:
+    context = {}
+    if request.lastfm_connection.is_connected() and request.spotify_connection.is_connected():
         context['tracks'] = get_tracks_data(request)
-    return render_to_response('index.html', context_instance=RequestContext(request, context))
-
-def connect_lastfm(request):
-    return request.connection_helper.connect_lastfm(request)
-
-def disconnect_lastfm(request):
-    return request.connection_helper.disconnect_lastfm()
-
-def disconnect_spotify(request):
-    return request.connection_helper.disconnect_spotify()
+    return render_to_response('index.html', context_instance=RequestContext(request, context, [connection_index_processor]))
 
 def result_update(request):
     if request.spotify_connection.is_connected():
