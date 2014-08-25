@@ -3,3 +3,4 @@ spotify_appkey.key
 .vagrant
 /tmp
 bower_components
+__pycache__
