@@ -8,7 +8,6 @@ from spotify import Session, Track, Playlist, PlaylistTrack, Artist
 
 from ..spotify_user import SpotifyUser
 from starstoloves.lib.connection.spotify_connection import SpotifyConnectionHelper
-from starstoloves.models import User
 
 
 pytestmark = pytest.mark.django_db
@@ -24,19 +23,6 @@ track_data_list = [
         'date_saved': 789012,
     },
 ]
-
-@pytest.fixture
-def user(request):
-    user = User(session_key='some_key')
-    user.save()
-    def fin():
-        user.delete()
-    request.addfinalizer(fin)
-    return user
-
-@pytest.fixture
-def fetch_user():
-    return User.objects.get(session_key='some_key')
 
 @pytest.fixture
 def spotify_session():
