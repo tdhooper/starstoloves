@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.utils.decorators import decorator_from_middleware
 
 from starstoloves.forms import SpotifyConnectForm
+from starstoloves.lib.user.spotify_user import SpotifyUser
 
 
 class ConnectionMiddleware:
@@ -11,10 +12,11 @@ class ConnectionMiddleware:
         if not request.lastfm_connection.is_connected():
             return
 
+        spotify_user = SpotifyUser(request.session_user, request.spotify_session)
         if request.method == 'POST':
-            request.spotify_form = self.spotify_connection_form(request.spotify_connection, request.POST)
+            request.spotify_form = self.spotify_connection_form(spotify_user.connection, request.POST)
         else:
-            request.spotify_form = self.spotify_connection_form(request.spotify_connection)
+            request.spotify_form = self.spotify_connection_form(spotify_user.connection)
 
         if request.spotify_form.connection_success:
             # Stop double POST on refresh
@@ -62,9 +64,10 @@ def add_lastfm_context(request, context):
 
 
 def add_spotify_context(request, context):
-    if request.spotify_connection.is_connected():
+    spotify_user = SpotifyUser(request.session_user, request.spotify_session)
+    if spotify_user.connection.is_connected():
         context.update({
-            'spUsername': request.spotify_connection.get_username(),
+            'spUsername': spotify_user.connection.get_username(),
             'spDisconnectUrl': reverse('disconnect_spotify'),
         })
     else:
@@ -92,5 +95,6 @@ def disconnect_lastfm(request):
 
 
 def disconnect_spotify(request):
-    request.spotify_connection.disconnect()
+    spotify_user = SpotifyUser(request.session_user, request.spotify_session)
+    spotify_user.connection.disconnect()
     return redirect('index')

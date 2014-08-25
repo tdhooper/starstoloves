@@ -8,7 +8,6 @@ from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
 
 from starstoloves.views import main
-from starstoloves.lib.connection.spotify_connection import SpotifyConnectionHelper
 
 class TestResultUpdate(TestCase):
 
@@ -22,6 +21,10 @@ class TestResultUpdate(TestCase):
         self.render = self.renderPatcher.start()
         self.render.return_value = HttpResponse('somehtml')
 
+        self.SpotifyUserPatcher = patch('starstoloves.views.main.SpotifyUser')
+        self.SpotifyUser = self.SpotifyUserPatcher.start()
+        self.SpotifyUser.return_value.connection.is_connected.return_value = True
+
         script_dir = os.path.dirname(__file__)
         with open (os.path.join(script_dir, 'fixtures/results-list.json'), 'r') as results_file:
             self.results_list = json.loads(results_file.read())
@@ -31,6 +34,7 @@ class TestResultUpdate(TestCase):
     def tearDown(self):
         self.tracksPatcher.stop()
         self.renderPatcher.stop()
+        self.SpotifyUserPatcher.stop()
 
     def test_returns_all_search_results_by_default(self):
         response = self.makeRequest('/update-tracks')
@@ -122,6 +126,7 @@ class TestResultUpdate(TestCase):
             request = self.factory.post(url, data)
         else:
             request = self.factory.post(url)
-        request.spotify_connection = MagicMock(SpotifyConnectionHelper)
+        request.session_user = MagicMock()
+        request.spotify_session = MagicMock()
         return main.result_update(request)
 

@@ -41,12 +41,13 @@ def spotify_session():
     return MagicMock(Session)
 
 @pytest.fixture
-def spotify_connection():
-    return MagicMock(SpotifyConnectionHelper)
+def spotify_connection(create_patch):
+    patch = create_patch('starstoloves.lib.user.spotify_user.SpotifyConnectionHelper')
+    return patch.return_value
 
 @pytest.fixture
-def spotify_user(user, spotify_session, spotify_connection):
-    return SpotifyUser(user, spotify_session, spotify_connection)
+def spotify_user(user, spotify_session):
+    return SpotifyUser(user, spotify_session)
 
 @pytest.fixture
 def playlist_tracks():
