@@ -12,7 +12,7 @@ class ConnectionMiddleware:
         if not request.lastfm_connection.is_connected():
             return
 
-        spotify_user = SpotifyUser(request.session_user, request.spotify_session)
+        spotify_user = SpotifyUser(request.session_user)
         if request.method == 'POST':
             request.spotify_form = self.spotify_connection_form(spotify_user.connection, request.POST)
         else:
@@ -64,7 +64,7 @@ def add_lastfm_context(request, context):
 
 
 def add_spotify_context(request, context):
-    spotify_user = SpotifyUser(request.session_user, request.spotify_session)
+    spotify_user = SpotifyUser(request.session_user)
     if spotify_user.connection.is_connected():
         context.update({
             'spUsername': spotify_user.connection.get_username(),
@@ -95,6 +95,6 @@ def disconnect_lastfm(request):
 
 
 def disconnect_spotify(request):
-    spotify_user = SpotifyUser(request.session_user, request.spotify_session)
+    spotify_user = SpotifyUser(request.session_user)
     spotify_user.connection.disconnect()
     return redirect('index')

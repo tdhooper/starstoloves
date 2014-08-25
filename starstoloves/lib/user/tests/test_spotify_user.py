@@ -1,3 +1,5 @@
+import builtins
+
 from unittest.mock import MagicMock, call
 
 import pytest
@@ -38,7 +40,9 @@ def fetch_user():
 
 @pytest.fixture
 def spotify_session():
-    return MagicMock(Session)
+    session = MagicMock(Session)
+    builtins.spotify_session = session
+    return session
 
 @pytest.fixture
 def spotify_connection(create_patch):
@@ -46,8 +50,8 @@ def spotify_connection(create_patch):
     return patch.return_value
 
 @pytest.fixture
-def spotify_user(user, spotify_session):
-    return SpotifyUser(user, spotify_session)
+def spotify_user(user):
+    return SpotifyUser(user)
 
 @pytest.fixture
 def playlist_tracks():
@@ -81,7 +85,7 @@ def spotify_user_with_starred(spotify_session, playlist):
     spotify_session.get_user.return_value.load.return_value.starred = playlist
 
 
-@pytest.mark.usefixtures("spotify_user_with_starred")
+@pytest.mark.usefixtures("spotify_user_with_starred", "spotify_session")
 class TestStarredTracks:
 
     def test_starred_tracks_loads_the_user(self, spotify_user, spotify_session, spotify_connection):

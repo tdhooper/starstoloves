@@ -3,8 +3,7 @@ from starstoloves.lib.connection.spotify_connection import SpotifyConnectionHelp
 
 class SpotifyUser:
 
-    def __init__(self, user, spotify_session):
-        self.spotify_session = spotify_session
+    def __init__(self, user):
         self.user = user
 
     @property
@@ -38,8 +37,8 @@ class SpotifyUser:
     @property
     def api_user(self):
         user_uri = self.connection.get_user_uri()
-        return self.spotify_session.get_user(user_uri).load()
+        return spotify_session.get_user(user_uri).load()
 
     @property
     def connection(self):
-        return SpotifyConnectionHelper(self.user, self.spotify_session)
+        return SpotifyConnectionHelper(self.user, spotify_session)

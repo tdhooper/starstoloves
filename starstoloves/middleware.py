@@ -21,7 +21,6 @@ class SpotifySession:
     def process_request(self, request):
         if not self.spotify_session:
             return HttpResponse('Spotify authentication failed')
-        request.spotify_session = self.spotify_session
 
 
 from lastfm import lfm

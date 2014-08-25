@@ -24,7 +24,7 @@ def forget_loved_tracks_urls(request):
         del request.session['loved_tracks_urls']
 
 def get_searches(request):
-    spotify_user = SpotifyUser(request.session_user, request.spotify_session)
+    spotify_user = SpotifyUser(request.session_user)
     return starred_track_searches(spotify_user, request.lastfm_app)
 
 def get_tracks_data(request):
@@ -45,13 +45,13 @@ def get_tracks_data(request):
 def index(request):
     context = {}
     if request.lastfm_connection.is_connected():
-        spotify_user = SpotifyUser(request.session_user, request.spotify_session)
+        spotify_user = SpotifyUser(request.session_user)
         if spotify_user.connection.is_connected():
             context['tracks'] = get_tracks_data(request)
     return render_to_response('index.html', context_instance=RequestContext(request, context, [connection_index_processor]))
 
 def result_update(request):
-    spotify_user = SpotifyUser(request.session_user, request.spotify_session)
+    spotify_user = SpotifyUser(request.session_user)
     if spotify_user.connection.is_connected():
         tracks = get_tracks_data(request)
         status_by_id = {
