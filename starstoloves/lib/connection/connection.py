@@ -4,13 +4,16 @@ class ConnectionHelper(object):
     CONNECTED = 1;
     FAILED = 2;
 
-    def get_username(self):
+    @property
+    def username(self):
         return self._get_from_connection('username')
 
+    @property
     def is_connected(self):
-        return self.get_connection_state() is self.CONNECTED
+        return self.connection_state is self.CONNECTED
 
-    def get_connection_state(self):
+    @property
+    def connection_state(self):
         state = self._get_from_connection('state')
         if state is not None:
             return state

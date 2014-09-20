@@ -11,7 +11,7 @@ class ConnectionMiddleware:
 
     def process_request(self, request):
         lastfm_user = LastfmUser(request.session_user)
-        if not lastfm_user.connection.is_connected():
+        if not lastfm_user.connection.is_connected:
             return
 
         spotify_user = SpotifyUser(request.session_user)
@@ -30,7 +30,7 @@ class ConnectionMiddleware:
             if form.is_valid():
                 username = form.cleaned_data.get('username')
                 spotify_connection.connect(username)
-                if spotify_connection.get_connection_state() is spotify_connection.FAILED:
+                if spotify_connection.connection_state is spotify_connection.FAILED:
                     form.set_connection_error()
                 else:
                     form.connection_success = True
@@ -45,23 +45,23 @@ def connection_index_processor(request):
     context = {}
     add_lastfm_context(request, context)
     lastfm_user = LastfmUser(request.session_user)
-    if lastfm_user.connection.is_connected():
+    if lastfm_user.connection.is_connected:
         add_spotify_context(request, context)
     return context
 
 
 def add_lastfm_context(request, context):
     lastfm_user = LastfmUser(request.session_user)
-    if lastfm_user.connection.is_connected():
+    if lastfm_user.connection.is_connected:
         context.update({
-            'lfmUsername': lastfm_user.connection.get_username(),
+            'lfmUsername': lastfm_user.connection.username,
             'lfmDisconnectUrl': reverse('disconnect_lastfm'),
         })
     else:
         context.update({
             'lfmConnectUrl': reverse('connect_lastfm'),
         })
-    if lastfm_user.connection.get_connection_state() is lastfm_user.connection.FAILED:
+    if lastfm_user.connection.connection_state is lastfm_user.connection.FAILED:
         context.update({
             'lfmConnectFailure': True
         })
@@ -69,9 +69,9 @@ def add_lastfm_context(request, context):
 
 def add_spotify_context(request, context):
     spotify_user = SpotifyUser(request.session_user)
-    if spotify_user.connection.is_connected():
+    if spotify_user.connection.is_connected:
         context.update({
-            'spUsername': spotify_user.connection.get_username(),
+            'spUsername': spotify_user.connection.username,
             'spDisconnectUrl': reverse('disconnect_spotify'),
         })
     else:
@@ -83,14 +83,14 @@ def add_spotify_context(request, context):
 
 def connect_lastfm(request):
     lastfm_user = LastfmUser(request.session_user)
-    if lastfm_user.connection.is_connected():
+    if lastfm_user.connection.is_connected:
         return redirect('index')
     token = request.GET.get('token')
     if token:
         lastfm_user.connection.connect(token)
         return redirect('index')
     callback_url = request.build_absolute_uri(reverse('connect_lastfm'))
-    auth_url = lastfm_user.connection.get_auth_url(callback_url)
+    auth_url = lastfm_user.connection.auth_url(callback_url)
     return redirect(auth_url)
 
 

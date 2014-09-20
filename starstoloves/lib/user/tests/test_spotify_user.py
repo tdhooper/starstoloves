@@ -75,7 +75,7 @@ class TestStarredTracks:
 
     def test_starred_tracks_loads_the_user(self, spotify_user, spotify_session, spotify_connection):
         spotify_user.starred_tracks
-        assert spotify_session.get_user.call_args == call(spotify_connection.get_user_uri.return_value)
+        assert spotify_session.get_user.call_args == call(spotify_connection.user_uri)
         assert spotify_session.get_user.return_value.load.call_count is 1
 
     @pytest.mark.usefixtures("spotify_user_with_starred")

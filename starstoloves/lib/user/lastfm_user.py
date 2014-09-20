@@ -37,7 +37,7 @@ class LastfmUser:
         return urls
 
     def loved_track_urls_data(self):
-        username = self.connection.get_username()
+        username = self.connection.username
         loved_tracks_response = lastfm_app.user.get_loved_tracks(username)
         urls = [track['url'] for track in loved_tracks_response['track']]
         return urls

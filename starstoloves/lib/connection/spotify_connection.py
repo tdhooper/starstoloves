@@ -12,7 +12,8 @@ class SpotifyConnectionHelper(ConnectionHelper):
         self.user = user
         self.session = session
 
-    def get_user_uri(self):
+    @property
+    def user_uri(self):
         return self._get_from_connection('user_uri')
 
     def connect(self, username):

@@ -18,6 +18,6 @@ def test_get_auth_url_proxies_to_app(connection, app):
         if (callback_url == 'some_callback'):
             return 'some_auth_url'
     app.auth.get_url.side_effect = get_url
-    auth_url = connection.get_auth_url('some_callback')
+    auth_url = connection.auth_url('some_callback')
     assert auth_url == 'some_auth_url'
 

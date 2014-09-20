@@ -38,7 +38,7 @@ class SpotifyUser:
 
     @property
     def api_user(self):
-        user_uri = self.connection.get_user_uri()
+        user_uri = self.connection.user_uri
         return spotify_session.get_user(user_uri).load()
 
     @property

@@ -42,7 +42,7 @@ class TestLovedTrackUrls():
     @pytest.mark.usefixtures('LastfmConnectionHelper_patch')
     def test_it_gets_loved_tracks_from_the_lastfm_api(self, lastfm_user, lastfm_app):
         lastfm_user.loved_track_urls
-        assert lastfm_app.user.get_loved_tracks.call_args == call(lastfm_user.connection.get_username.return_value)
+        assert lastfm_app.user.get_loved_tracks.call_args == call(lastfm_user.connection.username)
 
     def test_it_returns_the_track_urls(self, lastfm_user, lastfm_app):
         assert lastfm_user.loved_track_urls == ['some_url', 'another_url']

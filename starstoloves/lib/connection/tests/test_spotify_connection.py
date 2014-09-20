@@ -9,7 +9,7 @@ pytestmark = pytest.mark.django_db
 
 @pytest.mark.spotify_only
 def test_connection_user_uri_defaults_to_none(connection):
-    assert connection.get_user_uri() is None
+    assert connection.user_uri is None
 
 
 @pytest.mark.spotify_only
@@ -17,4 +17,4 @@ def test_connection_user_uri_defaults_to_none(connection):
 class TestSpotifyConnectionConnectSuccess():
 
     def test_stores_the_user_uri(self, fetch_connection):
-        assert fetch_connection.get_user_uri() == 'spotify:user:some_username'
+        assert fetch_connection.user_uri == 'spotify:user:some_username'

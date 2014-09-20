@@ -34,15 +34,15 @@ def get_tracks_data(request):
 def index(request):
     context = {}
     lastfm_user = LastfmUser(request.session_user)
-    if lastfm_user.connection.is_connected():
+    if lastfm_user.connection.is_connected:
         spotify_user = SpotifyUser(request.session_user)
-        if spotify_user.connection.is_connected():
+        if spotify_user.connection.is_connected:
             context['tracks'] = get_tracks_data(request)
     return render_to_response('index.html', context_instance=RequestContext(request, context, [connection_index_processor]))
 
 def result_update(request):
     spotify_user = SpotifyUser(request.session_user)
-    if spotify_user.connection.is_connected():
+    if spotify_user.connection.is_connected:
         tracks = get_tracks_data(request)
         status_by_id = {
             re.search('status\[(.+)\]', key).groups()[0]: value

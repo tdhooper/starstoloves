@@ -10,7 +10,7 @@ class LastfmConnectionHelper(ConnectionHelper):
         self.user = user
         self.app = app
 
-    def get_auth_url(self, callback_url):
+    def auth_url(self, callback_url):
         return self.app.auth.get_url(callback_url)
 
     def connect(self, token):
