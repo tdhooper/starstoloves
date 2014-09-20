@@ -18,3 +18,11 @@ def save(user):
     if user.loved_tracks:
         user_model.loved_tracks = user.loved_tracks
     user_model.save()
+
+def delete(user):
+    try:
+        user_model = UserModel.objects.get(session_key=user.session_key)
+        user_model.delete()
+    except UserModel.DoesNotExist:
+        pass;
+    
