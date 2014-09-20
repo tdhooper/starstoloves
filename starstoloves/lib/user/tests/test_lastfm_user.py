@@ -49,7 +49,7 @@ class TestLovedTrackUrls():
 
     def test_the_urls_are_stored_on_the_user_model(self, lastfm_user, fetch_user):
         lastfm_user.loved_track_urls
-        stored_urls = [track.url for track in fetch_user.loved_tracks.all()]
+        stored_urls = [track.url for track in fetch_user().loved_tracks]
         assert stored_urls == ['some_url', 'another_url']
 
     def test_it_does_not_call_the_api_again_when_called_twice(self, lastfm_user, lastfm_app):

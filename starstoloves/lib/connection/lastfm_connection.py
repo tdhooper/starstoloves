@@ -1,5 +1,5 @@
 from .connection import ConnectionHelper, MissingUserError
-from starstoloves.models import LastfmConnection
+from starstoloves.models import LastfmConnection, User
 
 class LastfmConnectionHelper(ConnectionHelper):
 
@@ -17,7 +17,8 @@ class LastfmConnectionHelper(ConnectionHelper):
         if not self.user:
             raise MissingUserError()
             
-        connection = LastfmConnection(user=self.user)
+        user_model = User.objects.get(session_key=self.user.session_key)
+        connection = LastfmConnection(user=user_model)
         try:
             app_session = self.app.auth.get_session(str(token))
             connection.username = app_session['name']

@@ -1,13 +1,11 @@
-from starstoloves.models import User
+from starstoloves.lib.user import repository
 
 class SessionUser:
 
     def process_request(self, request):
         user = None
         session_key = request.session.session_key
-        if session_key:
-            user, created = User.objects.get_or_create(session_key=session_key)
-        request.session_user = user
+        request.session_user = repository.from_session_key(session_key)
 
 
 from django.http import HttpResponse

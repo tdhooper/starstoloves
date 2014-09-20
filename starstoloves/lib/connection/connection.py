@@ -33,7 +33,7 @@ class ConnectionHelper(object):
     def get_connection(self):
         if (self.user):
             try:
-                return getattr(self.user, self.connection_name)
+                return self.connection_class.objects.get(user__session_key=self.user.session_key)
             except self.connection_class.DoesNotExist:
                 pass
         return None

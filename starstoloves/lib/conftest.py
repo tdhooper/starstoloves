@@ -3,6 +3,7 @@ from unittest.mock import patch
 import pytest
 
 from starstoloves.models import User
+from starstoloves.lib.user import repository
 
 
 @pytest.fixture
@@ -16,14 +17,11 @@ def create_patch(request):
     return create_patch
 
 @pytest.fixture
-def user(request):
-    user = User(session_key='some_key')
-    user.save()
-    def fin():
-        user.delete()
-    request.addfinalizer(fin)
-    return user
+def user():
+    return repository.from_session_key('some_key')
 
 @pytest.fixture
 def fetch_user():
-    return User.objects.get(session_key='some_key')
+    def fetch():
+        return repository.from_session_key('some_key')
+    return fetch

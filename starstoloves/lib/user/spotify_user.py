@@ -1,5 +1,6 @@
 from starstoloves.models import SpotifyTrack
 from starstoloves.lib.connection.spotify_connection import SpotifyConnectionHelper
+from . import repository
 
 class SpotifyUser:
 
@@ -16,7 +17,8 @@ class SpotifyUser:
             )[0]
             for track in tracks
         ]
-        self.user.starred_tracks.add(*track_models)
+        self.user.starred_tracks = track_models
+        repository.save(self.user)
         return tracks
 
     @property

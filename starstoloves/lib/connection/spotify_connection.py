@@ -1,7 +1,7 @@
 import spotify
 
 from .connection import ConnectionHelper, MissingUserError
-from starstoloves.models import SpotifyConnection
+from starstoloves.models import SpotifyConnection, User
 
 class SpotifyConnectionHelper(ConnectionHelper):
 
@@ -21,7 +21,8 @@ class SpotifyConnectionHelper(ConnectionHelper):
 
         user_uri = 'spotify:user:' + username
         # for now the only way I know of validating a user exists is to try and load a playlist
-        connection, created = SpotifyConnection.objects.get_or_create(user=self.user)
+        user_model = User.objects.get(session_key=self.user.session_key)
+        connection, created = SpotifyConnection.objects.get_or_create(user=user_model)
         if username:
             user = self.session.get_user(user_uri)
             starred = user.load().starred

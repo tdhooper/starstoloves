@@ -1,6 +1,7 @@
 from starstoloves.lib.connection.lastfm_connection import LastfmConnectionHelper
 from starstoloves.lib.lastfm import lastfm_app
 from starstoloves.models import LastfmTrack
+from . import repository
 
 
 class LastfmUser:
@@ -26,10 +27,13 @@ class LastfmUser:
             LastfmTrack.objects.get_or_create(url=url)[0]
             for url in urls
         ]
-        self.user.loved_tracks.add(*tracks)
+        self.user.loved_tracks = tracks
+        repository.save(self.user)
 
     def retrieve_loved_track_urls(self):
-        urls = [track.url for track in self.user.loved_tracks.all()]
+        if not self.user.loved_tracks:
+            return None
+        urls = [track.url for track in self.user.loved_tracks]
         return urls
 
     def loved_track_urls_data(self):

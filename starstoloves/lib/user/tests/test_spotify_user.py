@@ -9,7 +9,6 @@ from spotify import Session, Track, Playlist, PlaylistTrack, Artist
 from ..spotify_user import SpotifyUser
 from starstoloves.lib.connection.spotify_connection import SpotifyConnectionHelper
 
-
 pytestmark = pytest.mark.django_db
 
 track_data_list = [
@@ -89,7 +88,8 @@ class TestStarredTracks:
 
     def test_starred_tracks_stores_the_tracks(self, spotify_user, fetch_user):
         spotify_user.starred_tracks
-        track_models = fetch_user.starred_tracks.all()
+
+        track_models = fetch_user().starred_tracks
 
         assert len(track_models) is 2
 
@@ -102,6 +102,6 @@ class TestStarredTracks:
     def test_starred_tracks_only_creates_one_entry_for_each_track(self, spotify_user, fetch_user):
         spotify_user.starred_tracks
         spotify_user.starred_tracks
-        track_models = fetch_user.starred_tracks.all()
+        track_models = fetch_user().starred_tracks
         assert len(track_models) is 2
 

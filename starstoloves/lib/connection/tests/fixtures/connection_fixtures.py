@@ -32,8 +32,8 @@ def connection(request, connection_with_user, connection_without_user):
         return connection_without_user
 
 @pytest.fixture
-def fetch_user(fixtures):
-    return fixtures.fetch_user
+def fetch_user_model(fixtures):
+    return fixtures.fetch_user_model
 
 @pytest.fixture
 def fetch_connection(fixtures):
