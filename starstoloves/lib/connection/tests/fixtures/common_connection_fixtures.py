@@ -8,7 +8,6 @@ class CommonConnectionFixtures():
 
     def __init__(self):
         self.user = repository.from_session_key('some_key')
-        repository.save(self.user)
 
     def finalizer(self):
         repository.delete(self.user)
