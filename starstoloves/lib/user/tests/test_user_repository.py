@@ -5,7 +5,7 @@ import pytest
 from lastfm import lfm
 
 from starstoloves.models import SpotifyTrack, LastfmTrack
-from .. import repository
+from .. import user_repository
 from ..user import User
 
 
@@ -51,22 +51,22 @@ def lastfm_track_models():
 class TestFromSessionKey():
 
     def test_returns_user(self):
-        user = repository.from_session_key('some_key')
+        user = user_repository.from_session_key('some_key')
         assert isinstance(user, User)
 
     def test_passes_session_key(self):
-        user = repository.from_session_key('some_key')
+        user = user_repository.from_session_key('some_key')
         assert user.session_key == 'some_key'
 
 
 class TestSave():
 
     def test_persists_starred_tracks(self, spotify_track_models):
-        user = repository.from_session_key('some_key')
+        user = user_repository.from_session_key('some_key')
         user.starred_tracks = spotify_track_models
-        repository.save(user)
+        user_repository.save(user)
 
-        user = repository.from_session_key('some_key')
+        user = user_repository.from_session_key('some_key')
         tracks = user.starred_tracks.values()
         assert tracks[0]['track_name'] == 'some_track';
         assert tracks[0]['artist_name'] == 'some_artist';
@@ -74,11 +74,11 @@ class TestSave():
         assert tracks[1]['artist_name'] == 'another_artist';
 
     def test_persists_loved_tracks(self, lastfm_track_models):
-        user = repository.from_session_key('some_key')
+        user = user_repository.from_session_key('some_key')
         user.loved_tracks = lastfm_track_models
-        repository.save(user)
+        user_repository.save(user)
 
-        user = repository.from_session_key('some_key')
+        user = user_repository.from_session_key('some_key')
         tracks = user.loved_tracks.values()
         assert tracks[0]['track_name'] == 'some_track';
         assert tracks[0]['artist_name'] == 'some_artist';
@@ -91,12 +91,12 @@ class TestSave():
 class TestDelete():
 
     def test_deletes_stored_user(self, spotify_track_models, lastfm_track_models):
-        user = repository.from_session_key('some_key')
+        user = user_repository.from_session_key('some_key')
         user.starred_tracks = spotify_track_models
         user.loved_tracks = lastfm_track_models
-        repository.save(user)
+        user_repository.save(user)
 
-        repository.delete(user)
-        user = repository.from_session_key('some_key')
+        user_repository.delete(user)
+        user = user_repository.from_session_key('some_key')
         assert user.starred_tracks is None
         assert user.loved_tracks is None
