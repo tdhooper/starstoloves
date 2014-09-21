@@ -1,7 +1,5 @@
 import pytest
 
-from starstoloves.lib.connection.connection import MissingUserError
-
 from .fixtures.connection_fixtures import *
 
 
@@ -16,32 +14,22 @@ def test_username_defaults_to_none(connection):
 def test_disconnect_is_a_noop(connection):
     connection.disconnect()
 
-def test_connect_throws(connection_without_user):
-    with pytest.raises(MissingUserError):
-        connection_without_user.connect('some_token')
-
 
 @pytest.mark.usefixtures("successful_connection")
 class TestConnectionConnectSuccess():
 
-    def test_associates_a_connection(self, fetch_user_model, connection_name, connection_class):
-        assert isinstance(getattr(fetch_user_model, connection_name), connection_class)
-
     def test_stores_the_username(self, fetch_connection):
-        assert fetch_connection.username == 'some_username'
+        assert fetch_connection().username == 'some_username'
 
     def test_sets_the_state_as_connected(self, fetch_connection):
-        assert fetch_connection.state == fetch_connection.CONNECTED
+        assert fetch_connection().state == fetch_connection().CONNECTED
 
 
 @pytest.mark.usefixtures("failed_connection")
 class TestConnectionConnectFail():
 
-    def test_associates_a_connection(self, fetch_user_model, connection_name, connection_class):
-        assert isinstance(getattr(fetch_user_model, connection_name), connection_class)
-
-    def test_sets_the_state_as_failed(self, fetch_connection):
-        assert fetch_connection.state == fetch_connection.FAILED
+    def test_stores_the_state_as_failed(self, fetch_connection):
+        assert fetch_connection().state == fetch_connection().FAILED
 
 
 @pytest.mark.usefixtures("successful_connection", "disconnected_connection")

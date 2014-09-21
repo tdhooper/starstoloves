@@ -17,19 +17,8 @@ def fixtures(request):
     return fixtures;
 
 @pytest.fixture
-def connection_without_user(fixtures):
-    return fixtures.connection_without_user
-
-@pytest.fixture
-def connection_with_user(fixtures):
-    return fixtures.connection_with_user
-
-@pytest.fixture(params=[True, False])
-def connection(request, connection_with_user, connection_without_user):
-    if request.param:
-        return connection_with_user
-    else:
-        return connection_without_user
+def connection(fixtures):
+    return fixtures.connection
 
 @pytest.fixture
 def fetch_user_model(fixtures):

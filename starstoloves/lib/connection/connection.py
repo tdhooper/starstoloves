@@ -1,46 +1,21 @@
-class ConnectionHelper(object):
+from starstoloves.lib.repository import RepositoryItem
+
+class ConnectionHelper(RepositoryItem):
 
     DISCONNECTED = 0;
     CONNECTED = 1;
     FAILED = 2;
 
-    @property
-    def username(self):
-        return self._get_from_connection('username')
+    def __init__(self, username=None, state=None, **kwargs):
+        self.username = username
+        if state is None:
+            state = self.DISCONNECTED
+        self.state = state
+        super().__init__(**kwargs)
 
     @property
     def is_connected(self):
         return self.state is self.CONNECTED
 
-    @property
-    def state(self):
-        state = self._get_from_connection('state')
-        if state is not None:
-            return state
-        return self.DISCONNECTED
-
-    def _get_from_connection(self, key):
-        connection = self.get_connection()
-        if connection:
-            return getattr(connection, key)
-        return None
-
     def disconnect(self):
-        try:
-            connection = self.get_connection()
-            if connection:
-                connection.delete()
-        except:
-            pass
-
-    def get_connection(self):
-        if (self.user):
-            try:
-                return self.connection_class.objects.get(user__session_key=self.user.session_key)
-            except self.connection_class.DoesNotExist:
-                pass
-        return None
-
-
-class MissingUserError(Exception):
-    pass
+        self.repository.delete(self)

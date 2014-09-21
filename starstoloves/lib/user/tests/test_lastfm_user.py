@@ -9,8 +9,8 @@ from starstoloves.models import LastfmTrack
 pytestmark = pytest.mark.django_db
 
 @pytest.fixture
-def LastfmConnectionHelper_patch(create_patch):
-    return create_patch('starstoloves.lib.user.lastfm_user.LastfmConnectionHelper')
+def lastfm_connection_repository_patch(create_patch):
+    return create_patch('starstoloves.lib.user.lastfm_user.lastfm_connection_repository')
 
 @pytest.fixture
 def lastfm_user(user):
@@ -24,9 +24,9 @@ def lastfm_app(create_patch):
 def lastfm_api_returns_tracks(request, lastfm_app):
     lastfm_app.user.get_loved_tracks.return_value = request.cls.api_response
 
-def test_connection_returns_the_lastfm_connection(lastfm_user, user, lastfm_app, LastfmConnectionHelper_patch):
-    assert lastfm_user.connection is LastfmConnectionHelper_patch.return_value
-    assert LastfmConnectionHelper_patch.call_args == call(user, lastfm_app)
+def test_connection_returns_the_lastfm_connection(lastfm_user, user, lastfm_connection_repository_patch):
+    assert lastfm_user.connection is lastfm_connection_repository_patch.from_user.return_value
+    assert lastfm_connection_repository_patch.from_user.call_args == call(user)
 
 
 @pytest.mark.usefixtures('lastfm_api_returns_tracks')
@@ -39,7 +39,7 @@ class TestLovedTrackUrls():
         ]
     }
 
-    @pytest.mark.usefixtures('LastfmConnectionHelper_patch')
+    @pytest.mark.usefixtures('lastfm_connection_repository_patch')
     def test_it_gets_loved_tracks_from_the_lastfm_api(self, lastfm_user, lastfm_app):
         lastfm_user.loved_track_urls
         assert lastfm_app.user.get_loved_tracks.call_args == call(lastfm_user.connection.username)

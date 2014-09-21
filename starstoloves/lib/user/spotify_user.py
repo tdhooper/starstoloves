@@ -1,5 +1,6 @@
+from starstoloves.lib.spotify_session import session as spotify_session
 from starstoloves.models import SpotifyTrack
-from starstoloves.lib.connection.spotify_connection import SpotifyConnectionHelper
+from starstoloves.lib.connection import spotify_connection_repository
 from . import repository
 
 class SpotifyUser:
@@ -43,4 +44,4 @@ class SpotifyUser:
 
     @property
     def connection(self):
-        return SpotifyConnectionHelper(self.user, spotify_session)
+        return spotify_connection_repository.from_user(self.user)

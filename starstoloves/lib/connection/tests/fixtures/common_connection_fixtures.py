@@ -4,7 +4,7 @@ from starstoloves.models import User
 from starstoloves.lib.user import repository
 
 
-class CommonConnectionFixtures():
+class CommonConnectionFixtures(object):
 
     def __init__(self):
         self.user = repository.from_session_key('some_key')
@@ -21,4 +21,4 @@ class CommonConnectionFixtures():
         return User.objects.get(session_key='some_key')
 
     def disconnected_connection(self):
-        self.connection_with_user.disconnect()
+        self.connection.disconnect()

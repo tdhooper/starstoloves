@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -10,6 +10,7 @@ from starstoloves.models import SpotifyConnection
 from starstoloves.lib.connection.spotify_connection import SpotifyConnectionHelper
 
 from .common_connection_fixtures import CommonConnectionFixtures
+from ... import spotify_connection_repository
 
 
 class SpotifyConnectionFixtures(CommonConnectionFixtures):
@@ -19,19 +20,22 @@ class SpotifyConnectionFixtures(CommonConnectionFixtures):
 
     def __init__(self):
         super().__init__()
-        self.session = MagicMock(spec=spotify.Session).return_value
+        self.session_patch = patch('starstoloves.lib.connection.spotify_connection_repository.spotify_session')
+        self.session = self.session_patch.start()
+
+    def finalizer(self):
+        self.session_patch.stop()
+        super().finalizer()
 
     @property
-    def connection_without_user(self):
-        return SpotifyConnectionHelper(None, self.session)
-
-    @property
-    def connection_with_user(self):
-        return SpotifyConnectionHelper(self.user, self.session)
+    def connection(self):
+        return spotify_connection_repository.from_user(self.user)
 
     @property
     def fetch_connection(self):
-        return SpotifyConnectionHelper(self.fetch_user, self.session)
+        def fetch():
+            return spotify_connection_repository.from_user(self.user)
+        return fetch
 
     def successful_connection(self):
         starred = MagicMock(spec=Playlist)
@@ -48,7 +52,7 @@ class SpotifyConnectionFixtures(CommonConnectionFixtures):
                 return user
         self.session.get_user.side_effect = get_user
 
-        self.connection_with_user.connect('some_username')
+        self.connection.connect('some_username')
 
     def failed_connection(self):
         starred = MagicMock(spec=Playlist)
@@ -66,4 +70,4 @@ class SpotifyConnectionFixtures(CommonConnectionFixtures):
                 return user
         self.session.get_user.side_effect = get_user
 
-        self.connection_with_user.connect('some_username')
+        self.connection.connect('some_username')

@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -8,6 +8,7 @@ from starstoloves.models import LastfmConnection
 from starstoloves.lib.connection.lastfm_connection import LastfmConnectionHelper
 
 from .common_connection_fixtures import CommonConnectionFixtures
+from ... import lastfm_connection_repository
 
 
 class LastfmConnectionFixtures(CommonConnectionFixtures):
@@ -17,30 +18,33 @@ class LastfmConnectionFixtures(CommonConnectionFixtures):
 
     def __init__(self):
         super().__init__()
-        self.app = MagicMock(spec=lfm.App).return_value
+        self.app_patcher = patch('starstoloves.lib.connection.lastfm_connection_repository.lastfm_app')
+        self.app = self.app_patcher.start()
+
+    def finalizer(self):
+        self.app_patcher.stop()
+        super().finalizer()
 
     @property
-    def connection_without_user(self):
-        return LastfmConnectionHelper(None, self.app)
-
-    @property
-    def connection_with_user(self):
-        return LastfmConnectionHelper(self.user, self.app)
+    def connection(self):
+        return lastfm_connection_repository.from_user(self.user)
 
     @property
     def fetch_connection(self):
-        return LastfmConnectionHelper(self.fetch_user, self.app)
+        def fetch():
+            return lastfm_connection_repository.from_user(self.user)
+        return fetch
 
     def successful_connection(self):
         def get_session(token):
             if (token == 'some_token'):
                 return {'name': 'some_username'}
         self.app.auth.get_session.side_effect = get_session
-        self.connection_with_user.connect('some_token')
+        self.connection.connect('some_token')
 
     def failed_connection(self):
         def get_session(token):
             if (token == 'some_token'):
                 raise Exception()
         self.app.auth.get_session.side_effect = get_session
-        self.connection_with_user.connect('some_token')
+        self.connection.connect('some_token')
