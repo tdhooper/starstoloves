@@ -30,7 +30,7 @@ class ConnectionMiddleware:
             if form.is_valid():
                 username = form.cleaned_data.get('username')
                 spotify_connection.connect(username)
-                if spotify_connection.connection_state is spotify_connection.FAILED:
+                if spotify_connection.state is spotify_connection.FAILED:
                     form.set_connection_error()
                 else:
                     form.connection_success = True
@@ -61,7 +61,7 @@ def add_lastfm_context(request, context):
         context.update({
             'lfmConnectUrl': reverse('connect_lastfm'),
         })
-    if lastfm_user.connection.connection_state is lastfm_user.connection.FAILED:
+    if lastfm_user.connection.state is lastfm_user.connection.FAILED:
         context.update({
             'lfmConnectFailure': True
         })

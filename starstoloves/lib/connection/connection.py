@@ -10,10 +10,10 @@ class ConnectionHelper(object):
 
     @property
     def is_connected(self):
-        return self.connection_state is self.CONNECTED
+        return self.state is self.CONNECTED
 
     @property
-    def connection_state(self):
+    def state(self):
         state = self._get_from_connection('state')
         if state is not None:
             return state
