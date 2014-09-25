@@ -3,6 +3,8 @@ from .connection import ConnectionHelper
 
 class LastfmConnectionHelper(ConnectionHelper):
 
+    username = None
+
     def __init__(self, user, app, **kwargs):
         self.user = user
         self.app = app

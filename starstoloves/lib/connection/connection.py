@@ -6,6 +6,8 @@ class ConnectionHelper(RepositoryItem):
     CONNECTED = 1;
     FAILED = 2;
 
+    state = None
+
     def __init__(self, username=None, state=None, **kwargs):
         self.username = username
         if state is None:
