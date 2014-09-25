@@ -8,6 +8,8 @@ class ConnectionHelper(RepositoryItem):
 
     state = None
 
+    username = None
+
     def __init__(self, username=None, state=None, **kwargs):
         self.username = username
         if state is None:
