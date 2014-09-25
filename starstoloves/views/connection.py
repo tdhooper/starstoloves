@@ -6,7 +6,7 @@ from starstoloves.forms import SpotifyConnectForm
 from starstoloves.lib.connection import spotify_connection_repository, lastfm_connection_repository
 
 
-class ConnectionMiddleware:
+class ConnectionIndexMiddleware:
 
     def process_request(self, request):
         lastfm_connection = lastfm_connection_repository.from_user(request.session_user)
@@ -37,7 +37,19 @@ class ConnectionMiddleware:
         return SpotifyConnectForm()
 
 
-connection_index_decorator = decorator_from_middleware(ConnectionMiddleware)
+connection_index_decorator = decorator_from_middleware(ConnectionIndexMiddleware)
+
+
+class ConnectionStatusMiddleware:
+
+    def process_request(self, request):
+        lastfm_connection = lastfm_connection_repository.from_user(request.session_user)
+        spotify_connection = spotify_connection_repository.from_user(request.session_user)
+        request.is_lastfm_connected = lastfm_connection.is_connected
+        request.is_spotify_connected = spotify_connection.is_connected
+
+
+connection_status_decorator = decorator_from_middleware(ConnectionStatusMiddleware)
 
 
 def connection_index_processor(request):

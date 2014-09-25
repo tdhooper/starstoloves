@@ -7,9 +7,8 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseServerError
 
 from starstoloves.lib.user.spotify_user import SpotifyUser
-from starstoloves.lib.user.lastfm_user import LastfmUser
 from starstoloves.lib.user.user import starred_track_searches
-from .connection import connection_index_decorator, connection_index_processor
+from .connection import connection_index_decorator, connection_index_processor, connection_status_decorator
 
 
 def get_searches(request):
@@ -31,18 +30,16 @@ def get_tracks_data(request):
     ]
 
 @connection_index_decorator
+@connection_status_decorator
 def index(request):
     context = {}
-    lastfm_user = LastfmUser(request.session_user)
-    if lastfm_user.connection.is_connected:
-        spotify_user = SpotifyUser(request.session_user)
-        if spotify_user.connection.is_connected:
-            context['tracks'] = get_tracks_data(request)
+    if request.is_lastfm_connected and request.is_spotify_connected:
+        context['tracks'] = get_tracks_data(request)
     return render_to_response('index.html', context_instance=RequestContext(request, context, [connection_index_processor]))
 
+@connection_status_decorator
 def result_update(request):
-    spotify_user = SpotifyUser(request.session_user)
-    if spotify_user.connection.is_connected:
+    if request.is_spotify_connected:
         tracks = get_tracks_data(request)
         status_by_id = {
             re.search('status\[(.+)\]', key).groups()[0]: value

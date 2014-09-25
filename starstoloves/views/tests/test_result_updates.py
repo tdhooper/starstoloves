@@ -21,9 +21,13 @@ class TestResultUpdate(TestCase):
         self.render = self.renderPatcher.start()
         self.render.return_value = HttpResponse('somehtml')
 
-        self.SpotifyUserPatcher = patch('starstoloves.views.main.SpotifyUser')
-        self.SpotifyUser = self.SpotifyUserPatcher.start()
-        self.SpotifyUser.return_value.connection.is_connected.return_value = True
+        self.spotify_connection_repo_patcher = patch('starstoloves.views.connection.spotify_connection_repository')
+        self.spotify_connection_repo = self.spotify_connection_repo_patcher.start()
+        self.spotify_connection_repo.from_user.return_value.is_connected = True
+
+        self.lastfm_connection_repo_patcher = patch('starstoloves.views.connection.lastfm_connection_repository')
+        self.lastfm_connection_repo = self.lastfm_connection_repo_patcher.start()
+        self.lastfm_connection_repo.from_user.return_value.is_connected = True
 
         script_dir = os.path.dirname(__file__)
         with open (os.path.join(script_dir, 'fixtures/results-list.json'), 'r') as results_file:
@@ -34,7 +38,8 @@ class TestResultUpdate(TestCase):
     def tearDown(self):
         self.tracksPatcher.stop()
         self.renderPatcher.stop()
-        self.SpotifyUserPatcher.stop()
+        self.spotify_connection_repo_patcher.stop()
+        self.lastfm_connection_repo_patcher.stop()
 
     def test_returns_all_search_results_by_default(self):
         response = self.makeRequest('/update-tracks')
@@ -127,6 +132,5 @@ class TestResultUpdate(TestCase):
         else:
             request = self.factory.post(url)
         request.session_user = MagicMock()
-        request.spotify_session = MagicMock()
         return main.result_update(request)
 
