@@ -81,23 +81,3 @@ class TestStarredTracks:
 
     def test_starred_tracks_returns_the_users_starred_tracks(self, spotify_user):
         assert spotify_user.starred_tracks == track_data_list
-
-    def test_starred_tracks_stores_the_tracks(self, spotify_user, fetch_user):
-        spotify_user.starred_tracks
-
-        track_models = fetch_user().starred_tracks
-
-        assert len(track_models) is 2
-
-        assert track_models[0].track_name   == track_data_list[0]['track_name']
-        assert track_models[0].artist_name  == track_data_list[0]['artist_name']
-
-        assert track_models[1].track_name   == track_data_list[1]['track_name']
-        assert track_models[1].artist_name  == track_data_list[1]['artist_name']
-
-    def test_starred_tracks_only_creates_one_entry_for_each_track(self, spotify_user, fetch_user):
-        spotify_user.starred_tracks
-        spotify_user.starred_tracks
-        track_models = fetch_user().starred_tracks
-        assert len(track_models) is 2
-
