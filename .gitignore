@@ -4,3 +4,4 @@ spotify_appkey.key
 /tmp
 bower_components
 __pycache__
+migrations/
