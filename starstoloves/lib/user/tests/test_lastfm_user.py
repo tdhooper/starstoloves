@@ -1,20 +1,20 @@
-from unittest.mock import call
+from unittest.mock import MagicMock, call
 
 import pytest
 
 from ..lastfm_user import LastfmUser
 from starstoloves.models import LastfmTrack
-
+from starstoloves.lib.connection.lastfm_connection import LastfmConnectionHelper
 
 pytestmark = pytest.mark.django_db
 
 @pytest.fixture
-def lastfm_connection_repository_patch(create_patch):
-    return create_patch('starstoloves.lib.user.lastfm_user.lastfm_connection_repository')
+def lastfm_connection(create_patch):
+    return MagicMock(spec=LastfmConnectionHelper).return_value
 
 @pytest.fixture
-def lastfm_user(user):
-    return LastfmUser(user)
+def lastfm_user(lastfm_connection):
+    return LastfmUser(lastfm_connection)
 
 @pytest.fixture
 def lastfm_app(create_patch):
@@ -23,10 +23,6 @@ def lastfm_app(create_patch):
 @pytest.fixture
 def lastfm_api_returns_tracks(request, lastfm_app):
     lastfm_app.user.get_loved_tracks.return_value = request.cls.api_response
-
-def test_connection_returns_the_lastfm_connection(lastfm_user, user, lastfm_connection_repository_patch):
-    assert lastfm_user.connection is lastfm_connection_repository_patch.from_user.return_value
-    assert lastfm_connection_repository_patch.from_user.call_args == call(user)
 
 
 @pytest.mark.usefixtures('lastfm_api_returns_tracks')
@@ -39,10 +35,9 @@ class TestLovedTrackUrls():
         ]
     }
 
-    @pytest.mark.usefixtures('lastfm_connection_repository_patch')
-    def test_it_gets_loved_tracks_from_the_lastfm_api(self, lastfm_user, lastfm_app):
+    def test_it_gets_loved_tracks_from_the_lastfm_api(self, lastfm_user, lastfm_app, lastfm_connection):
         lastfm_user.loved_track_urls
-        assert lastfm_app.user.get_loved_tracks.call_args == call(lastfm_user.connection.username)
+        assert lastfm_app.user.get_loved_tracks.call_args == call(lastfm_connection.username)
 
     def test_it_returns_the_track_urls(self, lastfm_user, lastfm_app):
         assert lastfm_user.loved_track_urls == ['some_url', 'another_url']

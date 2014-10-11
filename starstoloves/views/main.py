@@ -12,8 +12,7 @@ from .connection import connection_index_decorator, connection_index_processor, 
 
 
 def get_searches(request):
-    spotify_user = SpotifyUser(request.session_user)
-    return starred_track_searches(spotify_user)
+    return starred_track_searches(request.session_user)
 
 def get_tracks_data(request):
     return [

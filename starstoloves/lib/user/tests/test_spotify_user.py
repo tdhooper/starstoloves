@@ -5,7 +5,7 @@ import pytest
 from spotify import Session, Track, Playlist, PlaylistTrack, Artist
 
 from ..spotify_user import SpotifyUser
-from starstoloves.lib.connection import spotify_connection_repository
+from starstoloves.lib.connection.spotify_connection import SpotifyConnectionHelper
 
 pytestmark = pytest.mark.django_db
 
@@ -27,12 +27,11 @@ def spotify_session(create_patch):
 
 @pytest.fixture
 def spotify_connection(create_patch):
-    patch = create_patch('starstoloves.lib.user.spotify_user.spotify_connection_repository')
-    return patch.from_user.return_value
+    return MagicMock(spec=SpotifyConnectionHelper).return_value
 
 @pytest.fixture
-def spotify_user(user):
-    return SpotifyUser(user)
+def spotify_user(spotify_connection):
+    return SpotifyUser(spotify_connection)
 
 @pytest.fixture
 def playlist_tracks():

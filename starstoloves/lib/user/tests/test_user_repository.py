@@ -48,6 +48,11 @@ def lastfm_track_models():
     ]
 
 
+@pytest.fixture
+def patch_spotify_user(create_patch):
+    create_patch('starstoloves.lib.user.user.SpotifyUser')
+
+
 class TestFromSessionKey():
 
     def test_returns_user(self):
@@ -73,6 +78,7 @@ class TestSave():
         assert tracks[1]['track_name'] == 'another_track';
         assert tracks[1]['artist_name'] == 'another_artist';
 
+    @pytest.mark.usefixtures("patch_spotify_user")
     def test_persists_loved_tracks(self, lastfm_track_models):
         user = user_repository.from_session_key('some_key')
         user.loved_tracks = lastfm_track_models
@@ -90,6 +96,7 @@ class TestSave():
 
 class TestDelete():
 
+    @pytest.mark.usefixtures("patch_spotify_user")
     def test_deletes_stored_user(self, spotify_track_models, lastfm_track_models):
         user = user_repository.from_session_key('some_key')
         user.starred_tracks = spotify_track_models
@@ -98,5 +105,5 @@ class TestDelete():
 
         user_repository.delete(user)
         user = user_repository.from_session_key('some_key')
-        assert user.starred_tracks is None
+        assert user.starred_tracks is not spotify_track_models
         assert user.loved_tracks is None

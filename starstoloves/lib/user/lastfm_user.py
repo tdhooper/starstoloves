@@ -1,15 +1,10 @@
-from starstoloves.lib.connection import lastfm_connection_repository
 from starstoloves.lib.lastfm import lastfm_app
 
 
 class LastfmUser:
 
-    def __init__(self, user):
-        self.user = user
-
-    @property
-    def connection(self):
-        return lastfm_connection_repository.from_user(self.user)
+    def __init__(self, connection):
+        self.connection = connection
 
     @property
     def loved_track_urls(self):

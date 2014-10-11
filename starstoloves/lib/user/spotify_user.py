@@ -1,11 +1,10 @@
 from starstoloves.lib.spotify_session import session as spotify_session
-from starstoloves.lib.connection import spotify_connection_repository
 
 
 class SpotifyUser:
 
-    def __init__(self, user):
-        self.user = user
+    def __init__(self, connection):
+        self.connection = connection
 
     @property
     def starred_tracks(self):
@@ -31,7 +30,3 @@ class SpotifyUser:
     def api_user(self):
         user_uri = self.connection.user_uri
         return spotify_session.get_user(user_uri).load()
-
-    @property
-    def connection(self):
-        return spotify_connection_repository.from_user(self.user)

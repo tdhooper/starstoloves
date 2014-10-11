@@ -1,4 +1,7 @@
 import builtins
+builtins.spotify_session = 'spotify_api_session'
+
+
 from unittest.mock import patch
 
 import pytest
@@ -6,8 +9,6 @@ import pytest
 from starstoloves.models import User
 from starstoloves.lib.user import user_repository
 
-
-builtins.spotify_session = 'spotify_api_session'
 
 @pytest.fixture
 def create_patch(request):
