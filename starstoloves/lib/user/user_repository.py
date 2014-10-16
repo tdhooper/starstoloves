@@ -1,4 +1,5 @@
 from starstoloves.models import User as UserModel
+from starstoloves import model_repository
 from .user import User
 
 def from_session_key(session_key):
@@ -17,8 +18,7 @@ def save(user):
 
 def delete(user):
     try:
-        user_model = UserModel.objects.get(session_key=user.session_key)
+        user_model = model_repository.from_user(user)
         user_model.delete()
     except UserModel.DoesNotExist:
         pass;
-    

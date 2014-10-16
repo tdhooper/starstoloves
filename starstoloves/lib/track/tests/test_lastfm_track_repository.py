@@ -60,18 +60,3 @@ class TestGetOrCreate:
             track_name='some_track',
             artist_name='some_artist'
         ).count() is 1
-
-
-class TestGetModel:
-
-    def test_returns_model(self):
-        track = lastfm_track_repository.get_or_create(
-            url='some_url',
-            track_name='some_track',
-            artist_name='some_artist'
-        )
-        track_model = lastfm_track_repository.get_model(track)
-        assert isinstance(track_model, LastfmTrackModel)
-        assert track_model.url == 'some_url'
-        assert track_model.track_name == 'some_track'
-        assert track_model.artist_name == 'some_artist'
