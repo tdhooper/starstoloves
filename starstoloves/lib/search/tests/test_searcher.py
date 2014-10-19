@@ -5,7 +5,7 @@ import pytest
 from celery.result import AsyncResult
 
 from ..searcher import LastfmSearcher
-from ..query import LastfmCachingQuery
+from ..query import LastfmQuery
 from starstoloves.models import LastfmSearch
 
 
@@ -37,7 +37,7 @@ def LastfmSearch_patch(request):
 
 @pytest.fixture
 def LastfmQuery_patch(request):
-    patcher = patch('starstoloves.lib.search.searcher.LastfmCachingQuery')
+    patcher = patch('starstoloves.lib.search.searcher.LastfmQuery')
     def fin():
         patcher.stop()
     request.addfinalizer(fin)
@@ -84,7 +84,7 @@ def test_search_only_creates_one_task_when_called_twice(task_patch, searcher, tr
 def test_search_returns_a_query_when_called_twice(task_patch, searcher, track):
     searcher.search(track)
     query = searcher.search(track)
-    assert isinstance(query, LastfmCachingQuery)
+    assert isinstance(query, LastfmQuery)
 
 def test_search_uses_the_same_task_when_called_twice(task_patch, searcher, LastfmQuery_mock, track):
     searcher.search(track)
