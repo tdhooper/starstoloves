@@ -1,6 +1,7 @@
 import pytest
 
 from starstoloves.models import LastfmTrack as LastfmTrackModel
+from starstoloves import model_repository
 from .. import lastfm_track_repository
 from ..lastfm_track import LastfmTrack
 
@@ -60,3 +61,24 @@ class TestGetOrCreate:
             track_name='some_track',
             artist_name='some_artist'
         ).count() is 1
+
+
+class TestFromModel:
+
+    def test_returns_a_lastfm_track(self):
+        track = lastfm_track_repository.get_or_create(url='some_url')
+        track_model = model_repository.from_lastfm_track(track)
+        new_track = lastfm_track_repository.from_model(track_model)
+        assert isinstance(new_track, LastfmTrack)
+
+    def test_passes_data(self):
+        track = lastfm_track_repository.get_or_create(
+            url='some_url',
+            track_name='some_track',
+            artist_name='some_artist'
+        )
+        track_model = model_repository.from_lastfm_track(track)
+        new_track = lastfm_track_repository.from_model(track_model)
+        assert new_track.url == 'some_url'
+        assert new_track.track_name == 'some_track'
+        assert new_track.artist_name == 'some_artist'

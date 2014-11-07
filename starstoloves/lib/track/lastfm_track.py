@@ -1,4 +1,6 @@
-class LastfmTrack:
+from starstoloves.lib.comparable import Comparable
+
+class LastfmTrack(Comparable):
 
     def __init__(self, url, track_name=None, artist_name=None):
         self.url = url

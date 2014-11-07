@@ -1,11 +1,38 @@
-from unittest.mock import patch, call, Mock
+from unittest.mock import call
 
 import pytest
 
+from starstoloves.lib.track import lastfm_track_repository
 from ..query import LastfmQuery
+from .fixtures import *
 
 
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture
+def revoke(create_patch):
+    return create_patch('starstoloves.lib.search.query.revoke')
+
+
+@pytest.fixture
+def query_repository(create_patch):
+    return create_patch('starstoloves.lib.search.query_repository')
+
+
+@pytest.fixture
+def query(request, query_repository, async_result):
+    if 'with_async_result' in request.keywords:
+        return LastfmQuery(query_repository, 'some_track', 'some_artist', async_result)
+    elif 'with_results' in request.keywords:
+        return LastfmQuery(query_repository, 'some_track', 'some_artist', None, 'some_results')
+    else:
+        return LastfmQuery(query_repository, 'some_track', 'some_artist')
+
+
+@pytest.fixture
+def search_lastfm(create_patch, async_result):
+    return create_patch('starstoloves.lib.search.query.search_lastfm')
 
 
 @pytest.fixture
@@ -14,54 +41,113 @@ def parser(create_patch):
     return patch.return_value
 
 
-@pytest.fixture
-def AsyncResult_patch(create_patch):
-    return create_patch('starstoloves.lib.search.query.AsyncResult')
 
 
-@pytest.fixture
-def query(request):
-    return LastfmQuery('some_id')
+class TestAsyncResult():
 
 
-@pytest.fixture
-def revoke_patch(create_patch):
-    return create_patch('starstoloves.lib.search.query.revoke')
+    @pytest.mark.with_async_result
+    def test_returns_async_result_when_provided(self, query, async_result):
+        assert query.async_result is async_result
 
 
-@pytest.fixture
-def async_result_has_data(AsyncResult_patch):
-    AsyncResult_patch.return_value.info = 'some_data'
+    @pytest.mark.with_async_result
+    def test_does_not_save_async_result_when_provided(self, query, async_result, query_repository):
+        query.async_result
+        assert query_repository.save.call_count is 0
 
 
-@pytest.fixture
-def parser_returns_tracks(request, parser):
-    parser.parse.return_value = request.cls.parsed_tracks
+    def test_starts_search_task(self, query, search_lastfm):
+        assert query.async_result is search_lastfm.delay.return_value
+        assert search_lastfm.delay.call_count is 1
+        assert search_lastfm.delay.call_args == call('some_track', 'some_artist')
+
+
+    def test_memoises_created_async_result(self, query, search_lastfm):
+        assert query.async_result is search_lastfm.delay.return_value
+        assert query.async_result is search_lastfm.delay.return_value
+        assert search_lastfm.delay.call_count is 1
+
+
+    def test_saves_created_async_result(self, query, search_lastfm, query_repository):
+        query.async_result
+        assert query_repository.save.call_args == call(query)
 
 
 
-
-def test_fetches_async_result_on_init(AsyncResult_patch, query):
-    assert AsyncResult_patch.call_args == call('some_id')
-
-
-def test_status_is_async_result_status(AsyncResult_patch, query):
-    AsyncResult_patch.return_value.status = 'SOME_STATUS'
+@pytest.mark.with_async_result
+def test_status_is_async_result_status(query, async_result):
+    async_result.status = 'SOME_STATUS'
     assert query.status == 'SOME_STATUS'
 
 
-def test_results_is_none_when_not_ready(AsyncResult_patch, query):
-    AsyncResult_patch.return_value.ready.return_value = False
-    assert query.results is None
+
+# TODO: Create our own id so that the task can be destroyed without loosing track of results
+@pytest.mark.with_async_result
+def test_id_is_async_result_id(query, async_result):
+    async_result.id = 'some_id'
+    assert query.id == 'some_id'
 
 
-@pytest.mark.usefixtures("async_result_has_data")
-def test_results_returns_parsed_AsynchResult_info(parser, query):
-    parser.parse.return_value = 'parsed_tracks'
-    assert query.results == 'parsed_tracks'
-    assert parser.parse.call_args == call('some_data')
+
+class TestResults():
 
 
-def test_stop_revokes_task(revoke_patch, query):
+    @pytest.mark.with_results
+    def test_returns_results_when_provided(self, query):
+        assert query.results is 'some_results'
+
+
+    @pytest.mark.with_async_result
+    def test_none_when_async_result_is_not_ready(self, query, async_result):
+        async_result.ready.return_value = False
+        assert query.results is None
+
+
+    @pytest.mark.with_async_result
+    def test_does_not_parse_when_async_result_is_not_ready(self, query, async_result, parser):
+        async_result.ready.return_value = False
+        assert query.results is None
+        assert parser.parse.call_count is 0
+
+
+    @pytest.mark.with_async_result
+    def test_returns_parsed_async_result_info_when_ready(self, query, async_result, parser):
+        async_result.info = 'some_data'
+        parser.parse.return_value = 'some_results'
+        assert query.results == 'some_results'
+        assert parser.parse.call_count is 1
+        assert parser.parse.call_args == call('some_data')
+
+
+    @pytest.mark.with_async_result
+    def test_saves_results_when_parsed(self, query, async_result, parser, query_repository):
+        async_result.info = 'some_data'
+        parser.parse.return_value = 'some_results'
+        query.results
+        assert query_repository.save.call_args == call(query)
+
+
+    @pytest.mark.with_async_result
+    def test_does_not_save_results_when_there_are_none(self, query, async_result, parser, query_repository):
+        async_result.info = 'some_data'
+        parser.parse.return_value = None
+        query.results
+        assert query_repository.save.call_count is 0
+
+
+    @pytest.mark.with_async_result
+    def test_memoises_parsed_async_result_info(self, query, async_result, parser):
+        async_result.info = 'some_data'
+        parser.parse.return_value = 'some_results'
+        assert query.results == 'some_results'
+        assert query.results == 'some_results'
+        assert parser.parse.call_count is 1
+
+
+
+
+@pytest.mark.with_async_result
+def test_stop_revokes_task(query, revoke):
     query.stop()
-    assert revoke_patch.call_args == call('some_id')
+    assert revoke.call_args == call('some_id')

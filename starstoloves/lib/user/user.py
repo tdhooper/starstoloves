@@ -10,16 +10,13 @@ def starred_track_searches(user):
     searcher = LastfmSearcher()
     searches = [
         {
-            'track': track,
+            'track': {
+                'track_name': track.track_name,
+                'artist_name': track.artist_name,
+            },
             'query': searcher.search(track),
         }
-        for track in [
-            {
-                'track_name': playlist_track.track_name,
-                'artist_name': playlist_track.artist_name,
-            }
-            for playlist_track in user.starred_tracks
-        ]
+        for track in user.starred_tracks
     ]
     return searches
 

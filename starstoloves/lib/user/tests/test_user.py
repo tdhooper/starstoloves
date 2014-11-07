@@ -55,20 +55,14 @@ class TestStarredTrackSearches:
         mock_user.starred_tracks = starred_tracks
         starred_track_searches(mock_user)
         assert searcher.search.call_args_list == [
-            call({
-                'track_name': 'some_track',
-                'artist_name': 'some_artist',
-            }),
-            call({
-                'track_name': 'another_track',
-                'artist_name': 'another_artist',
-            }),
+            call(starred_tracks[0]),
+            call(starred_tracks[1]),
         ]
 
     def test_it_returns_the_tracks_and_search_queries(self, mock_user, starred_tracks, searcher):
         search_returns = []
         def search(track):
-            search_returns.append(track['track_name'] + track['artist_name'])
+            search_returns.append(track.track_name + track.artist_name)
             return search_returns[-1]
         searcher.search.side_effect = search
 

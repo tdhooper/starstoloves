@@ -71,7 +71,8 @@ class TestConnectSpotify():
 
 class TestDisconnectSpotify():
 
-    def test_disconnects(self, client, spotify_connection):
+    def test_disconnects(self, client, spotify_connection, create_patch):
+        create_patch('starstoloves.views.main.get_searches')
         client.get(reverse('disconnect_spotify'))
         assert spotify_connection.disconnect.call_count is 1
 

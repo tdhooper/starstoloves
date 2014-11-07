@@ -15,3 +15,10 @@ def get_or_create(url, track_name=None, artist_name=None):
             url=url
         )
     return LastfmTrack(url, track_name, artist_name)
+
+def from_model(model):
+    return LastfmTrack(
+        url=model.url,
+        track_name=model.track_name,
+        artist_name=model.artist_name
+    )

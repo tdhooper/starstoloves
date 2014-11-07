@@ -8,11 +8,17 @@ from django.http import HttpResponse, HttpResponseServerError
 
 from starstoloves.lib.user.spotify_user import SpotifyUser
 from starstoloves.lib.user.user import starred_track_searches
-from .connection import connection_index_decorator, connection_index_processor, connection_status_decorator
+from .connection import (
+    connection_index_decorator,
+    connection_index_processor,
+    connection_status_decorator,
+    disconnect_spotify as connection_disconnect_spotify
+)
 
 
 def get_searches(request):
     return starred_track_searches(request.session_user)
+
 
 def get_tracks_data(request):
     return [
@@ -28,6 +34,7 @@ def get_tracks_data(request):
         for search in get_searches(request)
     ]
 
+
 @connection_index_decorator
 @connection_status_decorator
 def index(request):
@@ -35,6 +42,15 @@ def index(request):
     if request.is_lastfm_connected and request.is_spotify_connected:
         context['tracks'] = get_tracks_data(request)
     return render_to_response('index.html', context_instance=RequestContext(request, context, [connection_index_processor]))
+
+
+@connection_status_decorator
+def disconnect_spotify(request):
+    if request.is_spotify_connected:
+        for search in get_searches(request):
+            search['query'].stop()
+    return connection_disconnect_spotify(request)
+
 
 @connection_status_decorator
 def result_update(request):
@@ -62,4 +78,3 @@ def result_update(request):
         ]
         return HttpResponse(json.dumps(results), content_type="application/json")
     return HttpResponse('No results', status=401)
-    
