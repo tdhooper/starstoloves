@@ -1,6 +1,6 @@
 from celery.task.control import revoke
 
-from starstoloves.tasks import search_lastfm
+from .task import search_lastfm
 from .result import LastfmResultParser
 
 
