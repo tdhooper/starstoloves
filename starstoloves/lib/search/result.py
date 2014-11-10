@@ -1,4 +1,4 @@
-from starstoloves.lib.track import lastfm_track_repository
+from starstoloves.lib.track.lastfm_track import LastfmTrack
 
 
 class LastfmResultParser(object):
@@ -16,10 +16,10 @@ class LastfmResultParser(object):
             track_results = [track_results]
 
         tracks = [
-            lastfm_track_repository.get_or_create(
+            LastfmTrack(
                 url=track['url'],
                 track_name=track['name'],
-                artist_name=track['artist']
+                artist_name=track['artist'],
             )
             for track in track_results
         ]

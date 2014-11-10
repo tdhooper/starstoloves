@@ -82,3 +82,19 @@ class TestFromModel:
         assert new_track.url == 'some_url'
         assert new_track.track_name == 'some_track'
         assert new_track.artist_name == 'some_artist'
+
+
+class TestSave:
+
+    def test_stores_data_in_db(self):
+        track = LastfmTrack(
+            url='some_url',
+            track_name='some_track',
+            artist_name='some_artist'
+        )
+        lastfm_track_repository.save(track)
+        assert LastfmTrackModel.objects.filter(
+            url='some_url',
+            track_name='some_track',
+            artist_name='some_artist'
+        ).count() is 1

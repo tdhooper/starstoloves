@@ -1,7 +1,7 @@
 from celery.task.control import revoke
 
 from .task import search_lastfm
-from .result import LastfmResultParser
+from starstoloves.lib.track import lastfm_track_repository
 
 
 class LastfmQuery(object):
@@ -49,8 +49,9 @@ class LastfmQuery(object):
     @property
     def results(self):
         if not self._results and self.response_data:
-            parser = LastfmResultParser()
-            self._results = parser.parse(self.response_data)
+            self._results = self.response_data
+            for track in self._results:
+                lastfm_track_repository.save(track)
             if self._results:
                 self.repository.save(self)
         return self._results

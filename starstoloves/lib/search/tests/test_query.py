@@ -3,6 +3,7 @@ from unittest.mock import call
 import pytest
 
 from starstoloves.lib.track import lastfm_track_repository
+from starstoloves.lib.track.lastfm_track import LastfmTrack
 from ..query import LastfmQuery
 from .fixtures import *
 
@@ -36,9 +37,8 @@ def search_lastfm(create_patch, async_result):
 
 
 @pytest.fixture
-def parser(create_patch):
-    patch = create_patch('starstoloves.lib.search.query.LastfmResultParser')
-    return patch.return_value
+def lastfm_track_repository(create_patch):
+    return create_patch('starstoloves.lib.search.query.lastfm_track_repository')
 
 
 
@@ -93,6 +93,20 @@ def test_id_is_async_result_id(query, async_result):
 class TestResults():
 
 
+    tracks = [
+        LastfmTrack(
+            url='some_url',
+            track_name='some_track',
+            artist_name='some_artist',
+        ),
+        LastfmTrack(
+            url='another_url',
+            track_name='another_track',
+            artist_name='another_artist',
+        )
+    ]
+
+
     @pytest.mark.with_results
     def test_returns_results_when_provided(self, query):
         assert query.results is 'some_results'
@@ -105,44 +119,36 @@ class TestResults():
 
 
     @pytest.mark.with_async_result
-    def test_does_not_parse_when_async_result_is_not_ready(self, query, async_result, parser):
-        async_result.ready.return_value = False
-        assert query.results is None
-        assert parser.parse.call_count is 0
+    def test_saves_and_returns_lastfm_tracks_from_async_result_info_when_ready(self, query, async_result, lastfm_track_repository):
+        async_result.info = self.tracks
+        results = query.results
+        assert results == self.tracks
+        assert lastfm_track_repository.save.call_args_list == [
+            call(self.tracks[0]),
+            call(self.tracks[1]),
+        ]
 
 
     @pytest.mark.with_async_result
-    def test_returns_parsed_async_result_info_when_ready(self, query, async_result, parser):
-        async_result.info = 'some_data'
-        parser.parse.return_value = 'some_results'
-        assert query.results == 'some_results'
-        assert parser.parse.call_count is 1
-        assert parser.parse.call_args == call('some_data')
+    def test_memoises_lastfm_tracks(self, query, async_result, lastfm_track_repository):
+        async_result.info = self.tracks
+        results = query.results
+        assert query.results == results
+        assert lastfm_track_repository.save.call_count == 2
 
 
     @pytest.mark.with_async_result
-    def test_saves_results_when_parsed(self, query, async_result, parser, query_repository):
-        async_result.info = 'some_data'
-        parser.parse.return_value = 'some_results'
+    def test_saves_results_when_parsed(self, query, async_result, query_repository):
+        async_result.info = self.tracks
         query.results
         assert query_repository.save.call_args == call(query)
 
 
     @pytest.mark.with_async_result
-    def test_does_not_save_results_when_there_are_none(self, query, async_result, parser, query_repository):
-        async_result.info = 'some_data'
-        parser.parse.return_value = None
+    def test_does_not_save_results_when_there_are_none(self, query, async_result, query_repository):
+        async_result.info = None
         query.results
         assert query_repository.save.call_count is 0
-
-
-    @pytest.mark.with_async_result
-    def test_memoises_parsed_async_result_info(self, query, async_result, parser):
-        async_result.info = 'some_data'
-        parser.parse.return_value = 'some_results'
-        assert query.results == 'some_results'
-        assert query.results == 'some_results'
-        assert parser.parse.call_count is 1
 
 
 
