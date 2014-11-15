@@ -4,11 +4,13 @@ from unittest.mock import MagicMock, call
 import pytest
 
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from celery.result import AsyncResult
 
 from starstoloves.lib.user.tests.fixtures.spotify_user_fixtures import *
 from starstoloves.lib.search.query import LastfmQuery
+from starstoloves.lib.track.lastfm_track import LastfmTrack
 from .fixtures.connection_fixtures import *
 
 
@@ -29,6 +31,16 @@ def search_lastfm(create_patch):
 
 
 @pytest.fixture
+def separate_search_patch(create_patch):
+    return create_patch('starstoloves.lib.search.task.separate_search_strategy')
+
+
+@pytest.fixture
+def combined_search_patch(create_patch):
+    return create_patch('starstoloves.lib.search.task.combined_search_strategy')
+
+
+@pytest.fixture
 def get_searches_patch(create_patch):
     return create_patch('starstoloves.views.main.get_searches')
 
@@ -46,8 +58,6 @@ def has_searches(get_searches_patch, searches):
     get_searches_patch.return_value = searches
 
 
-
-
 @pytest.mark.usefixtures("lastfm_connected")
 @pytest.mark.usefixtures("spotify_connected")
 @pytest.mark.usefixtures("spotify_user_with_starred")
@@ -59,6 +69,19 @@ class TestIndex():
             call('some_track', 'some_artist'),
             call('another_track', 'another_artist')
         ]
+
+
+    def test_returns_results(self, client, separate_search_patch, combined_search_patch):
+        track_almost = LastfmTrack('some_url_1', 'some_track_almost', 'some_artist_almost')
+        track_nope = LastfmTrack('some_url_2', 'nope', 'nope')
+        track_match = LastfmTrack('some_url_3', 'some_track', 'some_artist')
+        track_reversed = LastfmTrack('some_url_4', 'some_artist', 'some_track')
+
+        separate_search_patch.return_value = [track_almost, track_nope]
+        combined_search_patch.return_value = [track_almost, track_match, track_reversed]
+
+        response = client.get(reverse('index'))
+        assert response.context['tracks'][0]['results'] == [track_match, track_almost, track_reversed, track_nope]
 
 
 @pytest.mark.usefixtures("spotify_connected")

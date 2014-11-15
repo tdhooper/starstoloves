@@ -73,6 +73,9 @@ sudo npm install -g bower
 sudo apt-get install -y git
 bower install --config.interactive=false
 
+# Install the project locally
+./setup.py develop
+
 # Django project setup
 ./manage.py syncdb --noinput
 ./manage.py migrate
