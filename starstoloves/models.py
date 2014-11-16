@@ -4,6 +4,7 @@ class LastfmTrack(models.Model):
     track_name = models.CharField(max_length=3000, null=True)
     artist_name = models.CharField(max_length=3000, null=True)
     url = models.URLField(max_length=3000, unique=True)
+    listeners = models.IntegerField(null=True)
 
 class SpotifyTrack(models.Model):
     track_name = models.CharField(max_length=3000, null=True)

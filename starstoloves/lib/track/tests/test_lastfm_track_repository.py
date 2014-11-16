@@ -19,25 +19,29 @@ class TestGetOrCreate:
         track = lastfm_track_repository.get_or_create(
             url='some_url',
             track_name='some_track',
-            artist_name='some_artist'
+            artist_name='some_artist',
+            listeners=10,
         )
         assert track.url == 'some_url'
         assert track.track_name == 'some_track'
         assert track.artist_name == 'some_artist'
+        assert track.listeners == 10
 
-    def test_track_and_artist_name_are_optional(self):
+    def test_only_url_is_required(self):
         lastfm_track_repository.get_or_create(url='some_url')
 
     def test_stores_data_in_db(self):
         lastfm_track_repository.get_or_create(
             url='some_url',
             track_name='some_track',
-            artist_name='some_artist'
+            artist_name='some_artist',
+            listeners=10,
         )
         assert LastfmTrackModel.objects.filter(
             url='some_url',
             track_name='some_track',
-            artist_name='some_artist'
+            artist_name='some_artist',
+            listeners=10,
         ).count() is 1
 
     def test_does_not_create_multiple_entries_for_url(self):
@@ -45,7 +49,8 @@ class TestGetOrCreate:
         lastfm_track_repository.get_or_create(
             url='some_url',
             track_name='some_track',
-            artist_name='some_artist'
+            artist_name='some_artist',
+            listeners=10,
         )
         assert LastfmTrackModel.objects.filter(url='some_url').count() is 1
 
@@ -54,12 +59,14 @@ class TestGetOrCreate:
         lastfm_track_repository.get_or_create(
             url='some_url',
             track_name='some_track',
-            artist_name='some_artist'
+            artist_name='some_artist',
+            listeners=10,
         )
         assert LastfmTrackModel.objects.filter(
             url='some_url',
             track_name='some_track',
-            artist_name='some_artist'
+            artist_name='some_artist',
+            listeners=10,
         ).count() is 1
 
 
@@ -75,13 +82,15 @@ class TestFromModel:
         track = lastfm_track_repository.get_or_create(
             url='some_url',
             track_name='some_track',
-            artist_name='some_artist'
+            artist_name='some_artist',
+            listeners=10,
         )
         track_model = model_repository.from_lastfm_track(track)
         new_track = lastfm_track_repository.from_model(track_model)
         assert new_track.url == 'some_url'
         assert new_track.track_name == 'some_track'
         assert new_track.artist_name == 'some_artist'
+        assert new_track.listeners == 10
 
 
 class TestSave:
@@ -90,11 +99,13 @@ class TestSave:
         track = LastfmTrack(
             url='some_url',
             track_name='some_track',
-            artist_name='some_artist'
+            artist_name='some_artist',
+            listeners=10,
         )
         lastfm_track_repository.save(track)
         assert LastfmTrackModel.objects.filter(
             url='some_url',
             track_name='some_track',
-            artist_name='some_artist'
+            artist_name='some_artist',
+            listeners=10,
         ).count() is 1
