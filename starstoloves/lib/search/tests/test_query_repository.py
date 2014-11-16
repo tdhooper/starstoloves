@@ -12,6 +12,8 @@ from .fixtures import *
 pytestmark = pytest.mark.django_db
 
 
+
+
 class TestGetOrCreate:
 
 
@@ -35,7 +37,8 @@ class TestGetOrCreate:
 class TestSave:
 
 
-    def test_creates_db_entry(self, async_result):
+    def test_creates_db_entry(self, search_lastfm, async_result):
+        search_lastfm.delay.return_value = async_result
         query = LastfmQuery(query_repository, 'some_track', 'some_artist')
         query_repository.save(query)
         assert LastfmSearchModel.objects.filter(

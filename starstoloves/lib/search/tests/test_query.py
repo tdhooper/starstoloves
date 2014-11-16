@@ -32,11 +32,6 @@ def query(request, query_repository, async_result):
 
 
 @pytest.fixture
-def search_lastfm(create_patch, async_result):
-    return create_patch('starstoloves.lib.search.query.search_lastfm')
-
-
-@pytest.fixture
 def lastfm_track_repository(create_patch):
     return create_patch('starstoloves.lib.search.query.lastfm_track_repository')
 

@@ -12,3 +12,6 @@ def async_result():
     return result
 
 
+@pytest.fixture
+def search_lastfm(create_patch, async_result):
+    return create_patch('starstoloves.lib.search.query.search_lastfm')
