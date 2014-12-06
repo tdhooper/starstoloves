@@ -21,10 +21,12 @@ class TestResultParser():
                     'name': 'trackA',
                     'artist': 'artistA',
                     'url': 'urlA',
+                    'listeners': '222',
                 },{
                     'name': 'trackB',
                     'artist': 'artistB',
                     'url': 'urlB',
+                    'listeners': '888',
                 },
             ]
         }
@@ -36,6 +38,7 @@ class TestResultParser():
                 'name': 'trackA',
                 'artist': 'artistA',
                 'url': 'urlA',
+                'listeners': '222',
             }
         }
     }
@@ -55,6 +58,7 @@ class TestResultParser():
         assert [track.track_name for track in tracks] == ['trackA', 'trackB']
         assert [track.artist_name for track in tracks] == ['artistA', 'artistB']
         assert [track.url for track in tracks] == ['urlA', 'urlB']
+        assert [track.listeners for track in tracks] == ['222', '888']
 
 
     def test_parse_extracts_track_details_when_there_is_only_one(self, result_parser):
@@ -62,6 +66,7 @@ class TestResultParser():
         assert [track.track_name for track in tracks] == ['trackA']
         assert [track.artist_name for track in tracks] == ['artistA']
         assert [track.url for track in tracks] == ['urlA']
+        assert [track.listeners for track in tracks] == ['222']
 
 
     def test_parse_returns_none_when_there_are_no_tracks(self, result_parser):

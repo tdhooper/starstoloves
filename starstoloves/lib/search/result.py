@@ -20,6 +20,7 @@ class LastfmResultParser(object):
                 url=track['url'],
                 track_name=track['name'],
                 artist_name=track['artist'],
+                listeners=track['listeners'],
             )
             for track in track_results
         ]
