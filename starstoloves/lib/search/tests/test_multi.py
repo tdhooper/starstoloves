@@ -3,8 +3,8 @@ from unittest.mock import call, MagicMock
 import pytest
 
 from starstoloves.lib.track.lastfm_track import LastfmTrack
-from ..task import (
-    search_lastfm,
+from ..multi import (
+    multi_search,
     Result,
     merge,
     score,
@@ -54,19 +54,19 @@ def tracks_from_combined(tracks):
 
 @pytest.fixture
 def SequenceMatcher(create_patch):
-    return create_patch('starstoloves.lib.search.task.SequenceMatcher')
+    return create_patch('starstoloves.lib.search.multi.SequenceMatcher')
 
 
 @pytest.fixture
 def separate_search_patch(create_patch):
-    patched = create_patch('starstoloves.lib.search.task.separate_search_strategy')
+    patched = create_patch('starstoloves.lib.search.multi.separate_search_strategy')
     patched.return_value = None
     return patched
 
 
 @pytest.fixture
 def combined_search_patch(create_patch):
-    patched = create_patch('starstoloves.lib.search.task.combined_search_strategy')
+    patched = create_patch('starstoloves.lib.search.multi.combined_search_strategy')
     patched.return_value = None
     return patched
 
@@ -83,21 +83,21 @@ def combined_search_has_tracks(combined_search_patch, tracks_from_combined):
 
 @pytest.fixture
 def score_patch(create_patch):
-    patched = create_patch('starstoloves.lib.search.task.score')
+    patched = create_patch('starstoloves.lib.search.multi.score')
     patched.side_effect = score
     return patched
 
 
 @pytest.fixture
 def rank_patch(create_patch):
-    patched = create_patch('starstoloves.lib.search.task.rank')
+    patched = create_patch('starstoloves.lib.search.multi.rank')
     patched.side_effect = rank
     return patched
 
 
 @pytest.fixture
 def merge_patch(create_patch):
-    patched = create_patch('starstoloves.lib.search.task.merge')
+    patched = create_patch('starstoloves.lib.search.multi.merge')
     patched.side_effect = merge
     return patched
 
@@ -219,12 +219,12 @@ class TestSearchLastfm():
     threshold = 0.5
 
     def test_tries_a_separate_search(self, separate_search_patch):
-        search_lastfm('query_track', 'query_artist')
+        multi_search('query_track', 'query_artist')
         assert separate_search_patch.call_args == call('query_track', 'query_artist')
 
 
     def test_scores_results(self, tracks_from_separate, score_patch):
-        search_lastfm('query_track', 'query_artist')
+        multi_search('query_track', 'query_artist')
 
         query_track = score_patch.call_args[0][0]
         query_artist = score_patch.call_args[0][1]
@@ -239,7 +239,7 @@ class TestSearchLastfm():
 
 
     def test_ranks_results(self, tracks_from_separate, rank_patch):
-        search_lastfm('query_track', 'query_artist')
+        multi_search('query_track', 'query_artist')
 
         results = rank_patch.call_args[0][0]
 
@@ -253,12 +253,12 @@ class TestSearchLastfm():
 class TestSearchLastfmWhenNoSeparateOrCombinedSearchResults():
 
     def test_tries_a_combined_search(self, combined_search_patch):
-        search_lastfm('query_track', 'query_artist')
+        multi_search('query_track', 'query_artist')
         assert combined_search_patch.call_args == call('query_track', 'query_artist')
 
 
     def returns_none(self):
-        tracks = search_lastfm('query_track', 'query_artist')
+        tracks = multi_search('query_track', 'query_artist')
         assert tracks is None
 
 
@@ -273,12 +273,12 @@ class TestSearchLastfmWhenSeparateSearchResultsAboveThreshold():
     }
 
     def test_does_not_try_a_combined_search(self, combined_search_patch):
-        search_lastfm('query_track', 'query_artist')
+        multi_search('query_track', 'query_artist')
         assert combined_search_patch.call_count is 0
 
 
     def test_returns_ranked_result_tracks(self, tracks_from_separate):
-        result_tracks = search_lastfm('query_track', 'query_artist')
+        result_tracks = multi_search('query_track', 'query_artist')
         assert result_tracks == [tracks_from_separate[1], tracks_from_separate[0]]
 
 
@@ -302,12 +302,12 @@ class TestSearchLastfmWhenSeparateSearchResultsBelowThreshold():
     }
 
     def test_tries_a_combined_search(self, combined_search_patch):
-        search_lastfm('query_track', 'query_artist')
+        multi_search('query_track', 'query_artist')
         assert combined_search_patch.call_args == call('query_track', 'query_artist')
 
 
     def test_merges_results(self, tracks_from_separate, tracks_from_combined, merge_patch):
-        search_lastfm('query_track', 'query_artist')
+        multi_search('query_track', 'query_artist')
 
         results_a = merge_patch.call_args[0][0]
         assert isinstance(results_a[0], Result)
@@ -323,7 +323,7 @@ class TestSearchLastfmWhenSeparateSearchResultsBelowThreshold():
 
 
     def test_scores_results(self, tracks_from_separate, tracks_from_combined, score_patch):
-        search_lastfm('query_track', 'query_artist')
+        multi_search('query_track', 'query_artist')
 
         query_track = score_patch.call_args[0][0]
         query_artist = score_patch.call_args[0][1]
@@ -340,7 +340,7 @@ class TestSearchLastfmWhenSeparateSearchResultsBelowThreshold():
 
 
     def test_ranks_results(self, tracks_from_separate, tracks_from_combined, rank_patch):
-        search_lastfm('query_track', 'query_artist')
+        multi_search('query_track', 'query_artist')
 
         results = rank_patch.call_args[0][0]
 
@@ -355,7 +355,7 @@ class TestSearchLastfmWhenSeparateSearchResultsBelowThreshold():
 
 
     def test_returns_ranked_result_tracks(self, tracks_from_separate, tracks_from_combined):
-        result_tracks = search_lastfm('query_track', 'query_artist')
+        result_tracks = multi_search('query_track', 'query_artist')
         assert result_tracks == [
             tracks_from_separate[1],
             tracks_from_combined[0],

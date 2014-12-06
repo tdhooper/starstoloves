@@ -32,12 +32,12 @@ def search_lastfm(create_patch):
 
 @pytest.fixture
 def separate_search_patch(create_patch):
-    return create_patch('starstoloves.lib.search.task.separate_search_strategy')
+    return create_patch('starstoloves.lib.search.multi.separate_search_strategy')
 
 
 @pytest.fixture
 def combined_search_patch(create_patch):
-    return create_patch('starstoloves.lib.search.task.combined_search_strategy')
+    return create_patch('starstoloves.lib.search.multi.combined_search_strategy')
 
 
 @pytest.fixture
