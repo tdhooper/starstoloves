@@ -5,3 +5,4 @@ spotify_appkey.key
 bower_components
 __pycache__
 migrations/
+*.egg-info
