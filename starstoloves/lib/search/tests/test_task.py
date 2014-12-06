@@ -5,13 +5,12 @@ import pytest
 from starstoloves.lib.track.lastfm_track import LastfmTrack
 from ..task import (
     search_lastfm,
-    separate_search_strategy,
-    combined_search_strategy,
     Result,
     merge,
     score,
     rank,
 )
+from .fixtures import lastfm_app
 
 
 threshold = 0.9
@@ -51,17 +50,6 @@ def tracks_from_separate(tracks):
 @pytest.fixture
 def tracks_from_combined(tracks):
     return tracks[2:]
-
-
-@pytest.fixture
-def lastfm_app(create_patch):
-    return create_patch('starstoloves.lib.search.task.lastfm_app')
-
-
-@pytest.fixture
-def parser(create_patch):
-    patch = create_patch('starstoloves.lib.search.task.LastfmResultParser')
-    return patch.return_value
 
 
 @pytest.fixture
@@ -129,39 +117,6 @@ def set_scores(SequenceMatcher):
 def set_scores_from_class(request, set_scores):
     set_scores(request.instance.scores)
 
-
-class TestSeparateSearchStrategy():
-
-    def test_searches_with_track_and_artist(self, lastfm_app):
-        separate_search_strategy('track_1_track', 'track_1_artist')
-        assert lastfm_app.track.search.call_args_list[0] == call('track_1_track', 'track_1_artist')
-
-
-    def test_returns_parsed_search_result(self, lastfm_app, parser):
-        assert separate_search_strategy('track_1_track', 'track_1_artist') == parser.parse.return_value
-        assert parser.parse.call_args == call(lastfm_app.track.search.return_value)
-
-
-    def test_returns_none_when_search_throws(self, lastfm_app):
-        lastfm_app.track.search.side_effect = TypeError
-        assert separate_search_strategy('track_1_track', 'track_1_artist') == None
-
-
-class TestCombinedSearchStrategy():
-
-    def test_searches_with_track_and_artist_names_combined(self, lastfm_app):
-        combined_search_strategy('track_1_track', 'track_1_artist')
-        assert lastfm_app.track.search.call_args_list[0] == call('track_1_track track_1_artist')
-
-
-    def test_returns_parsed_search_result(self, lastfm_app, parser):
-        assert combined_search_strategy('track_1_track', 'track_1_artist') == parser.parse.return_value
-        assert parser.parse.call_args == call(lastfm_app.track.search.return_value)
-
-
-    def test_returns_none_when_search_throws(self, lastfm_app):
-        lastfm_app.track.search.side_effect = TypeError
-        assert combined_search_strategy('track_1_track', 'track_1_artist') == None
 
 
 class TestResult():
