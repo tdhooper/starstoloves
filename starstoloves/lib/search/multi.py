@@ -55,12 +55,12 @@ def score(track_name, artist_name, results):
 def rank(results):
     s = results
     s = sorted(s, key=lambda result: result.track.listeners or 0, reverse=True)
-    s = sorted(s, key=lambda result: round(result.score * 5), reverse=True)
+    s = sorted(s, key=lambda result: round(result.score * 3), reverse=True)
     return s
 
 
 def multi_search(track_name, artist_name):
-    threshold = 0.9
+    threshold = 0.8
     strategies = [separate_search_strategy, combined_search_strategy]
     results = []
     for strategy in strategies:
