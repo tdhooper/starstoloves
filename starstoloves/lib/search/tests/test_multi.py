@@ -445,6 +445,7 @@ class TestAgainstRealResults():
         assert results[0].artist_name == "A*S*Y*S"
         assert results[0].listeners == 1912
 
+
     def test_good_separate_results_danger(
         self,
         separate_search_patch,
@@ -456,3 +457,16 @@ class TestAgainstRealResults():
         assert results[0].track_name == "11h30 (DatA Remix)"
         assert results[0].artist_name == "Danger"
         assert results[0].listeners == 114502
+
+
+    def test_badly_ordered_separate_results_the_subs(
+        self,
+        separate_search_patch,
+        get_result_fixtures
+    ):
+        parser = LastfmResultParser()
+        separate_search_patch.return_value = parser.parse(get_result_fixtures('result_separate_the_subs.json'))
+        results = multi_search('My Body', 'The Subs')
+        assert results[0].track_name == "My Body"
+        assert results[0].artist_name == "The Subs"
+        assert results[0].listeners == 521
