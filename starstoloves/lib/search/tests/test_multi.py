@@ -1,8 +1,11 @@
+import os
+import json
 from unittest.mock import call, MagicMock
 
 import pytest
 
 from starstoloves.lib.track.lastfm_track import LastfmTrack
+from ..result import LastfmResultParser
 from ..multi import (
     multi_search,
     Result,
@@ -118,6 +121,18 @@ def set_scores_from_class(request, set_scores):
     set_scores(request.instance.scores)
 
 
+@pytest.fixture
+def get_result_fixtures():
+    def get_file(filename):
+        path = os.path.join(
+            os.path.dirname(__file__),
+            'result_fixtures',
+            filename
+        )
+        with open (path, 'r') as results_file:
+            return json.loads(results_file.read())['results']
+    return get_file
+
 
 class TestResult():
 
@@ -207,8 +222,8 @@ class TestRank():
     def test_sorts_by_descending_score(self):
         results = [
             Result(LastfmTrack(''), .0),
-            Result(LastfmTrack(''), .2),
-            Result(LastfmTrack(''), .1),
+            Result(LastfmTrack(''), .9),
+            Result(LastfmTrack(''), .5),
         ]
         assert rank(results) == [
             results[1],
@@ -221,8 +236,8 @@ class TestRank():
         results = [
             Result(LastfmTrack(url='', listeners=3), .0),
             Result(LastfmTrack(url='', listeners=2), .0),
-            Result(LastfmTrack(url='', listeners=0), .1),
-            Result(LastfmTrack(url='', listeners=1), .1),
+            Result(LastfmTrack(url='', listeners=0), .5),
+            Result(LastfmTrack(url='', listeners=1), .5),
         ]
         assert rank(results) == [
             results[3],
@@ -234,10 +249,10 @@ class TestRank():
 
     def test_subtle_score_differences_do_not_trump_listener_counts(self):
         results = [
-            Result(LastfmTrack(url='', listeners=1), .00),
-            Result(LastfmTrack(url='', listeners=0), .01),
-            Result(LastfmTrack(url='', listeners=1), .10),
-            Result(LastfmTrack(url='', listeners=0), .11),
+            Result(LastfmTrack(url='', listeners=1), .01),
+            Result(LastfmTrack(url='', listeners=0), .02),
+            Result(LastfmTrack(url='', listeners=1), .91),
+            Result(LastfmTrack(url='', listeners=0), .92),
         ]
         assert rank(results) == [
             results[2],
@@ -249,9 +264,9 @@ class TestRank():
 
     def test_subtle_listener_count_differences_do_not_trump_score(self):
         results = [
-            Result(LastfmTrack(url='', listeners=10), .1),
+            Result(LastfmTrack(url='', listeners=10), .9),
             Result(LastfmTrack(url='', listeners=11), .0),
-            Result(LastfmTrack(url='', listeners=98), .1),
+            Result(LastfmTrack(url='', listeners=98), .9),
             Result(LastfmTrack(url='', listeners=99), .0),
         ]
         assert rank(results) == [
@@ -340,14 +355,14 @@ class TestSearchLastfmWhenSeparateSearchResultsAboveThreshold():
 class TestSearchLastfmWhenSeparateSearchResultsBelowThreshold():
 
     scores = {
-        'track_1_track': threshold - 0.2,
-        'track_1_artist': threshold - 0.2,
+        'track_1_track': threshold - 0.5,
+        'track_1_artist': threshold - 0.5,
         'track_2_track': threshold,
         'track_2_artist': threshold,
         'track_3_track': threshold - 0.1,
         'track_3_artist': threshold - 0.1,
-        'track_4_track': threshold - 0.3,
-        'track_4_artist': threshold - 0.3,
+        'track_4_track': threshold - 0.9,
+        'track_4_artist': threshold - 0.9,
     }
 
     def test_tries_a_combined_search(self, combined_search_patch):
@@ -411,3 +426,21 @@ class TestSearchLastfmWhenSeparateSearchResultsBelowThreshold():
             tracks_from_separate[0],
             tracks_from_combined[1],
         ]
+
+
+@pytest.mark.usefixtures('lastfm_app')
+class TestAgainstRealResults():
+
+    def test_no_good_separate_results(
+        self,
+        separate_search_patch,
+        combined_search_patch,
+        get_result_fixtures
+    ):
+        parser = LastfmResultParser()
+        separate_search_patch.return_value = parser.parse(get_result_fixtures('result_separate_asys.json'))
+        combined_search_patch.return_value = parser.parse(get_result_fixtures('result_combined_asys.json'))
+        results = multi_search('No More Fucking Rock´n´ Roll', 'A.S.Y.S.')
+        assert results[0].track_name == "No More Fucking Rock 'n' Roll"
+        assert results[0].artist_name == "A*S*Y*S"
+        assert results[0].listeners == 1912

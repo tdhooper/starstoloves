@@ -55,7 +55,7 @@ def score(track_name, artist_name, results):
 def rank(results):
     s = results
     s = sorted(s, key=lambda result: result.track.listeners or 0, reverse=True)
-    s = sorted(s, key=lambda result: round(result.score * 10), reverse=True)
+    s = sorted(s, key=lambda result: round(result.score * 5), reverse=True)
     return s
 
 

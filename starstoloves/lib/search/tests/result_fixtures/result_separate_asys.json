@@ -1,0 +1,17 @@
+{
+  "results": {
+    "opensearch:Query": {
+      "#text": "",
+      "role": "request",
+      "searchTerms": "No More Fucking Rock´n´ Roll",
+      "startPage": "1"
+    },
+    "opensearch:totalResults": "0",
+    "opensearch:startIndex": "0",
+    "opensearch:itemsPerPage": "30",
+    "trackmatches": "\n",
+    "@attr": {
+      "for": "No More Fucking Rock´n´ Roll"
+    }
+  }
+}

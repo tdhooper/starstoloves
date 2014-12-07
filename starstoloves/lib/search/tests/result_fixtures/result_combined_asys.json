@@ -1,0 +1,265 @@
+{
+  "results": {
+    "opensearch:Query": {
+      "#text": "",
+      "role": "request",
+      "searchTerms": "A.S.Y.S. - No More Fucking Rock´n´ Roll",
+      "startPage": "1"
+    },
+    "opensearch:totalResults": "19",
+    "opensearch:startIndex": "0",
+    "opensearch:itemsPerPage": "30",
+    "trackmatches": {
+      "track": [
+        {
+          "name": "No More Fucking Rock 'n' Roll",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/A*S*Y*S/_/No+More+Fucking+Rock+%27n%27+Roll",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "1912",
+          "image": [
+            {
+              "#text": "http://userserve-ak.last.fm/serve/34s/40234865.jpg",
+              "size": "small"
+            },
+            {
+              "#text": "http://userserve-ak.last.fm/serve/64s/40234865.jpg",
+              "size": "medium"
+            },
+            {
+              "#text": "http://userserve-ak.last.fm/serve/126/40234865.jpg",
+              "size": "large"
+            },
+            {
+              "#text": "http://userserve-ak.last.fm/serve/300x300/40234865.jpg",
+              "size": "extralarge"
+            }
+          ],
+          "mbid": "58a9a4dc-bc1b-4f01-afca-95cebe95b2be"
+        },
+        {
+          "name": "No More Fucking Rock n Roll",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/+noredirect/A*S*Y*S/_/No+More+Fucking+Rock+n+Roll",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "542",
+          "mbid": ""
+        },
+        {
+          "name": "No More Fucking Rock'n'Roll",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/A*S*Y*S/_/No+More+Fucking+Rock%27n%27Roll",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "749",
+          "mbid": ""
+        },
+        {
+          "name": "No More Fucking Rock´n´ Roll",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/A*S*Y*S/_/No+More+Fucking+Rock%C2%B4n%C2%B4+Roll",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "89",
+          "mbid": ""
+        },
+        {
+          "name": "No More Fucking Rock 'n Roll",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/A*S*Y*S/_/No+More+Fucking+Rock+%27n+Roll",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "51",
+          "mbid": ""
+        },
+        {
+          "name": "No More Fucking Rock N' Roll",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/A*S*Y*S/_/No+More+Fucking+Rock+N%27+Roll",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "12",
+          "mbid": ""
+        },
+        {
+          "name": "No More Fucking Rock'n'roll (Paul Van Dyk Edit)",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/A*S*Y*S/_/No+More+Fucking+Rock%27n%27roll+(Paul+Van+Dyk+Edit)",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "149",
+          "mbid": ""
+        },
+        {
+          "name": "No More Fucking Rock'n'Roll - Paul Van Dyk Edit",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/A*S*Y*S/_/No+More+Fucking+Rock%27n%27Roll+-+Paul+Van+Dyk+Edit",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "98",
+          "mbid": ""
+        },
+        {
+          "name": "No More Fucking Rock N Roll (Paul Van Dyk Edit)",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/A*S*Y*S/_/No+More+Fucking+Rock+N+Roll+(Paul+Van+Dyk+Edit)",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "66",
+          "mbid": ""
+        },
+        {
+          "name": "No More Fucking Rock´n´ Roll (Paul Van Dyk Edit)",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/A*S*Y*S/_/No+More+Fucking+Rock%C2%B4n%C2%B4+Roll+(Paul+Van+Dyk+Edit)",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "61",
+          "mbid": ""
+        },
+        {
+          "name": "No More Fucking Rock N Roll (P",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/A*S*Y*S/_/No+More+Fucking+Rock+N+Roll+(P",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "59",
+          "mbid": ""
+        },
+        {
+          "name": "No More Fucking Rock'n'roll (P",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/A*S*Y*S/_/No+More+Fucking+Rock%27n%27roll+(P",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "39",
+          "mbid": ""
+        },
+        {
+          "name": "No More Fucking Rock 'n' Roll (Paul van Dyk Edit)",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/A*S*Y*S/_/No+More+Fucking+Rock+%27n%27+Roll+(Paul+van+Dyk+Edit)",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "30",
+          "image": [
+            {
+              "#text": "http://userserve-ak.last.fm/serve/34s/40234865.jpg",
+              "size": "small"
+            },
+            {
+              "#text": "http://userserve-ak.last.fm/serve/64s/40234865.jpg",
+              "size": "medium"
+            },
+            {
+              "#text": "http://userserve-ak.last.fm/serve/126/40234865.jpg",
+              "size": "large"
+            },
+            {
+              "#text": "http://userserve-ak.last.fm/serve/300x300/40234865.jpg",
+              "size": "extralarge"
+            }
+          ],
+          "mbid": "b68fc49b-b88d-49e0-ac0d-25e8c61fcfc4"
+        },
+        {
+          "name": "No More Fucking Rock'n'roll (",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/A*S*Y*S/_/No+More+Fucking+Rock%27n%27roll+(",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "19",
+          "mbid": ""
+        },
+        {
+          "name": "No More Fucking Rock 'n' Roll (Pokie Rework)",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/A*S*Y*S/_/No+More+Fucking+Rock+%27n%27+Roll+(Pokie+Rework)",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "17",
+          "mbid": ""
+        },
+        {
+          "name": "No More Fucking Rock 'N Roll (Paul van Dyk edit)",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/A*S*Y*S/_/No+More+Fucking+Rock+%27N+Roll+(Paul+van+Dyk+edit)",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "12",
+          "mbid": ""
+        },
+        {
+          "name": "No More Fucking Rock'N'Roll (Original Mix)",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/A*S*Y*S/_/No+More+Fucking+Rock%27N%27Roll+(Original+Mix)",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "7",
+          "mbid": ""
+        },
+        {
+          "name": "Asys - No More Fucking Rock n Roll",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/+noredirect/A*S*Y*S/_/Asys+-+No+More+Fucking+Rock+n+Roll",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "1",
+          "mbid": ""
+        },
+        {
+          "name": "No More Fucking Rock'n'Roll (Paul van Dyk Edit) /  We Call It Aciiied!",
+          "artist": "A*S*Y*S",
+          "url": "http://www.last.fm/music/A*S*Y*S/_/No+More+Fucking+Rock%27n%27Roll+(Paul+van+Dyk+Edit)+%2F++We+Call+It+Aciiied!",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "15",
+          "mbid": ""
+        }
+      ]
+    },
+    "@attr": {
+      "for": "A.S.Y.S. - No More Fucking Rock´n´ Roll"
+    }
+  }
+}
