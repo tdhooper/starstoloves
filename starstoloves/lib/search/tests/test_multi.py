@@ -206,11 +206,60 @@ class TestRank():
 
     def test_sorts_by_descending_score(self):
         results = [
-            Result(LastfmTrack('track_1_url', 'track_1_track', 'track_1_artist'), 5),
-            Result(LastfmTrack('track_2_url', 'track_2_track', 'track_2_artist'), 10),
-            Result(LastfmTrack('other_url', 'other_track', 'other_artist'), 8),
+            Result(LastfmTrack(''), .0),
+            Result(LastfmTrack(''), .2),
+            Result(LastfmTrack(''), .1),
         ]
-        assert rank(results) == [results[1], results[2], results[0]]
+        assert rank(results) == [
+            results[1],
+            results[2],
+            results[0]
+        ]
+
+
+    def test_higher_listener_counts_float_to_top(self):
+        results = [
+            Result(LastfmTrack(url='', listeners=3), .0),
+            Result(LastfmTrack(url='', listeners=2), .0),
+            Result(LastfmTrack(url='', listeners=0), .1),
+            Result(LastfmTrack(url='', listeners=1), .1),
+        ]
+        assert rank(results) == [
+            results[3],
+            results[2],
+            results[0],
+            results[1]
+        ]
+
+
+    def test_subtle_score_differences_do_not_trump_listener_counts(self):
+        results = [
+            Result(LastfmTrack(url='', listeners=1), .00),
+            Result(LastfmTrack(url='', listeners=0), .01),
+            Result(LastfmTrack(url='', listeners=1), .10),
+            Result(LastfmTrack(url='', listeners=0), .11),
+        ]
+        assert rank(results) == [
+            results[2],
+            results[3],
+            results[0],
+            results[1]
+        ]
+
+
+    def test_subtle_listener_count_differences_do_not_trump_score(self):
+        results = [
+            Result(LastfmTrack(url='', listeners=10), .1),
+            Result(LastfmTrack(url='', listeners=11), .0),
+            Result(LastfmTrack(url='', listeners=98), .1),
+            Result(LastfmTrack(url='', listeners=99), .0),
+        ]
+        assert rank(results) == [
+            results[2],
+            results[0],
+            results[3],
+            results[1]
+        ]
 
 
 @pytest.mark.usefixtures('lastfm_app', 'separate_search_has_tracks')

@@ -44,8 +44,6 @@ def merge(first, second):
     return results
 
 
-# TODO: consider listener count as well
-# sort first by similarity, where +/- 0.2 is the same, then by listener
 def score(track_name, artist_name, results):
     for result in results:
         result.score = sum([
@@ -55,7 +53,10 @@ def score(track_name, artist_name, results):
 
 
 def rank(results):
-    return sorted(results, key=attrgetter('score'), reverse=True)
+    s = results
+    s = sorted(s, key=lambda result: result.track.listeners or 0, reverse=True)
+    s = sorted(s, key=lambda result: round(result.score * 10), reverse=True)
+    return s
 
 
 def multi_search(track_name, artist_name):
