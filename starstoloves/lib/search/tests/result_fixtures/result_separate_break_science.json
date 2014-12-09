@@ -1,0 +1,60 @@
+{
+  "results": {
+    "opensearch:Query": {
+      "#text": "",
+      "role": "request",
+      "searchTerms": "Whole World Locked",
+      "startPage": "1"
+    },
+    "opensearch:totalResults": "2",
+    "opensearch:startIndex": "0",
+    "opensearch:itemsPerPage": "30",
+    "trackmatches": {
+      "track": [
+        {
+          "name": "WHOLE WORLD LOCKED",
+          "artist": "Break Science",
+          "url": "http://www.last.fm/music/Break+Science/_/WHOLE+WORLD+LOCKED",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "4630",
+          "image": [
+            {
+              "#text": "http://userserve-ak.last.fm/serve/34s/73896782.jpg",
+              "size": "small"
+            },
+            {
+              "#text": "http://userserve-ak.last.fm/serve/64s/73896782.jpg",
+              "size": "medium"
+            },
+            {
+              "#text": "http://userserve-ak.last.fm/serve/126/73896782.jpg",
+              "size": "large"
+            },
+            {
+              "#text": "http://userserve-ak.last.fm/serve/300x300/73896782.jpg",
+              "size": "extralarge"
+            }
+          ],
+          "mbid": "63bbed04-b38e-4b0b-8446-f5bd4eef736f"
+        },
+        {
+          "name": "03 Whole World Locked",
+          "artist": "Break Science",
+          "url": "http://www.last.fm/music/Break+Science/_/03+Whole+World+Locked",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "7",
+          "mbid": ""
+        }
+      ]
+    },
+    "@attr": {
+      "for": "Whole World Locked"
+    }
+  }
+}

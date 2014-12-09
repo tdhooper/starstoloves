@@ -108,9 +108,10 @@ def merge_patch(create_patch):
 @pytest.fixture
 def set_scores(SequenceMatcher):
     def set_scores_method(score_map):
+        score_map = {key.upper(): value for key, value in score_map.items()}
         def new_matcher(isjunk, a, b):
             matcher = MagicMock()
-            matcher.ratio.return_value = score_map[b]
+            matcher.ratio.return_value = score_map[b.upper()]
             return matcher
         SequenceMatcher.side_effect = new_matcher
     return set_scores_method
@@ -198,11 +199,11 @@ class TestMerge():
 
 class TestScore():
 
-    def test_calculates_similarity_to_original_query(self, SequenceMatcher):
+    def test_calculates_similarity_to_original_query_ignoring_case(self, SequenceMatcher):
         result = Result(LastfmTrack('track_1_url', 'track_1_track', 'track_1_artist'))
         score('query_track', 'query_artist', [result])
-        assert call(None, 'query_track', 'track_1_track') in SequenceMatcher.call_args_list
-        assert call(None, 'query_artist', 'track_1_artist') in SequenceMatcher.call_args_list
+        assert call(None, 'QUERY_TRACK', 'TRACK_1_TRACK') in SequenceMatcher.call_args_list
+        assert call(None, 'QUERY_ARTIST', 'TRACK_1_ARTIST') in SequenceMatcher.call_args_list
 
 
     def test_adds_averaged_scores_to_results(self, set_scores):
@@ -483,3 +484,29 @@ class TestAgainstRealResults():
         assert results[0].track_name == "Mango Drive"
         assert results[0].artist_name == "Rhythm & Sound"
         assert results[0].listeners == 16382
+
+
+    def test_good_separate_results_mixhell(
+        self,
+        separate_search_patch,
+        get_result_fixtures
+    ):
+        parser = LastfmResultParser()
+        separate_search_patch.return_value = parser.parse(get_result_fixtures('result_separate_mixhell.json'))
+        results = multi_search('Highly Explicit - Huoratron Remix', 'Mixhell')
+        assert results[0].track_name == "Highly Explicit (Huoratron Remix)"
+        assert results[0].artist_name == "Mixhell"
+        assert results[0].listeners == 894
+
+
+    def test_good_separate_results_different_casing_break_science(
+        self,
+        separate_search_patch,
+        get_result_fixtures
+    ):
+        parser = LastfmResultParser()
+        separate_search_patch.return_value = parser.parse(get_result_fixtures('result_separate_break_science.json'))
+        results = multi_search('Whole World Locked', 'Break Science')
+        assert results[0].track_name == "WHOLE WORLD LOCKED"
+        assert results[0].artist_name == "Break Science"
+        assert results[0].listeners == 4630

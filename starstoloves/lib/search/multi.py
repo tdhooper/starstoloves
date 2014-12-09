@@ -45,11 +45,22 @@ def merge(first, second):
 
 
 def score(track_name, artist_name, results):
+
     for result in results:
-        result.score = sum([
-            SequenceMatcher(None, track_name, result.track.track_name).ratio(),
-            SequenceMatcher(None, artist_name, result.track.artist_name).ratio(),
-        ]) * 0.5
+
+        track_score = SequenceMatcher(
+            None,
+            track_name.upper(),
+            result.track.track_name.upper()
+        ).ratio()
+
+        artist_score = SequenceMatcher(
+            None,
+            artist_name.upper(),
+            result.track.artist_name.upper()
+        ).ratio()
+
+        result.score = sum([track_score, artist_score]) * 0.5
 
 
 def rank(results):

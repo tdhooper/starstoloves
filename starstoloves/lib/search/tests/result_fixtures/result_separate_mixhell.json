@@ -1,0 +1,42 @@
+{
+  "results": {
+    "opensearch:Query": {
+      "#text": "",
+      "role": "request",
+      "searchTerms": "Highly Explicit - Huoratron Remix",
+      "startPage": "1"
+    },
+    "opensearch:totalResults": "2",
+    "opensearch:startIndex": "0",
+    "opensearch:itemsPerPage": "30",
+    "trackmatches": {
+      "track": [
+        {
+          "name": "Highly Explicit (Huoratron Remix)",
+          "artist": "Mixhell",
+          "url": "http://www.last.fm/music/Mixhell/_/Highly+Explicit+(Huoratron+Remix)",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "894",
+          "mbid": ""
+        },
+        {
+          "name": "Highly Explicit - Huoratron Remix",
+          "artist": "Mixhell",
+          "url": "http://www.last.fm/music/Mixhell/_/Highly+Explicit+-+Huoratron+Remix",
+          "streamable": {
+            "#text": "0",
+            "fulltrack": "0"
+          },
+          "listeners": "723",
+          "mbid": ""
+        }
+      ]
+    },
+    "@attr": {
+      "for": "Highly Explicit - Huoratron Remix"
+    }
+  }
+}
