@@ -470,3 +470,16 @@ class TestAgainstRealResults():
         assert results[0].track_name == "My Body"
         assert results[0].artist_name == "The Subs"
         assert results[0].listeners == 521
+
+
+    def test_good_separate_results_rhythm_and_sound(
+        self,
+        separate_search_patch,
+        get_result_fixtures
+    ):
+        parser = LastfmResultParser()
+        separate_search_patch.return_value = parser.parse(get_result_fixtures('result_separate_rhythm_and_sound.json'))
+        results = multi_search('Mango Drive', 'Rhythm and Sound')
+        assert results[0].track_name == "Mango Drive"
+        assert results[0].artist_name == "Rhythm & Sound"
+        assert results[0].listeners == 16382
