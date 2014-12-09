@@ -7,10 +7,10 @@
                 {% for track_result in track.results %}
                     <li class="js-toggle-more-item result">
                         {% if track_result.loved %}♥ {% endif %}
-                        <a href="{{ track_result.url }}">
+                        <a class="result-track" href="{{ track_result.url }}">
                             {{track_result.artist_name}} - {{track_result.track_name}}
                         </a>
-                        <span>({{ track_result.listeners|intcomma }} listeners)</span>
+                        <span class="result-listeners">{{ track_result.listeners|intcomma }} listeners</span>
                     </li>
                 {% endfor %}
             </ul>

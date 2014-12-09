@@ -71,6 +71,18 @@ class TestIndex():
         ]
 
 
+    def test_returns_tracks(self, client, search_lastfm):
+        response = client.get(reverse('index'))
+
+        assert response.context['tracks'][0]['track'].track_name == 'some_track'
+        assert response.context['tracks'][0]['track'].artist_name == 'some_artist'
+        assert response.context['tracks'][0]['track'].added.timestamp() == 123456
+
+        assert response.context['tracks'][1]['track'].track_name == 'another_track'
+        assert response.context['tracks'][1]['track'].artist_name == 'another_artist'
+        assert response.context['tracks'][1]['track'].added.timestamp() == 789012
+
+
     def test_returns_results(self, client, separate_search_patch, combined_search_patch):
         track_almost = LastfmTrack('some_url_1', 'some_track_almost', 'some_artist_almost')
         track_nope = LastfmTrack('some_url_2', 'nope', 'nope')

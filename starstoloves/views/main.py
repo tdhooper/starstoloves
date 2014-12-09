@@ -23,10 +23,7 @@ def get_searches(request):
 def get_tracks_data(request):
     return [
         {
-            'track_name': search['track']['track_name'],
-            'artist_name': search['track']['artist_name'],
-            # 'date_saved': track.date_saved,
-            'date_saved': 0,
+            'track': search['track'],
             'id': search['query'].id,
             'status': search['query'].status,
             'results': search['query'].results

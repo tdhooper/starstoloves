@@ -71,16 +71,10 @@ class TestStarredTrackSearches:
 
         assert searches == [
             {
-                'track': {
-                    'track_name': 'some_track',
-                    'artist_name': 'some_artist',
-                },
+                'track': starred_tracks[0],
                 'query': search_returns[0],
             },{
-                'track': {
-                    'track_name': 'another_track',
-                    'artist_name': 'another_artist',
-                },
+                'track': starred_tracks[1],
                 'query': search_returns[1],
             }
         ]

@@ -101,14 +101,17 @@ h2 {
     margin-bottom: 12px;
 }
 
-.hide {
-    display: none;
-}
-
 ul {
     padding: 0;
     list-style-type: none;
     margin-bottom: 12px;
+}
+
+.date-saved {
+    color: #666;
+    font-weight: normal;
+    margin-right: 20px;
+    float: left;
 }
 
 .result-list {
@@ -118,6 +121,18 @@ ul {
 
 .result {
     margin-bottom: 0;
+    display: inline-block;
+    width: 100%;
+}
+
+.result-track {
+    float: left;
+}
+
+.result-listeners {
+    float: right;
+    font-size: 12px;
+    color: #666;
 }
 
 .toggle-more {
@@ -126,11 +141,12 @@ ul {
     position: absolute;
     bottom: -12px;
     width: 100%;
+    height: 0;
 }
 
 .toggle-more a {
     position: relative;
-    bottom: -13px;
+    top: -12px;
     background: #fff;
     padding: 5px 0 5px 10px;
     text-decoration: none;
@@ -200,4 +216,8 @@ ul {
     .sp-connect-form {
         display: inline;
     }
+}
+
+.hide {
+    display: none;
 }

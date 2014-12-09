@@ -60,7 +60,10 @@
             <ul class="js-results-list" data-csrf-token="{{ csrf_token }}">
                 {% for track in tracks %}
                     <li>
-                        <strong>{{track.artist_name}} - {{track.track_name}}</strong> - {{track.date_saved}}
+                        <h3 class="track">
+                            <span class="date-saved">{{track.track.added}}</span>
+                            {{track.track.artist_name}} - {{track.track.track_name}}
+                        </h3>
                         {% include 'result.html' %}
                     </li>
                 {% endfor %}
