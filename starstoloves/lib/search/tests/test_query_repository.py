@@ -71,3 +71,21 @@ class TestSave:
         query_repository.save(query)
         new_query = query_repository.get_or_create('some_track', 'some_artist')
         assert new_query.results == tracks
+
+
+    def test_persists_result_order(self):
+        track_a = lastfm_track_repository.get_or_create(
+            track_name='some_track',
+            artist_name='some_artist',
+            url='some_url'
+        )
+        track_b = lastfm_track_repository.get_or_create(
+            track_name='another_track',
+            artist_name='another_artist',
+            url='another_url'
+        )
+        tracks = [track_b, track_a]
+        query = LastfmQuery(query_repository, track_name='some_track', artist_name='some_artist', results=tracks)
+        query_repository.save(query)
+        new_query = query_repository.get_or_create('some_track', 'some_artist')
+        assert new_query.results == tracks
