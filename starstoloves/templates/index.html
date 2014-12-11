@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load humanize %}
+
 {% block content %}
 
         <div class="step">
@@ -61,9 +63,9 @@
                 {% for track in tracks %}
                     <li>
                         <h3 class="track">
-                            <span class="date-saved">{{track.track.added}}</span>
                             {{track.track.artist_name}} - {{track.track.track_name}}
                         </h3>
+                        <p class="date-saved">{{ track.track.added|naturalday:"j M Y" }}</p>
                         {% include 'result.html' %}
                     </li>
                 {% endfor %}

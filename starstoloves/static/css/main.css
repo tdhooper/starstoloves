@@ -46,6 +46,13 @@ h2 {
     margin: 0;
 }
 
+h3 {
+    font-size: 16px;
+    line-height: 22px;
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
 .step-disabled {
     color: #aaa;
 }
@@ -107,13 +114,6 @@ ul {
     margin-bottom: 12px;
 }
 
-.date-saved {
-    color: #666;
-    font-weight: normal;
-    margin-right: 20px;
-    float: left;
-}
-
 .result-list {
     margin-bottom: 36px;
     position: relative;
@@ -129,10 +129,24 @@ ul {
     float: left;
 }
 
+.track {
+    float: left;
+    width: 80%;
+}
+
+.date-saved,
 .result-listeners {
     float: right;
     font-size: 12px;
     color: #666;
+}
+
+.date-saved {
+    line-height: 22px;
+    margin-top: 0;
+    margin-bottom: 12px;
+    width: 20%;
+    text-align: right;
 }
 
 .toggle-more {
