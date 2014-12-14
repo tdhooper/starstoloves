@@ -27,6 +27,7 @@ class SpotifyPlaylistTrack(models.Model):
 
 class LastfmConnection(models.Model):
     username = models.CharField(max_length=300, null=True)
+    session_key = models.CharField(max_length=300, null=True)
     state = models.IntegerField(null=True)
     user = models.OneToOneField(User, related_name='lastfm_connection')
 

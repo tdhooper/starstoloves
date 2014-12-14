@@ -21,3 +21,10 @@ def test_get_auth_url_proxies_to_app(connection, app):
     auth_url = connection.auth_url('some_callback')
     assert auth_url == 'some_auth_url'
 
+
+@pytest.mark.lastfm_only
+@pytest.mark.usefixtures("successful_connection")
+class TestLastfmConnectionConnectSuccess():
+
+    def test_stores_the_session_key(self, fetch_connection):
+        assert fetch_connection().session_key == 'lastfm_session_key'

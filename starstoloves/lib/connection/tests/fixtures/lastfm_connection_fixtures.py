@@ -38,7 +38,10 @@ class LastfmConnectionFixtures(CommonConnectionFixtures):
     def successful_connection(self):
         def get_session(token):
             if (token == 'some_token'):
-                return {'name': 'some_username'}
+                return {
+                    'name': 'some_username',
+                    'key': 'lastfm_session_key',
+                }
         self.app.auth.get_session.side_effect = get_session
         self.connection.connect('some_token')
 
