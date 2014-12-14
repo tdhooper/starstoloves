@@ -141,6 +141,21 @@ ul {
     color: #666;
 }
 
+.result-select {
+    float: left;
+    margin-left: -25px;
+    margin-top: 6px;
+}
+
+.result-link {
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.sumbit-loved {
+    margin-bottom: 2em;
+}
+
 .date-saved {
     line-height: 22px;
     margin-top: 0;

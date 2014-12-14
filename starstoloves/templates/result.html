@@ -6,11 +6,25 @@
             <ul class="js-toggle-more result-list">
                 {% for track_result in track.results %}
                     <li class="js-toggle-more-item result">
-                        {% if track_result.loved %}♥ {% endif %}
-                        <a class="result-track" href="{{ track_result.url }}">
-                            {{track_result.artist_name}} - {{track_result.track_name}}
-                        </a>
-                        <span class="result-listeners">{{ track_result.listeners|intcomma }} listeners</span>
+                        <label>
+                            <input
+                                class="result-select"
+                                type="checkbox"
+                                name="love_tracks"
+                                value="{{ track_result.url }}"
+                            />
+                            {% if track_result.loved %}♥ {% endif %}
+                            <span class="result-track">
+                                {{track_result.artist_name}} - {{track_result.track_name}}
+                                <a
+                                    class="result-link"
+                                    href="{{ track_result.url }}"
+                                    title="View on Last.fm"
+                                    target="_blank"
+                                >⇗</a>
+                            </span>
+                            <span class="result-listeners">{{ track_result.listeners|intcomma }} listeners</span>
+                        </label>
                     </li>
                 {% endfor %}
             </ul>

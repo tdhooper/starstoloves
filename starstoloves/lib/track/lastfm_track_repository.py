@@ -3,9 +3,16 @@ from .lastfm_track import LastfmTrack
 
 
 def get_or_create(url, track_name=None, artist_name=None, listeners=None):
-    track = LastfmTrack(url, track_name, artist_name, listeners)
-    save(track)
-    return track
+    try:
+        model = LastfmTrackModel.objects.get(url=url)
+    except LastfmTrackModel.DoesNotExist:
+        model = LastfmTrackModel.objects.create(
+            url=url,
+            track_name=track_name,
+            artist_name=artist_name,
+            listeners=listeners,
+        )
+    return from_model(model)
 
 
 def from_model(model):
@@ -18,17 +25,12 @@ def from_model(model):
 
 
 def save(track):
-    query = LastfmTrackModel.objects.filter(url=track.url)
-    if query.exists():
-        query.update(
-            track_name=track.track_name,
-            artist_name=track.artist_name,
-            listeners=track.listeners,
-        )
-    else:
-        LastfmTrackModel.objects.create(
-            track_name=track.track_name,
-            artist_name=track.artist_name,
-            url=track.url,
-            listeners=track.listeners,
-        )
+    get_or_create(track.url, track.track_name, track.artist_name, track.listeners)
+
+
+def get(url):
+    try:
+        model = LastfmTrackModel.objects.get(url=url)
+        return from_model(model)
+    except LastfmTrackModel.DoesNotExist:
+        return None

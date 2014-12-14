@@ -1,5 +1,5 @@
 from uuid import uuid4
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 
@@ -11,6 +11,7 @@ from celery.result import AsyncResult
 from starstoloves.lib.user.tests.fixtures.spotify_user_fixtures import *
 from starstoloves.lib.search.query import LastfmQuery
 from starstoloves.lib.track.lastfm_track import LastfmTrack
+from starstoloves.lib.user.user import User
 from .fixtures.connection_fixtures import *
 
 
@@ -58,6 +59,7 @@ def has_searches(get_searches_patch, searches):
     get_searches_patch.return_value = searches
 
 
+
 @pytest.mark.usefixtures("lastfm_connected")
 @pytest.mark.usefixtures("spotify_connected")
 @pytest.mark.usefixtures("spotify_user_with_starred")
@@ -94,6 +96,60 @@ class TestIndex():
 
         response = client.get(reverse('index'))
         assert response.context['tracks'][0]['results'] == [track_match, track_almost, track_reversed, track_nope]
+
+
+
+@pytest.mark.usefixtures("lastfm_connected")
+@pytest.mark.usefixtures("spotify_connected")
+@pytest.mark.usefixtures("spotify_user_with_starred")
+class TestLoveTracks():
+
+    def test_redirects_to_index(self, client):
+        response = client.post(reverse('love_tracks'), follow=True);
+        assert response.redirect_chain[0][0] == 'http://testserver' + reverse('index')
+
+
+    def test_loves_checked_results(self, client, separate_search_patch):
+        tracks = [
+            LastfmTrack('some_url_a', 'some_track_a', 'some_artist_a'),
+            LastfmTrack('some_url_b', 'some_track_b', 'some_artist_b'),
+            LastfmTrack('some_url_c', 'some_track_c', 'some_artist_c'),
+        ]
+        separate_search_patch.return_value = tracks
+        client.get(reverse('index'))
+
+        with patch('starstoloves.middleware.user_repository') as user_repository:
+
+            session_user = MagicMock(spec=User)
+            user_repository.from_session_key.return_value = session_user
+
+            client.post(reverse('love_tracks'), {
+                'love_tracks': [
+                    'some_url_a',
+                    'some_url_b',
+                ]
+            });
+
+            loved_tracks = session_user.love_tracks.call_args[0][0]
+            assert len(loved_tracks) is 2
+            assert tracks[0] in loved_tracks
+            assert tracks[1] in loved_tracks
+
+
+    # TODO: Return a warning when requested tracks weren't loved
+    def test_ignores_junk_results(self, client):
+        with patch('starstoloves.middleware.user_repository') as user_repository:
+
+            session_user = MagicMock(spec=User)
+            user_repository.from_session_key.return_value = session_user
+
+            client.post(reverse('love_tracks'), {
+                'love_tracks': [
+                    'not_a_track'
+                ]
+            });
+
+            assert session_user.love_tracks.call_args[0][0] == []
 
 
 @pytest.mark.usefixtures("spotify_connected")

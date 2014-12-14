@@ -7,6 +7,7 @@ urlpatterns = patterns('',
     url(r'^disconnect-lastfm/$',    connection.disconnect_lastfm, name='disconnect_lastfm'),
     url(r'^disconnect-spotify/$',   main.disconnect_spotify, name='disconnect_spotify'),
     url(r'^result-update$',         main.result_update, name='result_update'),
+    url(r'^love-tracks$',           main.love_tracks, name='love_tracks'),
 
     url(r'^specs/', include('starstoloves.apps.jasmine.urls', namespace='specs')),
     url(r'^test/', include('starstoloves.apps.test.urls', namespace='test')),

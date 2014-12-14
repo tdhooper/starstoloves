@@ -1,13 +1,13 @@
 import json
 import re
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseServerError
 
-from starstoloves.lib.user.spotify_user import SpotifyUser
 from starstoloves.lib.user.user import starred_track_searches
+from starstoloves.lib.track import lastfm_track_repository
 from .connection import (
     connection_index_decorator,
     connection_index_processor,
@@ -75,3 +75,12 @@ def result_update(request):
         ]
         return HttpResponse(json.dumps(results), content_type="application/json")
     return HttpResponse('No results', status=401)
+
+
+def love_tracks(request):
+    tracks = list(filter(None, [
+        lastfm_track_repository.get(url)
+        for url in request.POST.getlist('love_tracks')
+    ]))
+    request.session_user.love_tracks(tracks)
+    return redirect('index')
