@@ -6,25 +6,31 @@ import pytest
 from lastfm import lfm
 
 from starstoloves.lib.track.spotify_track import SpotifyPlaylistTrack
+from starstoloves.lib.track.lastfm_track import LastfmTrack
 from ..spotify_user import SpotifyUser
 from ..user import starred_track_searches
+
 
 
 @pytest.fixture
 def sp_user():
     return MagicMock(spec=SpotifyUser).return_value
 
+
 @pytest.fixture
 def LastfmSearcher_patch(create_patch):
     return create_patch('starstoloves.lib.user.user.LastfmSearcher')
+
 
 @pytest.fixture
 def searcher(LastfmSearcher_patch):
     return LastfmSearcher_patch.return_value
 
+
 @pytest.fixture
 def mock_user():
     return MagicMock()
+
 
 @pytest.fixture
 def starred_tracks(mock_user):
@@ -42,6 +48,7 @@ def starred_tracks(mock_user):
             added=datetime.fromtimestamp(456)
         )
     ]
+
 
 
 class TestStarredTrackSearches:
@@ -80,26 +87,46 @@ class TestStarredTrackSearches:
         ]
 
 
+
 from unittest.mock import PropertyMock
 
 from ..user import User
 from starstoloves.lib.user import user_repository
 
 
+
 pytestmark = pytest.mark.django_db
+
 
 
 @pytest.fixture
 def spotify_connection_repository(create_patch):
     return create_patch('starstoloves.lib.user.user.spotify_connection_repository')
 
+
+@pytest.fixture
+def lastfm_connection_repository(create_patch):
+    return create_patch('starstoloves.lib.user.user.lastfm_connection_repository')
+
+
 @pytest.fixture
 def SpotifyUser(create_patch):
     return create_patch('starstoloves.lib.user.user.SpotifyUser')
 
+
+@pytest.fixture
+def LastfmUser(create_patch):
+    return create_patch('starstoloves.lib.user.user.LastfmUser')
+
+
 @pytest.fixture
 def spotify_user(SpotifyUser):
     return SpotifyUser.return_value
+
+
+@pytest.fixture
+def lastfm_user(LastfmUser):
+    return LastfmUser.return_value
 
 
 class TestUser:
@@ -108,6 +135,7 @@ class TestUser:
         user = User('some_key', 'some_loved_tracks')
         assert user.session_key == 'some_key'
         assert user.loved_tracks == 'some_loved_tracks'
+
 
 
 class TestUserStarredTracks:
@@ -155,3 +183,25 @@ class TestUserStarredTracks:
         assert starred_tracks[0].added.timestamp() == 123
 
         assert starred_tracks_property.call_count is 1
+
+
+
+class TestUserLoveTracks:
+
+    def test_lastfm_user_is_created_with_lastfm_connection(self, user, LastfmUser, lastfm_connection_repository):
+        lastfm_user = user.lastfm_user
+        assert lastfm_connection_repository.from_user.call_args == call(user)
+        assert LastfmUser.call_args == call(lastfm_connection_repository.from_user.return_value)
+        assert lastfm_user is LastfmUser.return_value
+
+
+    def test_proxies_to_lastfm_user(self, user, lastfm_user):
+        tracks = [
+            LastfmTrack('some_url_a', 'some_track_a', 'some_artist_a'),
+            LastfmTrack('some_url_b', 'some_track_b', 'some_artist_b'),
+        ]
+        user.love_tracks(tracks)
+        assert lastfm_user.love_track.call_args_list == [
+            call(track_name='some_track_a', artist_name='some_artist_a'),
+            call(track_name='some_track_b', artist_name='some_artist_b'),
+        ]
