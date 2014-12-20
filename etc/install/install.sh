@@ -65,6 +65,9 @@ echo "source `which virtualenvwrapper.sh`" >> ~/.bashrc
 cd $PROJECT_DIR
 workon $VIRTUALENV_NAME
 
+# Install Mercurial, needed for some requirements
+sudo apt-get install -y mercurial
+
 # Install the requirements
 pip install -r requirements.txt
 

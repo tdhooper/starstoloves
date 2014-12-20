@@ -1,7 +1,7 @@
 Django==1.6.5
 psycopg2==2.5.2
 pyspotify==2.0.0b2
-lfmh==1.1.1
+-e hg+https://tdhooper@bitbucket.org/tdhooper/lfm@configure-api-root-1.1.1#egg=lfmh
 celery==3.1.11
 django-celery==3.1.10
 South==1.0
