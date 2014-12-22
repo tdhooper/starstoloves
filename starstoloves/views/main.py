@@ -30,7 +30,7 @@ def get_track_mappings(request):
 def index(request):
     context = {}
     if request.is_lastfm_connected and request.is_spotify_connected:
-        context['tracks'] = get_track_mappings(request)
+        context['mappings'] = get_track_mappings(request)
     return render_to_response('index.html', context_instance=RequestContext(request, context, [connection_index_processor]))
 
 
@@ -62,7 +62,7 @@ def result_update(request):
             {
                 'id': mapping.id,
                 'status': mapping.status,
-                'html': render(request, 'result.html', {'track': mapping}).content.decode("utf-8"),
+                'html': render(request, 'result.html', {'mapping': mapping}).content.decode("utf-8"),
             }
             for mapping in mappings
         ]

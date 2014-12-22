@@ -1,10 +1,10 @@
 {% load humanize %}
 
-<div class="js-result" data-status="{{ track.status }}" data-id="{{ track.id }}">
-    {% if track.status == 'SUCCESS' %}
-        {% if track.results %}
+<div class="js-result" data-status="{{ mapping.status }}" data-id="{{ mapping.id }}">
+    {% if mapping.status == 'SUCCESS' %}
+        {% if mapping.results %}
             <ul class="js-toggle-more result-list">
-                {% for track_result in track.results %}
+                {% for track_result in mapping.results %}
                     <li class="js-toggle-more-item result">
                         <label>
                             <input
@@ -29,9 +29,9 @@
                 {% endfor %}
             </ul>
         {% else %}
-            <p>No Last.fm tracks found, <a href="http://www.last.fm/search?q={{track.artist_name}} {{track.track_name}}&amp;type=track">try searching manually</a></p>
+            <p>No Last.fm tracks found, <a href="http://www.last.fm/search?q={{mapping.track.artist_name}} {{mapping.track.track_name}}&amp;type=track">try searching manually</a></p>
         {% endif %}
     {% elif track.status == 'FAILURE' %}
-        <p>Last.fm search failed, <a href="http://www.last.fm/search?q={{track.artist_name}} {{track.track_name}}&amp;type=track">try searching manually</a></p>
+        <p>Last.fm search failed, <a href="http://www.last.fm/search?q={{mapping.track.artist_name}} {{mapping.track.track_name}}&amp;type=track">try searching manually</a></p>
     {% endif %}
 </div>

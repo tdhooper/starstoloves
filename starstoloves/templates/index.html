@@ -52,23 +52,23 @@
         </div>
         
         <div class="step">
-            <h2 {% if not tracks %}class="step-disabled"{% endif %}>
+            <h2 {% if not mappings %}class="step-disabled"{% endif %}>
                 <span class="step-counter">Step 3:</span>
                 Select tracks
             </h2>
         </div>
 
-        {% if tracks %}
+        {% if mappings %}
             <form action="{% url 'love_tracks' %}" method="post">
                 {% csrf_token %}
                 <ul class="js-results-list" data-csrf-token="{{ csrf_token }}">
-                    {% for track in tracks %}
+                    {% for mapping in mappings %}
                         <li>
                             <h3 class="track">
-                                {{track.track.artist_name}} - {{track.track.track_name}}
+                                {{mapping.track.artist_name}} - {{mapping.track.track_name}}
                             </h3>
-                            <p class="date-saved">{{ track.track.added|naturalday:"j M Y" }}</p>
-                            {% include 'result.html' with date_saved=track.track.added %}
+                            <p class="date-saved">{{ mapping.track.added|naturalday:"j M Y" }}</p>
+                            {% include 'result.html' %}
                         </li>
                     {% endfor %}
                 </ul>

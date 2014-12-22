@@ -153,8 +153,8 @@ class TestResultUpdate(TestCase):
         self.makeRequest('/update-tracks', data)
         self.assertEqual(self.render.call_count, 2)
         render_args_context = [args[0][2] for args in self.render.call_args_list]
-        assert render_args_context[0]['track'].track == spotify_tracks[1]
-        assert render_args_context[1]['track'].track == spotify_tracks[2]
+        assert render_args_context[0]['mapping'].track == spotify_tracks[1]
+        assert render_args_context[1]['mapping'].track == spotify_tracks[2]
 
 
     def test_includes_rendered_result_in_returned_json(self):
@@ -162,7 +162,7 @@ class TestResultUpdate(TestCase):
             '1': HttpResponse('rendered1'),
             '2': HttpResponse('rendered2')
         }
-        self.render.side_effect = lambda request, template, context: render_results[context['track'].id]
+        self.render.side_effect = lambda request, template, context: render_results[context['mapping'].id]
         data = {
             'status[0]': 'SUCCESS',
             'status[1]': 'PENDING',
