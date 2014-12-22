@@ -6,7 +6,6 @@ from django.template import RequestContext
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseServerError
 
-from starstoloves.lib.user.user import starred_track_searches
 from starstoloves.lib.track import lastfm_track_repository
 from starstoloves.lib.mapping import TrackMapping
 from .connection import (

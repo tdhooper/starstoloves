@@ -1,97 +1,11 @@
-from datetime import datetime
-from unittest.mock import MagicMock, call
-
 import pytest
 
-from lastfm import lfm
+from unittest.mock import MagicMock, call, PropertyMock
 
 from starstoloves.lib.track.spotify_track import SpotifyPlaylistTrack
 from starstoloves.lib.track.lastfm_track import LastfmTrack
-from ..spotify_user import SpotifyUser
-from ..user import starred_track_searches
-
-
-
-@pytest.fixture
-def sp_user():
-    return MagicMock(spec=SpotifyUser).return_value
-
-
-@pytest.fixture
-def LastfmSearcher_patch(create_patch):
-    return create_patch('starstoloves.lib.user.user.LastfmSearcher')
-
-
-@pytest.fixture
-def searcher(LastfmSearcher_patch):
-    return LastfmSearcher_patch.return_value
-
-
-@pytest.fixture
-def mock_user():
-    return MagicMock()
-
-
-@pytest.fixture
-def starred_tracks(mock_user):
-    return [
-        SpotifyPlaylistTrack(
-            user=mock_user,
-            track_name='some_track',
-            artist_name='some_artist',
-            added=datetime.fromtimestamp(123)
-        ),
-        SpotifyPlaylistTrack(
-            user=mock_user,
-            track_name='another_track',
-            artist_name='another_artist',
-            added=datetime.fromtimestamp(456)
-        )
-    ]
-
-
-
-class TestStarredTrackSearches:
-
-    def test_it_creates_a_searcher(self, mock_user, starred_tracks, LastfmSearcher_patch):
-        mock_user.starred_tracks = starred_tracks
-        starred_track_searches(mock_user)
-        assert LastfmSearcher_patch.call_count is 1
-
-    def test_it_starts_a_search_for_each_track(self, mock_user, starred_tracks, searcher):
-        mock_user.starred_tracks = starred_tracks
-        starred_track_searches(mock_user)
-        assert searcher.search.call_args_list == [
-            call(starred_tracks[0]),
-            call(starred_tracks[1]),
-        ]
-
-    def test_it_returns_the_tracks_and_search_queries(self, mock_user, starred_tracks, searcher):
-        search_returns = []
-        def search(track):
-            search_returns.append(track.track_name + track.artist_name)
-            return search_returns[-1]
-        searcher.search.side_effect = search
-
-        mock_user.starred_tracks = starred_tracks
-        searches = starred_track_searches(mock_user)
-
-        assert searches == [
-            {
-                'track': starred_tracks[0],
-                'query': search_returns[0],
-            },{
-                'track': starred_tracks[1],
-                'query': search_returns[1],
-            }
-        ]
-
-
-
-from unittest.mock import PropertyMock
-
-from ..user import User
 from starstoloves.lib.user import user_repository
+from ..user import User
 
 
 

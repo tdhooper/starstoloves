@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from starstoloves.lib.search.searcher import LastfmSearcher
 from starstoloves.lib.connection import (
     spotify_connection_repository,
     lastfm_connection_repository,
@@ -9,17 +8,6 @@ from starstoloves.lib.track import spotify_playlist_track_repository
 from .spotify_user import SpotifyUser
 from .lastfm_user import LastfmUser
 
-
-def starred_track_searches(user):
-    searcher = LastfmSearcher()
-    searches = [
-        {
-            'track': track,
-            'query': searcher.search(track),
-        }
-        for track in user.starred_tracks
-    ]
-    return searches
 
 
 class User():
