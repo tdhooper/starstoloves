@@ -29,7 +29,7 @@ def test_index_returns_spotify_form(client, spotify_connection):
 
 @pytest.mark.usefixtures("lastfm_connected")
 @pytest.mark.usefixtures("spotify_connected")
-@pytest.mark.usefixtures("stub_get_tracks_data")
+@pytest.mark.usefixtures("stub_get_track_mappings")
 def test_index_returns_spotify_disconnect_url_when_connected(client):
     response = client.get('/')
     assert response.context['spDisconnectUrl'] == reverse('disconnect_spotify')
@@ -37,7 +37,7 @@ def test_index_returns_spotify_disconnect_url_when_connected(client):
 
 @pytest.mark.usefixtures("lastfm_connected")
 @pytest.mark.usefixtures("spotify_connected")
-@pytest.mark.usefixtures("stub_get_tracks_data")
+@pytest.mark.usefixtures("stub_get_track_mappings")
 def test_index_returns_spotify_username_when_connected(client, spotify_connection):
     spotify_connection.username = 'some_username'
     response = client.get('/')
@@ -72,7 +72,7 @@ class TestConnectSpotify():
 class TestDisconnectSpotify():
 
     def test_disconnects(self, client, spotify_connection, create_patch):
-        create_patch('starstoloves.views.main.get_searches')
+        create_patch('starstoloves.views.main.get_track_mappings')
         client.get(reverse('disconnect_spotify'))
         assert spotify_connection.disconnect.call_count is 1
 

@@ -50,5 +50,5 @@ def spotify_disconnected(spotify_connection):
 
 
 @pytest.fixture
-def stub_get_tracks_data(create_patch):
-    get_tracks_data = create_patch('starstoloves.views.main.get_tracks_data')
+def stub_get_track_mappings(create_patch):
+    get_track_mappings = create_patch('starstoloves.views.main.get_track_mappings')

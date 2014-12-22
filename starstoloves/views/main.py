@@ -8,6 +8,7 @@ from django.http import HttpResponse, HttpResponseServerError
 
 from starstoloves.lib.user.user import starred_track_searches
 from starstoloves.lib.track import lastfm_track_repository
+from starstoloves.lib.mapping import TrackMapping
 from .connection import (
     connection_index_decorator,
     connection_index_processor,
@@ -16,19 +17,11 @@ from .connection import (
 )
 
 
-def get_searches(request):
-    return starred_track_searches(request.session_user)
 
-
-def get_tracks_data(request):
+def get_track_mappings(request):
     return [
-        {
-            'track': search['track'],
-            'id': search['query'].id,
-            'status': search['query'].status,
-            'results': search['query'].results
-        }
-        for search in get_searches(request)
+        TrackMapping(track)
+        for track in request.session_user.starred_tracks
     ]
 
 
@@ -37,41 +30,41 @@ def get_tracks_data(request):
 def index(request):
     context = {}
     if request.is_lastfm_connected and request.is_spotify_connected:
-        context['tracks'] = get_tracks_data(request)
+        context['tracks'] = get_track_mappings(request)
     return render_to_response('index.html', context_instance=RequestContext(request, context, [connection_index_processor]))
 
 
 @connection_status_decorator
 def disconnect_spotify(request):
     if request.is_spotify_connected:
-        for search in get_searches(request):
-            search['query'].stop()
+        for mapping in get_track_mappings(request):
+            mapping.query.stop()
     return connection_disconnect_spotify(request)
 
 
 @connection_status_decorator
 def result_update(request):
     if request.is_spotify_connected:
-        tracks = get_tracks_data(request)
+        mappings = get_track_mappings(request)
         status_by_id = {
             re.search('status\[(.+)\]', key).groups()[0]: value
             for key, value in request.POST.items()
         }
         if status_by_id:
-            tracks = [
-                track
-                for track in tracks
+            mappings = [
+                mapping
+                for mapping in mappings
                 if
-                    not track['id'] in status_by_id
-                    or track['status'] != status_by_id[track['id']]
+                    not mapping.id in status_by_id
+                    or mapping.status != status_by_id[mapping.id]
             ]
         results = [
             {
-                'id': track['id'],
-                'status': track['status'],
-                'html': render(request, 'result.html', {'track': track}).content.decode("utf-8"),
+                'id': mapping.id,
+                'status': mapping.status,
+                'html': render(request, 'result.html', {'track': mapping}).content.decode("utf-8"),
             }
-            for track in tracks
+            for mapping in mappings
         ]
         return HttpResponse(json.dumps(results), content_type="application/json")
     return HttpResponse('No results', status=401)

@@ -12,10 +12,12 @@ from starstoloves.lib.user.tests.fixtures.spotify_user_fixtures import *
 from starstoloves.lib.search.query import LastfmQuery
 from starstoloves.lib.track.lastfm_track import LastfmTrack
 from starstoloves.lib.user.user import User
+from starstoloves.lib.mapping import TrackMapping
 from .fixtures.connection_fixtures import *
 
 
 pytestmark = pytest.mark.django_db
+
 
 
 @pytest.fixture
@@ -41,24 +43,6 @@ def combined_search_patch(create_patch):
     return create_patch('starstoloves.lib.search.multi.combined_search_strategy')
 
 
-@pytest.fixture
-def get_searches_patch(create_patch):
-    return create_patch('starstoloves.views.main.get_searches')
-
-
-@pytest.fixture
-def searches():
-    return [
-        {'query': MagicMock(spec=LastfmQuery)},
-        {'query': MagicMock(spec=LastfmQuery)}
-    ]
-
-
-@pytest.fixture
-def has_searches(get_searches_patch, searches):
-    get_searches_patch.return_value = searches
-
-
 
 @pytest.mark.usefixtures("lastfm_connected")
 @pytest.mark.usefixtures("spotify_connected")
@@ -73,16 +57,18 @@ class TestIndex():
         ]
 
 
-    def test_returns_tracks(self, client, search_lastfm):
+    def test_returns_TrackMappings(self, client, search_lastfm):
         response = client.get(reverse('index'))
 
-        assert response.context['tracks'][0]['track'].track_name == 'some_track'
-        assert response.context['tracks'][0]['track'].artist_name == 'some_artist'
-        assert response.context['tracks'][0]['track'].added.timestamp() == 123456
+        assert isinstance(response.context['tracks'][0], TrackMapping)
+        assert response.context['tracks'][0].track.track_name == 'some_track'
+        assert response.context['tracks'][0].track.artist_name == 'some_artist'
+        assert response.context['tracks'][0].track.added.timestamp() == 123456
 
-        assert response.context['tracks'][1]['track'].track_name == 'another_track'
-        assert response.context['tracks'][1]['track'].artist_name == 'another_artist'
-        assert response.context['tracks'][1]['track'].added.timestamp() == 789012
+        assert isinstance(response.context['tracks'][1], TrackMapping)
+        assert response.context['tracks'][1].track.track_name == 'another_track'
+        assert response.context['tracks'][1].track.artist_name == 'another_artist'
+        assert response.context['tracks'][1].track.added.timestamp() == 789012
 
 
     def test_returns_results(self, client, separate_search_patch, combined_search_patch):
@@ -95,7 +81,7 @@ class TestIndex():
         combined_search_patch.return_value = [track_almost, track_match, track_reversed]
 
         response = client.get(reverse('index'))
-        assert response.context['tracks'][0]['results'] == [track_match, track_almost, track_reversed, track_nope]
+        assert response.context['tracks'][0].results == [track_match, track_almost, track_reversed, track_nope]
 
 
 
@@ -152,9 +138,31 @@ class TestLoveTracks():
             assert session_user.love_tracks.call_args[0][0] == []
 
 
+
+@pytest.fixture
+def queries():
+    return {
+        'some_track': MagicMock(spec=LastfmQuery).return_value,
+        'another_track': MagicMock(spec=LastfmQuery).return_value,
+    }
+
+
+@pytest.fixture
+def LastfmQuery_patch(create_patch, queries):
+
+    def new_LastfmQuery(repository, track_name, artist_name=None, async_result=None, results=None):
+        return queries[track_name]
+
+    patch = create_patch('starstoloves.lib.search.query_repository.LastfmQuery')
+    patch.side_effect = new_LastfmQuery
+    return patch
+
+
+
 @pytest.mark.usefixtures("spotify_connected")
-@pytest.mark.usefixtures('has_searches')
-def test_disconnect_spotify_clears_searches(client, searches):
+@pytest.mark.usefixtures('LastfmQuery_patch')
+@pytest.mark.usefixtures("spotify_user_with_starred")
+def test_disconnect_spotify_clears_searches(client, queries):
     response = client.get(reverse('disconnect_spotify'), follow=True)
-    assert searches[0]['query'].stop.call_count is 1
-    assert searches[1]['query'].stop.call_count is 1
+    assert queries['some_track'].stop.call_count is 1
+    assert queries['another_track'].stop.call_count is 1
