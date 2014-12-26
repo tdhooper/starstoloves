@@ -36,7 +36,6 @@ class User():
 
     def love_tracks(self, tracks):
         for track in tracks:
-            print(track)
             self.lastfm_user.love_track(
                 track_name=track.track_name,
                 artist_name=track.artist_name,

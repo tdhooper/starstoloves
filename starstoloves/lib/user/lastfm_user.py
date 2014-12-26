@@ -17,5 +17,4 @@ class LastfmUser:
 
 
     def love_track(self, track_name, artist_name):
-        print(track_name, artist_name)
         lastfm_app.track.love(track=track_name, artist=artist_name)
