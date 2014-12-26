@@ -53,6 +53,8 @@ class LastfmQuery(object):
             for track in self._results:
                 lastfm_track_repository.save(track)
             if self._results:
+                # TODO: Move the save method onto a different module so that
+                # the repository module doesn't have to be pased in
                 self.repository.save(self)
         return self._results
 

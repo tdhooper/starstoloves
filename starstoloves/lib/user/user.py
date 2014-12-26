@@ -19,6 +19,8 @@ class User():
 
     @property
     def starred_tracks(self):
+        # TODO: Make this work like LastfmQuery#results, using a repository
+        # save method so it hides the external repository access
         tracks = spotify_playlist_track_repository.for_user(self)
         if len(tracks) is not 0:
             return tracks

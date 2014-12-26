@@ -8,6 +8,7 @@ class SpotifyUser:
 
     @property
     def starred_tracks(self):
+        # TODO: Remove the redundant separate method
         tracks = self._starred_tracks_data
         return tracks
 
