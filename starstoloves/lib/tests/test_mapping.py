@@ -39,10 +39,14 @@ def lastfm_tracks():
 
 
 @pytest.fixture
-def loved_urls():
+def loved_tracks():
     return [
-        'track_2_url',
-        'track_3_url',
+        LastfmTrack(
+            url='track_2_url',
+        ),
+        LastfmTrack(
+            url='track_3_url',
+        ),
     ]
 
 
@@ -101,25 +105,25 @@ class TestTrackMappingResults():
         assert mapping.results is None
 
 
-    def test_marks_loved_status(self, spotify_track, query, lastfm_tracks, loved_urls):
+    def test_marks_loved_status(self, spotify_track, query, lastfm_tracks, loved_tracks):
         query.results = lastfm_tracks
-        mapping = TrackMapping(spotify_track, loved_urls)
+        mapping = TrackMapping(spotify_track, loved_tracks)
         assert self._track_by_url(mapping.results, 'track_1_url').loved == False
         assert self._track_by_url(mapping.results, 'track_2_url').loved == True
         assert self._track_by_url(mapping.results, 'track_3_url').loved == True
 
 
-    def test_does_not_mutate_query_results(self, spotify_track, query, lastfm_tracks, loved_urls):
+    def test_does_not_mutate_query_results(self, spotify_track, query, lastfm_tracks, loved_tracks):
         query.results = lastfm_tracks
-        mapping = TrackMapping(spotify_track, loved_urls)
+        mapping = TrackMapping(spotify_track, loved_tracks)
         assert query.results[0].loved == False
         assert query.results[1].loved == False
         assert query.results[2].loved == False
 
 
-    def test_moves_loved_tracks_to_the_top_of_the_list(self, spotify_track, query, lastfm_tracks, loved_urls):
+    def test_moves_loved_tracks_to_the_top_of_the_list(self, spotify_track, query, lastfm_tracks, loved_tracks):
         query.results = lastfm_tracks
-        mapping = TrackMapping(spotify_track, loved_urls)
+        mapping = TrackMapping(spotify_track, loved_tracks)
         assert mapping.results[0].url == 'track_2_url'
         assert mapping.results[1].url == 'track_3_url'
         assert mapping.results[2].url == 'track_1_url'

@@ -6,9 +6,9 @@ from starstoloves.lib.search import query_repository
 class TrackMapping():
 
 
-    def __init__(self, track, loved_urls=None):
+    def __init__(self, track, loved_tracks=None):
         self.track = track
-        self.loved_urls = loved_urls
+        self.loved_tracks = loved_tracks
         self.query = query_repository.get_or_create(track.track_name, track.artist_name)
 
 
@@ -26,10 +26,10 @@ class TrackMapping():
     def results(self):
         results = self.query.results
 
-        if results and self.loved_urls:
+        if results and self.loved_tracks:
 
             for result in results:
-                result.loved = result.url in self.loved_urls
+                result.loved = result in self.loved_tracks
 
             results = sorted(
                 results,

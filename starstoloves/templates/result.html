@@ -13,8 +13,10 @@
                                 name="love_tracks"
                                 value="{{ track_result.url }}"
                             />
-                            {% if track_result.loved %}♥ {% endif %}
                             <span class="result-track">
+                                {% if track_result.loved %}
+                                    <span class="result-love">♥</span>
+                                {% endif %}
                                 {{track_result.artist_name}} - {{track_result.track_name}}
                                 <a
                                     class="result-link"

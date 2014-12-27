@@ -19,7 +19,7 @@ from .connection import (
 
 def get_track_mappings(request):
     return [
-        TrackMapping(track)
+        TrackMapping(track, request.session_user.loved_tracks)
         for track in request.session_user.starred_tracks
     ]
 

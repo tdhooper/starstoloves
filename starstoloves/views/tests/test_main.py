@@ -43,6 +43,10 @@ def combined_search_patch(create_patch):
     return create_patch('starstoloves.lib.search.multi.combined_search_strategy')
 
 
+@pytest.fixture
+def lastfm_user(create_patch):
+    return create_patch('starstoloves.lib.user.user.LastfmUser').return_value
+
 
 @pytest.mark.usefixtures("lastfm_connected")
 @pytest.mark.usefixtures("spotify_connected")
@@ -83,6 +87,19 @@ class TestIndex():
         response = client.get(reverse('index'))
         assert response.context['mappings'][0].results == [track_match, track_almost, track_reversed, track_nope]
 
+
+    def test_marks_loved_results(self, client, separate_search_patch, combined_search_patch, lastfm_user):
+        lastfm_user.loved_track_urls = ['some_url_3']
+
+        track_nope = LastfmTrack('some_url_2', 'nope', 'nope')
+        track_match = LastfmTrack('some_url_3', 'some_track', 'some_artist')
+
+        separate_search_patch.return_value = [track_match, track_nope]
+
+        response = client.get(reverse('index'))
+        assert response.context['mappings'][0].results == [track_match, track_nope]
+        assert response.context['mappings'][0].results[0].loved == True
+        assert response.context['mappings'][0].results[1].loved == False
 
 
 @pytest.mark.usefixtures("lastfm_connected")

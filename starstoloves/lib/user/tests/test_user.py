@@ -161,3 +161,8 @@ class TestUserLovedTracks:
 
         assert tracks == tracks_again
         assert loved_track_urls_property.call_count is 1
+
+
+    def test_copes_with_empty_loved_track_urls(self, user, lastfm_user, loved_track_urls_property):
+        loved_track_urls_property.return_value = []
+        assert user.loved_tracks is None
