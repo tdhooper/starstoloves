@@ -39,12 +39,17 @@ def spotify_user(SpotifyUser):
 
 
 @pytest.fixture
-def lastfm_user(LastfmUser):
-    instance = LastfmUser.return_value
-    instance.loved_track_urls = [
+def loved_track_urls_property():
+    return PropertyMock(return_value=[
         'some_url_a',
         'some_url_b',
-    ]
+    ])
+
+
+@pytest.fixture
+def lastfm_user(LastfmUser, loved_track_urls_property):
+    instance = LastfmUser.return_value
+    type(instance).loved_track_urls = loved_track_urls_property
     return instance
 
 
@@ -138,3 +143,21 @@ class TestUserLovedTracks:
 
         assert isinstance(tracks[1], LastfmTrack)
         assert tracks[1].url == 'some_url_b'
+
+
+    def test_does_not_regenerate_LastfmTracks_each_time_called(self, user, lastfm_user, loved_track_urls_property):
+        tracks = user.loved_tracks
+        tracks_again = user.loved_tracks
+
+        assert tracks is tracks_again
+        assert loved_track_urls_property.call_count is 1
+
+
+    def test_persists_result(self, user, lastfm_user, loved_track_urls_property):
+        tracks = user.loved_tracks
+
+        user_again = user_repository.from_session_key(user.session_key)
+        tracks_again = user_again.loved_tracks
+
+        assert tracks == tracks_again
+        assert loved_track_urls_property.call_count is 1

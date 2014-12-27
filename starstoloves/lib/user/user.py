@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from starstoloves.lib.repository import RepositoryItem
 from starstoloves.lib.connection import (
     spotify_connection_repository,
     lastfm_connection_repository,
@@ -12,12 +13,12 @@ from .spotify_user import SpotifyUser
 from .lastfm_user import LastfmUser
 
 
+class User(RepositoryItem):
 
-class User():
-
-    def __init__(self, session_key, loved_tracks=None):
+    def __init__(self, session_key, loved_tracks=None, **kwargs):
         self.session_key = session_key
         self._loved_tracks = loved_tracks
+        super().__init__(**kwargs)
 
 
     @property
@@ -49,10 +50,14 @@ class User():
         if not loved_track_urls:
             return None
 
-        return [
+        self._loved_tracks = [
             lastfm_track_repository.get_or_create(url=url)
             for url in loved_track_urls
         ]
+
+        self.repository.save(self)
+
+        return self._loved_tracks
 
 
     @loved_tracks.setter

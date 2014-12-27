@@ -1,4 +1,5 @@
 class RepositoryItem(object):
 
     def __init__(self, **kwargs):
-        self.repository = kwargs['repository']
+        if 'repository' in kwargs:
+            self.repository = kwargs['repository']

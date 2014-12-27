@@ -1,3 +1,5 @@
+import sys
+
 from starstoloves.models import User as UserModel
 from starstoloves import model_repository
 from starstoloves.lib.track import lastfm_track_repository
@@ -12,7 +14,11 @@ def from_session_key(session_key):
         ]
     else:
         loved_tracks = None
-    return User(session_key, loved_tracks);
+    return User(
+        session_key=session_key,
+        loved_tracks=loved_tracks,
+        repository=sys.modules[__name__],
+    );
 
 def save(user):
     user_model, created = UserModel.objects.get_or_create(session_key=user.session_key)
