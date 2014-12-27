@@ -40,7 +40,13 @@ def spotify_user(SpotifyUser):
 
 @pytest.fixture
 def lastfm_user(LastfmUser):
-    return LastfmUser.return_value
+    instance = LastfmUser.return_value
+    instance.loved_track_urls = [
+        'some_url_a',
+        'some_url_b',
+    ]
+    return instance
+
 
 
 class TestUser:
@@ -119,3 +125,16 @@ class TestUserLoveTracks:
             call(track_name='some_track_a', artist_name='some_artist_a'),
             call(track_name='some_track_b', artist_name='some_artist_b'),
         ]
+
+
+
+class TestUserLovedTracks:
+
+    def test_returns_LastfmTracks_from_lastfm_user_loved_track_urls(self, user, lastfm_user):
+        tracks = user.loved_tracks
+
+        assert isinstance(tracks[0], LastfmTrack)
+        assert tracks[0].url == 'some_url_a'
+
+        assert isinstance(tracks[1], LastfmTrack)
+        assert tracks[1].url == 'some_url_b'

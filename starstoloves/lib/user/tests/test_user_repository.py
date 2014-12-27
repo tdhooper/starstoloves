@@ -40,6 +40,11 @@ def patch_spotify_user(create_patch):
     create_patch('starstoloves.lib.user.user.SpotifyUser')
 
 
+@pytest.fixture
+def lastfm_user(create_patch):
+    return create_patch('starstoloves.lib.user.user.LastfmUser').return_value
+
+
 class TestFromSessionKey():
 
     def test_returns_user(self):
@@ -76,7 +81,9 @@ class TestSave():
 class TestDelete():
 
     @pytest.mark.usefixtures("patch_spotify_user")
-    def test_deletes_stored_user(self, lastfm_tracks):
+    def test_deletes_stored_user(self, lastfm_tracks, lastfm_user):
+        lastfm_user.loved_track_urls = None
+
         user = user_repository.from_session_key('some_key')
         user.loved_tracks = lastfm_tracks
         user_repository.save(user)

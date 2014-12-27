@@ -59,6 +59,12 @@ class TestLovedTrackUrls():
         assert lastfm_user.loved_track_urls == ['some_url', 'another_url']
 
 
+    def test_it_returns_none_when_not_connected(self, lastfm_user, lastfm_app, lastfm_connection):
+        lastfm_connection.is_connected = False
+        assert lastfm_user.loved_track_urls == None
+        assert lastfm_app.user.get_loved_tracks.call_count is 0
+
+
 
 class TestLoveTrack():
 
