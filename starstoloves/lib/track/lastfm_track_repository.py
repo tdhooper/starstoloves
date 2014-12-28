@@ -5,6 +5,13 @@ from .lastfm_track import LastfmTrack
 def get_or_create(url, track_name=None, artist_name=None, listeners=None):
     try:
         model = LastfmTrackModel.objects.get(url=url)
+        if track_name is not None:
+            model.track_name = track_name
+        if artist_name is not None:
+            model.artist_name = artist_name
+        if listeners is not None:
+            model.listeners = listeners
+        model.save()
     except LastfmTrackModel.DoesNotExist:
         model = LastfmTrackModel.objects.create(
             url=url,

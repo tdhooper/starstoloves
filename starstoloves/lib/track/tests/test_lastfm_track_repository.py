@@ -76,6 +76,22 @@ class TestGetOrCreate:
         assert LastfmTrackModel.objects.filter(url='some_url').count() is 1
 
 
+    def test_adds_new_fields(self):
+        lastfm_track_repository.get_or_create(url='some_url')
+        lastfm_track_repository.get_or_create(
+            url='some_url',
+            track_name='some_track',
+            artist_name='some_artist',
+            listeners=10,
+        )
+        track = lastfm_track_repository.get_or_create(url='some_url')
+
+        assert track.url == 'some_url'
+        assert track.track_name == 'some_track'
+        assert track.artist_name == 'some_artist'
+        assert track.listeners == 10
+
+
 
 class TestFromModel:
 
