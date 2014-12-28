@@ -19,3 +19,5 @@ def run():
 
     if success:
         builtins.spotify_session = sp_session
+    else:
+        print('spotify authentication failed')

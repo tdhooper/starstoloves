@@ -25,8 +25,11 @@ class SpotifyAuth:
 
         self.spotifySession.login(username, password)
 
-        logged_in_event.wait()
-        return self.isReady()
+        logged_in_event.wait(timeout=5)
+
+        if logged_in_event.is_set():
+            return self.isReady()
+
 
     def isReady(self):
         if self.spotifySession.connection_state == spotify.ConnectionState.LOGGED_IN:
