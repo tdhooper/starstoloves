@@ -1,5 +1,6 @@
 import json
 import re
+from operator import attrgetter
 
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
@@ -20,7 +21,11 @@ from .connection import (
 def get_track_mappings(request):
     return [
         TrackMapping(track, request.session_user.loved_tracks)
-        for track in request.session_user.starred_tracks
+        for track in sorted(
+            request.session_user.starred_tracks,
+            key=attrgetter('added'),
+            reverse=True,
+        )
     ]
 
 

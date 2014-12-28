@@ -7,27 +7,35 @@ from urllib.parse import urlencode
 from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
 
-from starstoloves.lib.track.spotify_track import SpotifyTrack
+from starstoloves.lib.track.spotify_track import SpotifyPlaylistTrack
 from starstoloves.views import main
 
 
 
 spotify_tracks = [
-    SpotifyTrack(
+    SpotifyPlaylistTrack(
+        user=None,
         artist_name="Modeselektor",
-        track_name="Das Claudia Woelky Massaker"
+        track_name="Das Claudia Woelky Massaker",
+        added=567,
     ),
-    SpotifyTrack(
+    SpotifyPlaylistTrack(
+        user=None,
         artist_name="The Bloody Beetroots",
-        track_name="It’s Better A DJ On 2 turntables"
+        track_name="It’s Better A DJ On 2 turntables",
+        added=456,
     ),
-    SpotifyTrack(
+    SpotifyPlaylistTrack(
+        user=None,
         artist_name="A.S.Y.S.",
-        track_name="No More Fucking Rock´n´ Roll"
+        track_name="No More Fucking Rock´n´ Roll",
+        added=345,
     ),
-    SpotifyTrack(
+    SpotifyPlaylistTrack(
+        user=None,
         artist_name="Booka Shade",
-        track_name="No Difference"
+        track_name="No Difference",
+        added=234,
     ),
 ]
 

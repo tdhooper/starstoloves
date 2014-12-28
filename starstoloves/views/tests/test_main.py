@@ -56,8 +56,8 @@ class TestIndex():
     def test_starts_a_search_for_each_starred_track(self, client, search_lastfm):
         client.get(reverse('index'))
         assert search_lastfm.delay.call_args_list == [
+            call('another_track', 'another_artist'),
             call('some_track', 'some_artist'),
-            call('another_track', 'another_artist')
         ]
 
 
@@ -65,14 +65,15 @@ class TestIndex():
         response = client.get(reverse('index'))
 
         assert isinstance(response.context['mappings'][0], TrackMapping)
-        assert response.context['mappings'][0].track.track_name == 'some_track'
-        assert response.context['mappings'][0].track.artist_name == 'some_artist'
-        assert response.context['mappings'][0].track.added.timestamp() == 123456
+        assert response.context['mappings'][0].track.track_name == 'another_track'
+        assert response.context['mappings'][0].track.artist_name == 'another_artist'
+        assert response.context['mappings'][0].track.added.timestamp() == 789012
 
         assert isinstance(response.context['mappings'][1], TrackMapping)
-        assert response.context['mappings'][1].track.track_name == 'another_track'
-        assert response.context['mappings'][1].track.artist_name == 'another_artist'
-        assert response.context['mappings'][1].track.added.timestamp() == 789012
+        assert response.context['mappings'][1].track.track_name == 'some_track'
+        assert response.context['mappings'][1].track.artist_name == 'some_artist'
+        assert response.context['mappings'][1].track.added.timestamp() == 123456
+
 
 
     def test_returns_results(self, client, separate_search_patch, combined_search_patch):
@@ -85,7 +86,7 @@ class TestIndex():
         combined_search_patch.return_value = [track_almost, track_match, track_reversed]
 
         response = client.get(reverse('index'))
-        assert response.context['mappings'][0].results == [track_match, track_almost, track_reversed, track_nope]
+        assert response.context['mappings'][1].results == [track_match, track_almost, track_reversed, track_nope]
 
 
     def test_marks_loved_results(self, client, separate_search_patch, combined_search_patch, lastfm_user):
