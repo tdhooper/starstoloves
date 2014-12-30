@@ -48,9 +48,38 @@ def lastfm_user(create_patch):
     return create_patch('starstoloves.lib.user.user.LastfmUser').return_value
 
 
+@pytest.fixture
+def some_track_results():
+    return {
+        'almost': LastfmTrack('some_url_1', 'some_track_almost', 'some_artist_almost'),
+        'nope': LastfmTrack('some_url_2', 'nope', 'nope'),
+        'match': LastfmTrack('some_url_3', 'some_track', 'some_artist'),
+        'reversed': LastfmTrack('some_url_4', 'some_artist', 'some_track'),
+    }
+
+
+@pytest.fixture
+def has_results(
+    spotify_user_with_starred,
+    separate_search_patch,
+    combined_search_patch,
+    some_track_results,
+):
+    separate_search_patch.return_value = [
+        some_track_results['almost'],
+        some_track_results['nope'],
+    ]
+    combined_search_patch.return_value = [
+        some_track_results['almost'],
+        some_track_results['match'],
+        some_track_results['reversed'],
+    ]
+
+
+
 @pytest.mark.usefixtures("lastfm_connected")
 @pytest.mark.usefixtures("spotify_connected")
-@pytest.mark.usefixtures("spotify_user_with_starred")
+@pytest.mark.usefixtures("has_results")
 class TestIndex():
 
     def test_starts_a_search_for_each_starred_track(self, client, search_lastfm):
@@ -75,37 +104,42 @@ class TestIndex():
         assert response.context['mappings'][1].track.added.timestamp() == 123456
 
 
+    def test_returns_results(self, client, some_track_results):
+        response = client.get(reverse('index'))
+        assert response.context['mappings'][1].results == [
+            some_track_results['match'],
+            some_track_results['almost'],
+            some_track_results['reversed'],
+            some_track_results['nope'],
+        ]
 
-    def test_returns_results(self, client, separate_search_patch, combined_search_patch):
-        track_almost = LastfmTrack('some_url_1', 'some_track_almost', 'some_artist_almost')
-        track_nope = LastfmTrack('some_url_2', 'nope', 'nope')
-        track_match = LastfmTrack('some_url_3', 'some_track', 'some_artist')
-        track_reversed = LastfmTrack('some_url_4', 'some_artist', 'some_track')
 
-        separate_search_patch.return_value = [track_almost, track_nope]
-        combined_search_patch.return_value = [track_almost, track_match, track_reversed]
+    def test_bumps_loved_tracks_to_the_top(self, client, lastfm_user, some_track_results):
+        lastfm_user.loved_track_urls = ['some_url_3', 'some_url_4']
 
         response = client.get(reverse('index'))
-        assert response.context['mappings'][1].results == [track_match, track_almost, track_reversed, track_nope]
+        assert response.context['mappings'][1].results == [
+            some_track_results['match'],
+            some_track_results['reversed'],
+            some_track_results['almost'],
+            some_track_results['nope'],
+        ]
 
 
-    def test_marks_loved_results(self, client, separate_search_patch, combined_search_patch, lastfm_user):
-        lastfm_user.loved_track_urls = ['some_url_3']
-
-        track_nope = LastfmTrack('some_url_2', 'nope', 'nope')
-        track_match = LastfmTrack('some_url_3', 'some_track', 'some_artist')
-
-        separate_search_patch.return_value = [track_match, track_nope]
+    def test_marks_loved_results(self, client, lastfm_user, some_track_results):
+        lastfm_user.loved_track_urls = ['some_url_3', 'some_url_4']
 
         response = client.get(reverse('index'))
-        assert response.context['mappings'][0].results == [track_match, track_nope]
-        assert response.context['mappings'][0].results[0].loved == True
-        assert response.context['mappings'][0].results[1].loved == False
+        assert response.context['mappings'][1].results[0].loved == True
+        assert response.context['mappings'][1].results[1].loved == True
+        assert response.context['mappings'][1].results[2].loved == False
+        assert response.context['mappings'][1].results[3].loved == False
+
 
 
 @pytest.mark.usefixtures("lastfm_connected")
 @pytest.mark.usefixtures("spotify_connected")
-@pytest.mark.usefixtures("spotify_user_with_starred")
+@pytest.mark.usefixtures("has_results")
 class TestLoveTracks():
 
     def test_redirects_to_index(self, client):
@@ -113,13 +147,7 @@ class TestLoveTracks():
         assert response.redirect_chain[0][0] == 'http://testserver' + reverse('index')
 
 
-    def test_loves_checked_results(self, client, separate_search_patch):
-        tracks = [
-            LastfmTrack('some_url_a', 'some_track_a', 'some_artist_a'),
-            LastfmTrack('some_url_b', 'some_track_b', 'some_artist_b'),
-            LastfmTrack('some_url_c', 'some_track_c', 'some_artist_c'),
-        ]
-        separate_search_patch.return_value = tracks
+    def test_loves_checked_results(self, client, some_track_results):
         client.get(reverse('index'))
 
         with patch('starstoloves.middleware.user_repository') as user_repository:
@@ -129,15 +157,15 @@ class TestLoveTracks():
 
             client.post(reverse('love_tracks'), {
                 'love_tracks': [
-                    'some_url_a',
-                    'some_url_b',
+                    'some_url_1',
+                    'some_url_2',
                 ]
             });
 
             loved_tracks = session_user.love_tracks.call_args[0][0]
             assert len(loved_tracks) is 2
-            assert tracks[0] in loved_tracks
-            assert tracks[1] in loved_tracks
+            assert some_track_results['almost'] in loved_tracks
+            assert some_track_results['nope'] in loved_tracks
 
 
     # TODO: Return a warning when requested tracks weren't loved
