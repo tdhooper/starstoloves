@@ -7,7 +7,7 @@ define(['jquery'], function($) {
 
         that.start = function() {
             $el.on('click', '.js-toggle-more-toggle', function(evt) {
-                var $group = $(evt.target).parents('.js-toggle-more');
+                var $group = $(this).prev('.js-toggle-more');
                 that.toggle($group);
                 evt.preventDefault();
             });
@@ -25,7 +25,7 @@ define(['jquery'], function($) {
 
         that.add = function($group) {
             $group.data('toggleMoreActive', true);
-            $('.js-toggle-more-item', $group).eq(0).after('<li class="toggle-more"><a href="#" class="js-toggle-more-toggle"></a></li>');
+            $group.after('<a href="#" class="toggle-more-toggle js-toggle-more-toggle"><span></span></a>');
             that.hide($group);
         };
 
@@ -41,14 +41,14 @@ define(['jquery'], function($) {
             var $items = $('.js-toggle-more-item', $group);
             $items.not(':first').addClass('hide');
             var count = $items.length - 1;
-            $('.js-toggle-more-toggle', $group).text(count + " More");
+            $group.next('.js-toggle-more-toggle').find('span').text(count + " More");
             $group.data('toggleClosed', true);
         };
 
         that.show = function($group) {
             var $items = $('.js-toggle-more-item', $group);
             $items.not(':first').removeClass('hide');
-            $('.js-toggle-more-toggle', $group).text("Hide");
+            $group.next('.js-toggle-more-toggle').find('span').text("Hide");
             $group.data('toggleClosed', false);
         };
 

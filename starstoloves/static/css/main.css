@@ -87,7 +87,8 @@ h3 {
 }
 
 /* .visuallyhidden */
-.sp-connect-form label {
+.sp-connect-form label,
+.result-list thead {
     border: 0;
     clip: rect(0 0 0 0);
     height: 1px;
@@ -114,19 +115,13 @@ ul {
     margin-bottom: 12px;
 }
 
-.result-list {
+
+/* ==========================================================================
+   Mapping
+   ========================================================================== */
+
+.mapping {
     margin-bottom: 36px;
-    position: relative;
-}
-
-.result {
-    margin-bottom: 0;
-    display: inline-block;
-    width: 100%;
-}
-
-.result-track {
-    float: left;
 }
 
 .track {
@@ -134,59 +129,105 @@ ul {
     width: 80%;
 }
 
-.date-saved,
-.result-listeners {
+.date-saved {
     float: right;
+
+    width: 20%;
+    margin-top: 0;
+    margin-bottom: 12px;
+
+    font-size: 12px;
+    line-height: 22px;
+    text-align: right;
+    color: #666;
+}
+
+/* Result list
+   ========================================================================== */
+
+.result-select      { width: 5%;    }
+.result-track-name  { width: 65%;   }
+.result-listeners   { width: 20%;   text-align: right; }
+.result-love        { width: 5%;    text-align: right; }
+.result-link        { width: 5%;    text-align: right; }
+
+.result-list {
+    margin-bottom: 12px;
+    position: relative;
+    width: 100%;
+    text-align: left;
+}
+
+.result {
+    margin-bottom: 0;
+    width: 100%;
+}
+
+.result-listeners {
     font-size: 12px;
     color: #666;
 }
 
-.result-select {
-    float: left;
-    margin-left: -25px;
-    margin-top: 6px;
-}
-
 .result-link {
-    text-decoration: none;
     font-weight: bold;
 }
+
+.result-link a {
+    text-decoration: none;
+}
+
+.result-link a:hover,
+.result-link a:focus {
+    text-decoration: underline;
+}
+
+/* Toggle more
+   ========================================================================== */
+
+.toggle-more-toggle {
+    position: relative;
+    display: block;
+    width: 100%;
+
+    color: #1b1b1b;
+    text-align: center;
+    text-decoration: none;
+}
+
+.toggle-more-toggle:hover,
+.toggle-more-toggle:focus {
+    text-decoration: underline;
+}
+
+.toggle-more-toggle span {
+    padding: 0 10px;
+    font-size: 12px;
+    text-align: center;
+    background: #fff;
+}
+
+.toggle-more-toggle span:before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+
+    width: 100%;
+    height: 0;
+    left: 0;
+
+    margin-top: 12px;
+    border-bottom: 1px solid #aaa;
+}
+
+
+/* Submit
+   ========================================================================== */
 
 .sumbit-loved {
     margin-bottom: 2em;
 }
 
-.date-saved {
-    line-height: 22px;
-    margin-top: 0;
-    margin-bottom: 12px;
-    width: 20%;
-    text-align: right;
-}
 
-.toggle-more {
-    border-bottom: 1px solid #aaa;
-    text-align: right;
-    position: absolute;
-    bottom: -12px;
-    width: 100%;
-    height: 0;
-}
-
-.toggle-more a {
-    position: relative;
-    top: -12px;
-    background: #fff;
-    padding: 5px 0 5px 10px;
-    text-decoration: none;
-    color: #1b1b1b;
-    font-size: 12px;
-}
-
-.toggle-more a:hover,
-.toggle-more a:focus {
-    text-decoration: underline;
-}
 
 @media (min-width: 400px) {
 

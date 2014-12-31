@@ -8,17 +8,16 @@ define(['jquery', 'toggle-more'], function($, ToggleMore) {
             expect($('.js-toggle-more-item:first', context.$active).is('.hide')).toBe(false);
         });
 
-        it("adds toggle links after the first item in the group", function() {
-            var selector = '.js-toggle-more-item:first + li a.js-toggle-more-toggle';
-            expect($(selector, context.$active).length).toBe(1);
+        it("adds toggle links after the group", function() {
+            expect(context.$active.next('a.js-toggle-more-toggle').length).toBe(1);
         });
 
         it("labels the toggle link as more", function() {
-            expect($('.js-toggle-more-toggle', context.$active).is(':contains(More)')).toBe(true); 
+            expect(context.$active.next('.js-toggle-more-toggle').is(':contains(More)')).toBe(true); 
         });
 
         it("includes the number of hidden items in the toggle link", function() {
-            expect($('.js-toggle-more-toggle', context.$active).is(':contains(' + context.activeHidden + ')')).toBe(true);
+            expect(context.$active.next('.js-toggle-more-toggle').is(':contains(' + context.activeHidden + ')')).toBe(true);
         });
 
         describe("when the toggle link is clicked", function() {
@@ -27,7 +26,7 @@ define(['jquery', 'toggle-more'], function($, ToggleMore) {
 
             beforeEach(function() {
                 evt = $.Event('click');
-                $('.js-toggle-more-toggle', context.$active).trigger(evt);
+                context.$active.next('.js-toggle-more-toggle').trigger(evt);
             });
 
             it("prevents default", function() {
@@ -39,7 +38,7 @@ define(['jquery', 'toggle-more'], function($, ToggleMore) {
             });
 
             it("labels the toggle link as hide", function() {
-                expect($('.js-toggle-more-toggle', context.$active).is(':contains(Hide)')).toBe(true); 
+                expect(context.$active.next('.js-toggle-more-toggle').is(':contains(Hide)')).toBe(true); 
             });
 
             it("doesn't change other groups", function() {
@@ -49,7 +48,7 @@ define(['jquery', 'toggle-more'], function($, ToggleMore) {
             describe("when the toggle link is again", function() {
 
                 beforeEach(function() {
-                    $('.js-toggle-more-toggle', context.$active).trigger('click');
+                    context.$active.next('.js-toggle-more-toggle').trigger('click');
                 });
 
                 it("hides all but the first item in the group", function() {
@@ -58,7 +57,7 @@ define(['jquery', 'toggle-more'], function($, ToggleMore) {
                 });
 
                 it("labels the toggle link as more", function() {
-                    expect($('.js-toggle-more-toggle', context.$active).is(':contains(More)')).toBe(true); 
+                    expect(context.$active.next('.js-toggle-more-toggle').is(':contains(More)')).toBe(true); 
                 });
             });
         });
@@ -143,8 +142,8 @@ define(['jquery', 'toggle-more'], function($, ToggleMore) {
                 });
 
                 it("doesn't re-initialise the other groups", function() {
-                    expect($('.js-toggle-more-toggle', $groups[0]).length).toBe(1);
-                    expect($('.js-toggle-more-toggle', $groups[1]).length).toBe(1);
+                    expect($groups.eq(0).next('.js-toggle-more-toggle').length).toBe(1);
+                    expect($groups.eq(1).next('.js-toggle-more-toggle').length).toBe(1);
                 });
             });
         });
