@@ -18,5 +18,9 @@ class LastfmUser:
         return urls
 
 
-    def love_track(self, track_name, artist_name):
-        lastfm_app.track.love(track=track_name, artist=artist_name)
+    def love_track(self, track_name, artist_name, timestamp=None):
+        lastfm_app.request('track', 'love', {
+            'track': track_name,
+            'artist': artist_name,
+            'timestamp': timestamp,
+        })

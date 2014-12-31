@@ -65,12 +65,12 @@ class User(RepositoryItem):
         self._loved_tracks = value
 
 
-    def love_tracks(self, tracks):
-        for track in tracks:
-            self.lastfm_user.love_track(
-                track_name=track.track_name,
-                artist_name=track.artist_name,
-            )
+    def love_track(self, track, timestamp=None):
+        self.lastfm_user.love_track(
+            track_name=track.track_name,
+            artist_name=track.artist_name,
+            timestamp=timestamp,
+        )
 
 
     @property

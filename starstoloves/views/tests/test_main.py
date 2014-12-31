@@ -45,7 +45,9 @@ def combined_search_patch(create_patch):
 
 @pytest.fixture
 def lastfm_user(create_patch):
-    return create_patch('starstoloves.lib.user.user.LastfmUser').return_value
+    instance = create_patch('starstoloves.lib.user.user.LastfmUser').return_value
+    instance.loved_track_urls = None
+    return instance
 
 
 @pytest.fixture
@@ -59,21 +61,42 @@ def some_track_results():
 
 
 @pytest.fixture
+def another_track_results():
+    return {
+        'match': LastfmTrack('some_url_5', 'another_track', 'another_artist'),
+    }
+
+
+@pytest.fixture
 def has_results(
     spotify_user_with_starred,
     separate_search_patch,
     combined_search_patch,
     some_track_results,
+    another_track_results
 ):
-    separate_search_patch.return_value = [
-        some_track_results['almost'],
-        some_track_results['nope'],
-    ]
-    combined_search_patch.return_value = [
-        some_track_results['almost'],
-        some_track_results['match'],
-        some_track_results['reversed'],
-    ]
+    def separate_search(track_name, artist_name):
+        return {
+            'some_track': [
+                some_track_results['almost'],
+                some_track_results['nope'],
+            ],
+            'another_track': [
+                another_track_results['match'],
+            ],
+        }[track_name]
+
+    def combined_search(track_name, artist_name):
+        return {
+            'some_track': [
+                some_track_results['almost'],
+                some_track_results['match'],
+                some_track_results['reversed'],
+            ],
+        }[track_name]
+
+    separate_search_patch.side_effect = separate_search
+    combined_search_patch.side_effect = combined_search
 
 
 
@@ -143,45 +166,58 @@ class TestIndex():
 class TestLoveTracks():
 
     def test_redirects_to_index(self, client):
-        response = client.post(reverse('love_tracks'), follow=True);
+        response = client.post(reverse('love_tracks'), follow=True)
         assert response.redirect_chain[0][0] == 'http://testserver' + reverse('index')
 
 
-    def test_loves_checked_results(self, client, some_track_results):
-        client.get(reverse('index'))
+    def test_loves_checked_results(self, client, lastfm_user, some_track_results, another_track_results):
+        response = client.get(reverse('index'))
 
-        with patch('starstoloves.middleware.user_repository') as user_repository:
+        client.post(reverse('love_tracks'), {
+            response.context['mappings'][0].id: [
+                'some_url_5',
+            ],
+            response.context['mappings'][1].id: [
+                'some_url_1',
+                'some_url_2',
+            ],
+        });
 
-            session_user = MagicMock(spec=User)
-            user_repository.from_session_key.return_value = session_user
+        calls = lastfm_user.love_track.call_args_list
 
-            client.post(reverse('love_tracks'), {
-                'love_tracks': [
-                    'some_url_1',
-                    'some_url_2',
-                ]
-            });
+        assert len(calls) is 3
 
-            loved_tracks = session_user.love_tracks.call_args[0][0]
-            assert len(loved_tracks) is 2
-            assert some_track_results['almost'] in loved_tracks
-            assert some_track_results['nope'] in loved_tracks
+        assert call(
+            track_name=some_track_results['almost'].track_name,
+            artist_name=some_track_results['almost'].artist_name,
+            timestamp=123456,
+        ) in calls
+
+        assert call(
+            track_name=some_track_results['nope'].track_name,
+            artist_name=some_track_results['nope'].artist_name,
+            timestamp=123456,
+        ) in calls
+
+        assert call(
+            track_name=another_track_results['match'].track_name,
+            artist_name=another_track_results['match'].artist_name,
+            timestamp=789012,
+        ) in calls
+
 
 
     # TODO: Return a warning when requested tracks weren't loved
-    def test_ignores_junk_results(self, client):
-        with patch('starstoloves.middleware.user_repository') as user_repository:
+    def test_ignores_junk_results(self, client, lastfm_user):
+        response = client.get(reverse('index'))
 
-            session_user = MagicMock(spec=User)
-            user_repository.from_session_key.return_value = session_user
+        client.post(reverse('love_tracks'), {
+            response.context['mappings'][0].id: [
+                'not_a_track',
+            ],
+        });
 
-            client.post(reverse('love_tracks'), {
-                'love_tracks': [
-                    'not_a_track'
-                ]
-            });
-
-            assert session_user.love_tracks.call_args[0][0] == []
+        assert lastfm_user.love_track.call_count is 0
 
 
 

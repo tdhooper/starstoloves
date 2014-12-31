@@ -69,5 +69,13 @@ class TestLovedTrackUrls():
 class TestLoveTrack():
 
     def test_it_proxies_to_api(self, lastfm_user, lastfm_app):
-        lastfm_user.love_track(track_name='some_track', artist_name='some_artist')
-        assert lastfm_app.track.love.call_args == call(track='some_track', artist='some_artist')
+        lastfm_user.love_track(track_name='some_track', artist_name='some_artist', timestamp=123)
+        assert lastfm_app.request.call_args == call(
+            'track',
+            'love',
+            {
+                'track': 'some_track',
+                'artist': 'some_artist',
+                'timestamp': 123,
+            },
+        )
