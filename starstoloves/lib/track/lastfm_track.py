@@ -14,3 +14,12 @@ class LastfmTrack(Comparable):
 
     def __eq__(self, other):
         return self.url == other.url
+
+
+
+class LastfmPlaylistTrack(LastfmTrack):
+
+    def __init__(self, user, url, added, track_name=None, artist_name=None, listeners=None):
+        super().__init__(url, track_name, artist_name, listeners)
+        self.user = user
+        self.added = added

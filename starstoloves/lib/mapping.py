@@ -24,17 +24,28 @@ class TrackMapping():
 
     @property
     def results(self):
-        results = self.query.results
+        tracks = self.query.results
 
-        if results and self.loved_tracks:
+        if not tracks:
+            return None
+
+        results = [
+            {
+                'track': track,
+                'loved': False,
+            }
+            for track in tracks
+        ]
+
+        if self.loved_tracks:
 
             for result in results:
-                result.loved = result in self.loved_tracks
+                result['loved'] = next((
+                    loved_track.added
+                    for loved_track in self.loved_tracks
+                    if loved_track.url == result['track'].url
+                ), False)
 
-            results = sorted(
-                results,
-                key=attrgetter('loved'),
-                reverse=True
-            )
+            results = sorted(results, key=lambda result: 0 if result['loved'] else 1)
 
         return results

@@ -3,7 +3,7 @@ import pytest
 from unittest.mock import MagicMock, call, PropertyMock
 
 from starstoloves.lib.track.spotify_track import SpotifyPlaylistTrack
-from starstoloves.lib.track.lastfm_track import LastfmTrack
+from starstoloves.lib.track.lastfm_track import LastfmTrack, LastfmPlaylistTrack
 from starstoloves.lib.user import user_repository
 from ..user import User
 
@@ -39,17 +39,22 @@ def spotify_user(SpotifyUser):
 
 
 @pytest.fixture
-def loved_track_urls_property():
+def loved_tracks_property():
     return PropertyMock(return_value=[
-        'some_url_a',
-        'some_url_b',
+        {
+            'url': 'some_url_a',
+            'added': 123,
+        },{
+            'url': 'some_url_b',
+            'added': 456,
+        },
     ])
 
 
 @pytest.fixture
-def lastfm_user(LastfmUser, loved_track_urls_property):
+def lastfm_user(LastfmUser, loved_tracks_property):
     instance = LastfmUser.return_value
-    type(instance).loved_track_urls = loved_track_urls_property
+    type(instance).loved_tracks = loved_tracks_property
     return instance
 
 
@@ -57,9 +62,8 @@ def lastfm_user(LastfmUser, loved_track_urls_property):
 class TestUser:
 
     def test_returns_values_it_was_created_with(self):
-        user = User('some_key', 'some_loved_tracks')
+        user = User('some_key')
         assert user.session_key == 'some_key'
-        assert user.loved_tracks == 'some_loved_tracks'
 
 
 
@@ -133,34 +137,28 @@ class TestUserLoveTrack:
 
 class TestUserLovedTracks:
 
-    def test_returns_LastfmTracks_from_lastfm_user_loved_track_urls(self, user, lastfm_user):
+    def test_returns_LastfmPlaylistTracks_from_lastfm_user_loved_tracks(self, user, lastfm_user):
         tracks = user.loved_tracks
 
-        assert isinstance(tracks[0], LastfmTrack)
+        assert isinstance(tracks[0], LastfmPlaylistTrack)
         assert tracks[0].url == 'some_url_a'
+        assert tracks[0].added.timestamp() == 123
 
-        assert isinstance(tracks[1], LastfmTrack)
+        assert isinstance(tracks[1], LastfmPlaylistTrack)
         assert tracks[1].url == 'some_url_b'
+        assert tracks[1].added.timestamp() == 456
 
 
-    def test_does_not_regenerate_LastfmTracks_each_time_called(self, user, lastfm_user, loved_track_urls_property):
-        tracks = user.loved_tracks
-        tracks_again = user.loved_tracks
-
-        assert tracks is tracks_again
-        assert loved_track_urls_property.call_count is 1
-
-
-    def test_persists_result(self, user, lastfm_user, loved_track_urls_property):
+    def test_persists_result(self, user, lastfm_user, loved_tracks_property):
         tracks = user.loved_tracks
 
         user_again = user_repository.from_session_key(user.session_key)
         tracks_again = user_again.loved_tracks
 
         assert tracks == tracks_again
-        assert loved_track_urls_property.call_count is 1
+        assert loved_tracks_property.call_count is 1
 
 
-    def test_copes_with_empty_loved_track_urls(self, user, lastfm_user, loved_track_urls_property):
-        loved_track_urls_property.return_value = []
-        assert user.loved_tracks is None
+    def test_copes_with_empty_loved_tracks(self, user, lastfm_user, loved_tracks_property):
+        loved_tracks_property.return_value = None
+        assert user.loved_tracks == []

@@ -67,7 +67,9 @@
                             <h3 class="track">
                                 {{mapping.track.artist_name}} - {{mapping.track.track_name}}
                             </h3>
-                            <p class="date-saved">{{ mapping.track.added|naturalday:"j M Y" }}</p>
+                            <p class="date-saved" title="{{ mapping.track.added }}">
+                                {{ mapping.track.added|naturalday:"j M Y" }}
+                            </p>
                             {% include 'result.html' %}
                         </li>
                     {% endfor %}

@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import uuid4
 from unittest.mock import MagicMock, call, patch
 
@@ -46,7 +47,7 @@ def combined_search_patch(create_patch):
 @pytest.fixture
 def lastfm_user(create_patch):
     instance = create_patch('starstoloves.lib.user.user.LastfmUser').return_value
-    instance.loved_track_urls = None
+    instance.loved_tracks = None
     return instance
 
 
@@ -130,33 +131,50 @@ class TestIndex():
     def test_returns_results(self, client, some_track_results):
         response = client.get(reverse('index'))
         assert response.context['mappings'][1].results == [
-            some_track_results['match'],
-            some_track_results['almost'],
-            some_track_results['reversed'],
-            some_track_results['nope'],
+            {
+                'track': some_track_results['match'],
+                'loved': False,
+            },{
+                'track': some_track_results['almost'],
+                'loved': False,
+            },{
+                'track': some_track_results['reversed'],
+                'loved': False,
+            },{
+                'track': some_track_results['nope'],
+                'loved': False,
+            }
         ]
 
 
-    def test_bumps_loved_tracks_to_the_top(self, client, lastfm_user, some_track_results):
-        lastfm_user.loved_track_urls = ['some_url_3', 'some_url_4']
+    def test_bumps_loved_tracks_to_the_top_and_marks_them(self, client, lastfm_user, some_track_results):
+        lastfm_user.loved_tracks = [
+            {
+                'url': 'some_url_3',
+                'added': 123
+            },
+            {
+                'url': 'some_url_4',
+                'added': 456
+            },
+        ]
 
         response = client.get(reverse('index'))
         assert response.context['mappings'][1].results == [
-            some_track_results['match'],
-            some_track_results['reversed'],
-            some_track_results['almost'],
-            some_track_results['nope'],
+            {
+                'track': some_track_results['match'],
+                'loved': datetime.fromtimestamp(123),
+            },{
+                'track': some_track_results['reversed'],
+                'loved': datetime.fromtimestamp(456),
+            },{
+                'track': some_track_results['almost'],
+                'loved': False,
+            },{
+                'track': some_track_results['nope'],
+                'loved': False,
+            }
         ]
-
-
-    def test_marks_loved_results(self, client, lastfm_user, some_track_results):
-        lastfm_user.loved_track_urls = ['some_url_3', 'some_url_4']
-
-        response = client.get(reverse('index'))
-        assert response.context['mappings'][1].results[0].loved == True
-        assert response.context['mappings'][1].results[1].loved == True
-        assert response.context['mappings'][1].results[2].loved == False
-        assert response.context['mappings'][1].results[3].loved == False
 
 
 

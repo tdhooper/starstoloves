@@ -16,12 +16,18 @@ class SpotifyTrack(models.Model):
 class User(models.Model):
     session_key = models.CharField(max_length=300)
     starred_tracks = models.ManyToManyField(SpotifyTrack, null=True, through='SpotifyPlaylistTrack')
-    loved_tracks = models.ManyToManyField(LastfmTrack, null=True)
+    loved_tracks = models.ManyToManyField(LastfmTrack, null=True, through='LastfmPlaylistTrack')
 
 
 class SpotifyPlaylistTrack(models.Model):
     user = models.ForeignKey(User)
     track = models.ForeignKey(SpotifyTrack)
+    added = models.DateTimeField()
+
+
+class LastfmPlaylistTrack(models.Model):
+    user = models.ForeignKey(User)
+    track = models.ForeignKey(LastfmTrack)
     added = models.DateTimeField()
 
 

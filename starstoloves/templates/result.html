@@ -8,33 +8,35 @@
                     <tr>
                         <th>Love</th>
                         <th>Artist - Track</th>
-                        <th>Listeners</th>
                         <th>Loved</th>
+                        <th>Listeners</th>
                         <th>Last.fm link</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for track_result in mapping.results %}
+                    {% for result in mapping.results %}
                         <tr class="js-toggle-more-item result">
                             <td class="result-select">
                                 <input
                                     type="checkbox"
                                     name="{{ mapping.id }}"
-                                    value="{{ track_result.url }}"
+                                    value="{{ result.track.url }}"
                                 />
                             </td>
                             <td class="result-track-name">
-                                {{track_result.artist_name}} - {{track_result.track_name}}
+                                {{result.track.artist_name}} - {{result.track.track_name}}
+                            </td>
+                            <td class="result-loved" title="{{ result.loved }}">
+                                {% if result.loved %}
+                                    ♥ {{ result.loved|naturalday:"j M Y" }}
+                                {% endif %}
                             </td>
                             <td class="result-listeners">
-                                {{ track_result.listeners|intcomma }} listeners
-                            </td>
-                            <td class="result-love">
-                                {% if track_result.loved %}♥{% endif %}
+                                {{ result.track.listeners|intcomma }} listeners
                             </td>
                             <td class="result-link">
                                 <a
-                                    href="{{ track_result.url }}"
+                                    href="{{ result.track.url }}"
                                     title="View on Last.fm"
                                     target="_blank"
                                 >⇗</a>

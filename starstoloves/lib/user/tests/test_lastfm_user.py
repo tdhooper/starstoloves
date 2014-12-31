@@ -40,29 +40,55 @@ def test_it_sets_the_session_key_on_the_api(lastfm_connection, lastfm_app):
 
 
 @pytest.mark.usefixtures('lastfm_api_returns_tracks')
-class TestLovedTrackUrls():
+class TestLovedTracks():
 
     api_response = {
         'track': [
-            {'url': 'some_url'},
-            {'url': 'another_url'}
+            {
+                'url': 'some_url',
+                'date': {
+                    'uts': '123',
+                },
+            },{
+                'url': 'another_url',
+                'date': {
+                    'uts': '345',
+                },
+            },
         ]
     }
 
-
     def test_it_gets_loved_tracks_from_the_lastfm_api(self, lastfm_user, lastfm_app, lastfm_connection):
-        lastfm_user.loved_track_urls
+        lastfm_user.loved_tracks
         assert lastfm_app.user.get_loved_tracks.call_args == call(lastfm_connection.username)
 
 
-    def test_it_returns_the_track_urls(self, lastfm_user, lastfm_app):
-        assert lastfm_user.loved_track_urls == ['some_url', 'another_url']
+    def test_it_returns_the_track_urls_and_dates(self, lastfm_user, lastfm_app):
+        assert lastfm_user.loved_tracks == [
+            {
+                'url': 'some_url',
+                'added': 123,
+            },{
+                'url': 'another_url',
+                'added': 345,
+            },
+        ]
 
 
     def test_it_returns_none_when_not_connected(self, lastfm_user, lastfm_app, lastfm_connection):
         lastfm_connection.is_connected = False
-        assert lastfm_user.loved_track_urls == None
+        assert lastfm_user.loved_tracks == None
         assert lastfm_app.user.get_loved_tracks.call_count is 0
+
+
+
+@pytest.mark.usefixtures('lastfm_api_returns_tracks')
+class TestLovedTracksEmpty():
+
+    api_response = {}
+
+    def test_it_returns_none(self, lastfm_user, lastfm_app):
+        assert lastfm_user.loved_tracks == None
 
 
 

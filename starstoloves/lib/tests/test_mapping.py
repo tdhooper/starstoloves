@@ -1,9 +1,10 @@
+from datetime import datetime
 from unittest.mock import MagicMock, call
 
 import pytest
 
 from starstoloves.lib.track.spotify_track import SpotifyTrack
-from starstoloves.lib.track.lastfm_track import LastfmTrack
+from starstoloves.lib.track.lastfm_track import LastfmTrack, LastfmPlaylistTrack
 from starstoloves.lib.search.query import LastfmQuery
 from ..mapping import TrackMapping
 
@@ -41,11 +42,15 @@ def lastfm_tracks():
 @pytest.fixture
 def loved_tracks():
     return [
-        LastfmTrack(
+        LastfmPlaylistTrack(
+            user=None,
             url='track_2_url',
+            added=datetime.fromtimestamp(123),
         ),
-        LastfmTrack(
+        LastfmPlaylistTrack(
+            user=None,
             url='track_3_url',
+            added=datetime.fromtimestamp(456),
         ),
     ]
 
@@ -93,10 +98,13 @@ class TestTrackMapping():
 class TestTrackMappingResults():
 
 
-    def test_returns_query_results(self, spotify_track, query, lastfm_tracks):
+    def test_returns_query_results_as_track_in_dicts(self, spotify_track, query, lastfm_tracks):
         query.results = lastfm_tracks
         mapping = TrackMapping(spotify_track)
-        assert mapping.results is lastfm_tracks
+        assert len(mapping.results) is 3
+        assert mapping.results[0]['track'] is lastfm_tracks[0]
+        assert mapping.results[1]['track'] is lastfm_tracks[1]
+        assert mapping.results[2]['track'] is lastfm_tracks[2]
 
 
     def test_returns_none_when_there_are_no_results(self, spotify_track, query):
@@ -105,29 +113,29 @@ class TestTrackMappingResults():
         assert mapping.results is None
 
 
-    def test_marks_loved_status(self, spotify_track, query, lastfm_tracks, loved_tracks):
+    def test_marks_loved_status_as_false_by_default(self, spotify_track, query, lastfm_tracks):
         query.results = lastfm_tracks
-        mapping = TrackMapping(spotify_track, loved_tracks)
-        assert self._track_by_url(mapping.results, 'track_1_url').loved == False
-        assert self._track_by_url(mapping.results, 'track_2_url').loved == True
-        assert self._track_by_url(mapping.results, 'track_3_url').loved == True
+        mapping = TrackMapping(spotify_track)
+        assert self._result_by_url(mapping.results, 'track_1_url')['loved'] == False
+        assert self._result_by_url(mapping.results, 'track_2_url')['loved'] == False
+        assert self._result_by_url(mapping.results, 'track_3_url')['loved'] == False
 
 
-    def test_does_not_mutate_query_results(self, spotify_track, query, lastfm_tracks, loved_tracks):
+    def test_marks_loved_status_as_time(self, spotify_track, query, lastfm_tracks, loved_tracks):
         query.results = lastfm_tracks
         mapping = TrackMapping(spotify_track, loved_tracks)
-        assert query.results[0].loved == False
-        assert query.results[1].loved == False
-        assert query.results[2].loved == False
+        assert self._result_by_url(mapping.results, 'track_1_url')['loved'] == False
+        assert self._result_by_url(mapping.results, 'track_2_url')['loved'] == datetime.fromtimestamp(123)
+        assert self._result_by_url(mapping.results, 'track_3_url')['loved'] == datetime.fromtimestamp(456)
 
 
     def test_moves_loved_tracks_to_the_top_of_the_list(self, spotify_track, query, lastfm_tracks, loved_tracks):
         query.results = lastfm_tracks
         mapping = TrackMapping(spotify_track, loved_tracks)
-        assert mapping.results[0].url == 'track_2_url'
-        assert mapping.results[1].url == 'track_3_url'
-        assert mapping.results[2].url == 'track_1_url'
+        assert mapping.results[0]['track'].url == 'track_2_url'
+        assert mapping.results[1]['track'].url == 'track_3_url'
+        assert mapping.results[2]['track'].url == 'track_1_url'
 
 
-    def _track_by_url(self, tracks, url):
-        return [track for track in tracks if track.url == url][0]
+    def _result_by_url(self, results, url):
+        return [result for result in results if result['track'].url == url][0]

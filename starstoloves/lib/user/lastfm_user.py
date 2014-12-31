@@ -9,13 +9,24 @@ class LastfmUser:
 
 
     @property
-    def loved_track_urls(self):
+    def loved_tracks(self):
         if not self.connection.is_connected:
             return None
+
         username = self.connection.username
+
         loved_tracks_response = lastfm_app.user.get_loved_tracks(username)
-        urls = [track['url'] for track in loved_tracks_response['track']]
-        return urls
+
+        if not 'track' in loved_tracks_response:
+            return None
+
+        return [
+            {
+                'url': track['url'],
+                'added': int(track['date']['uts']),
+            }
+            for track in loved_tracks_response['track']
+        ]
 
 
     def love_track(self, track_name, artist_name, timestamp=None):

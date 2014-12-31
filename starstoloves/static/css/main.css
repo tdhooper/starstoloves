@@ -146,9 +146,9 @@ ul {
    ========================================================================== */
 
 .result-select      { width: 5%;    }
-.result-track-name  { width: 65%;   }
+.result-track-name  { width: 55%;   }
+.result-loved       { width: 15%;   text-align: right; }
 .result-listeners   { width: 20%;   text-align: right; }
-.result-love        { width: 5%;    text-align: right; }
 .result-link        { width: 5%;    text-align: right; }
 
 .result-list {
@@ -163,8 +163,16 @@ ul {
     width: 100%;
 }
 
-.result-listeners {
+.result-listeners,
+.result-loved {
     font-size: 12px;
+}
+
+.result-loved {
+    color: red;
+}
+
+.result-listeners {
     color: #666;
 }
 
