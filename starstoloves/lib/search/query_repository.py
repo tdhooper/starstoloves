@@ -13,7 +13,7 @@ from .query import LastfmQuery
 
 
 def get_or_create(track_name, artist_name):
-    search_model, created = LastfmSearchModel.objects.get_or_create(track_name=track_name, artist_name=artist_name)
+    search_model, created = LastfmSearchModel.objects.select_related('query').get_or_create(track_name=track_name, artist_name=artist_name)
     if search_model.query and search_model.query.task_id is not None:
         async_result = AsyncResult(search_model.query.task_id)
         results = [

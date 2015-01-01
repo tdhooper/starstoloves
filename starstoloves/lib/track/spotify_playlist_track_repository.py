@@ -25,7 +25,7 @@ def for_user(user):
             artist_name=model.track.artist_name,
             added=model.added
         )
-        for model in SpotifyPlaylistTrackModel.objects.filter(
+        for model in SpotifyPlaylistTrackModel.objects.select_related('track').filter(
             user=model_repository.from_user(user)
         )
     ]

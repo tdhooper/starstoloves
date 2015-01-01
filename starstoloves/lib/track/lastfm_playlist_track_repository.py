@@ -36,7 +36,7 @@ def for_user(user):
             listeners=model.track.listeners,
             added=model.added
         )
-        for model in LastfmPlaylistTrackModel.objects.filter(
+        for model in LastfmPlaylistTrackModel.objects.select_related('track').filter(
             user=model_repository.from_user(user)
         )
     ]
