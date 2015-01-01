@@ -224,6 +224,40 @@ class TestLoveTracks():
         ) in calls
 
 
+    def test_gets_fresh_loved_tracks(self, client, lastfm_user):
+
+        lastfm_user.loved_tracks = [
+            {
+                'url': 'some_url_3',
+                'added': 123
+            }
+        ]
+
+        def love_track(**kwargs):
+            lastfm_user.loved_tracks = [
+                {
+                    'url': 'some_url_3',
+                    'added': 123
+                },
+                {
+                    'url': 'some_url_4',
+                    'added': 456
+                },
+            ]
+        lastfm_user.love_track.side_effect = love_track
+
+        response = client.get(reverse('index'))
+        assert response.context['mappings'][1].results[0]['loved'] is not False
+        assert response.context['mappings'][1].results[1]['loved'] is False
+
+        response = client.post(reverse('love_tracks'), {
+            response.context['mappings'][1].id: [
+                'some_url_4',
+            ],
+        }, follow=True);
+        assert response.context['mappings'][1].results[0]['loved'] is not False
+        assert response.context['mappings'][1].results[1]['loved'] is not False
+
 
     # TODO: Return a warning when requested tracks weren't loved
     def test_ignores_junk_results(self, client, lastfm_user):

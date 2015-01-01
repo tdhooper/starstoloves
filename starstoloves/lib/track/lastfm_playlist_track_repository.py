@@ -40,3 +40,9 @@ def for_user(user):
             user=model_repository.from_user(user)
         )
     ]
+
+
+def clear_user(user):
+    LastfmPlaylistTrackModel.objects.filter(
+        user=model_repository.from_user(user)
+    ).delete()

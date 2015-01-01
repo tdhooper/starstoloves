@@ -7,7 +7,10 @@ from django.template import RequestContext
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseServerError
 
-from starstoloves.lib.track import lastfm_track_repository
+from starstoloves.lib.track import (
+    lastfm_track_repository,
+    lastfm_playlist_track_repository,
+)
 from starstoloves.lib.mapping import TrackMapping
 from .connection import (
     connection_index_decorator,
@@ -84,4 +87,7 @@ def love_tracks(request):
                 track = lastfm_track_repository.get(url)
                 if track:
                     request.session_user.love_track(track, mapping.track.added.timestamp())
+
+    lastfm_playlist_track_repository.clear_user(request.session_user)
+
     return redirect('index')

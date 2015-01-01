@@ -113,3 +113,22 @@ class TestForUser:
         assert another_user_tracks[0].artist_name == 'tother_artist'
         assert another_user_tracks[0].added.timestamp() == 222
         assert another_user_tracks[0].listeners == 20
+
+
+class TestClearUser:
+
+    def test_removes_loved_tracks_from_user(
+        self,
+        user,
+        playlist_track,
+        another_playlist_track,
+    ):
+        assert len(lastfm_playlist_track_repository.for_user(user)) is 2
+
+        lastfm_playlist_track_repository.clear_user(user)
+        assert lastfm_playlist_track_repository.for_user(user) == []
+
+
+    def test_copes_with_no_loved_tracks(self, user):
+        assert lastfm_playlist_track_repository.for_user(user) == []
+        lastfm_playlist_track_repository.clear_user(user)
