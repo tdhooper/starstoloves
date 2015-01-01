@@ -1,3 +1,4 @@
+import functools
 from datetime import datetime
 
 from starstoloves.lib.repository import RepositoryItem
@@ -40,6 +41,7 @@ class User(RepositoryItem):
 
 
     @property
+    @functools.lru_cache(maxsize=None)
     def loved_tracks(self):
         # TODO: Make this work like LastfmQuery#results, using a repository
         # save method so it hides the external repository access

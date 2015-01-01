@@ -159,6 +159,22 @@ class TestUserLovedTracks:
         assert loved_tracks_property.call_count is 1
 
 
+    def test_memoises_the_result(self, user, lastfm_user):
+        tracks = user.loved_tracks
+        tracks_mem = user.loved_tracks
+        assert tracks is tracks_mem
+
+
+    def test_memoises_persisted_result(self, user, lastfm_user, loved_tracks_property):
+        tracks = user.loved_tracks
+
+        user_again = user_repository.from_session_key(user.session_key)
+        tracks_again = user_again.loved_tracks
+        tracks_mem = user_again.loved_tracks
+
+        assert tracks_again is tracks_mem
+
+
     def test_copes_with_empty_loved_tracks(self, user, lastfm_user, loved_tracks_property):
         loved_tracks_property.return_value = None
         assert user.loved_tracks == []
