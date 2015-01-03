@@ -56,4 +56,4 @@ class TestDelete():
 
         user_repository.delete(user)
         user = user_repository.from_session_key('some_key')
-        assert user.loved_tracks == []
+        assert user.loved_tracks() == []

@@ -40,7 +40,6 @@ class User(RepositoryItem):
         ]
 
 
-    @property
     @functools.lru_cache(maxsize=None)
     def loved_tracks(self):
         # TODO: Make this work like LastfmQuery#results, using a repository
@@ -62,6 +61,11 @@ class User(RepositoryItem):
             )
             for track in loved_tracks_data
         ]
+
+
+    def reload_loved_tracks(self):
+        self.loved_tracks.cache_clear()
+        lastfm_playlist_track_repository.clear_user(self)
 
 
     def love_track(self, track, timestamp=None):

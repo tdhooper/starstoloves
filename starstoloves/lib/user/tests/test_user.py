@@ -52,6 +52,14 @@ def loved_tracks_property():
 
 
 @pytest.fixture
+def different_loved_tracks():
+    return [{
+        'url': 'some_url_c',
+        'added': 789,
+    }]
+
+
+@pytest.fixture
 def lastfm_user(LastfmUser, loved_tracks_property):
     instance = LastfmUser.return_value
     type(instance).loved_tracks = loved_tracks_property
@@ -135,10 +143,11 @@ class TestUserLoveTrack:
 
 
 
+@pytest.mark.usefixtures('lastfm_user')
 class TestUserLovedTracks:
 
-    def test_returns_LastfmPlaylistTracks_from_lastfm_user_loved_tracks(self, user, lastfm_user):
-        tracks = user.loved_tracks
+    def test_returns_LastfmPlaylistTracks_from_lastfm_user_loved_tracks(self, user):
+        tracks = user.loved_tracks()
 
         assert isinstance(tracks[0], LastfmPlaylistTrack)
         assert tracks[0].url == 'some_url_a'
@@ -149,32 +158,65 @@ class TestUserLovedTracks:
         assert tracks[1].added.timestamp() == 456
 
 
-    def test_persists_result(self, user, lastfm_user, loved_tracks_property):
-        tracks = user.loved_tracks
+    def test_persists_result(self, user, loved_tracks_property):
+        tracks = user.loved_tracks()
 
         user_again = user_repository.from_session_key(user.session_key)
-        tracks_again = user_again.loved_tracks
+        tracks_again = user_again.loved_tracks()
 
         assert tracks == tracks_again
         assert loved_tracks_property.call_count is 1
 
 
-    def test_memoises_the_result(self, user, lastfm_user):
-        tracks = user.loved_tracks
-        tracks_mem = user.loved_tracks
+    def test_memoises_the_result(self, user):
+        tracks = user.loved_tracks()
+        tracks_mem = user.loved_tracks()
         assert tracks is tracks_mem
 
 
-    def test_memoises_persisted_result(self, user, lastfm_user, loved_tracks_property):
-        tracks = user.loved_tracks
+    def test_memoises_persisted_result(self, user, loved_tracks_property):
+        tracks = user.loved_tracks()
 
         user_again = user_repository.from_session_key(user.session_key)
-        tracks_again = user_again.loved_tracks
-        tracks_mem = user_again.loved_tracks
+        tracks_again = user_again.loved_tracks()
+        tracks_mem = user_again.loved_tracks()
 
         assert tracks_again is tracks_mem
 
 
-    def test_copes_with_empty_loved_tracks(self, user, lastfm_user, loved_tracks_property):
+    def test_copes_with_empty_loved_tracks(self, user, loved_tracks_property):
         loved_tracks_property.return_value = None
-        assert user.loved_tracks == []
+        assert user.loved_tracks() == []
+
+
+
+@pytest.mark.usefixtures('lastfm_user')
+class TestReloadLovedTracks:
+
+    def test_clears_persisted_loved_tracks(self, user, loved_tracks_property, different_loved_tracks):
+        tracks = user.loved_tracks()
+
+        loved_tracks_property.return_value = different_loved_tracks
+        user.reload_loved_tracks()
+
+        user_again = user_repository.from_session_key(user.session_key)
+        tracks_again = user_again.loved_tracks()
+
+        assert tracks != tracks_again
+        assert len(tracks_again) is 1
+        assert tracks_again[0].url == 'some_url_c'
+        assert tracks_again[0].added.timestamp() == 789
+
+
+    def test_clears_memoised_loved_tracks(self, user, loved_tracks_property, different_loved_tracks):
+        tracks = user.loved_tracks()
+
+        loved_tracks_property.return_value = different_loved_tracks
+        user.reload_loved_tracks()
+
+        tracks_again = user.loved_tracks()
+
+        assert tracks != tracks_again
+        assert len(tracks_again) is 1
+        assert tracks_again[0].url == 'some_url_c'
+        assert tracks_again[0].added.timestamp() == 789

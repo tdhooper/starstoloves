@@ -7,10 +7,7 @@ from django.template import RequestContext
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseServerError
 
-from starstoloves.lib.track import (
-    lastfm_track_repository,
-    lastfm_playlist_track_repository,
-)
+from starstoloves.lib.track import lastfm_track_repository
 from starstoloves.lib.mapping import TrackMapping
 from .connection import (
     connection_index_decorator,
@@ -23,7 +20,7 @@ from .connection import (
 # TODO: Only start a few searches at a time
 def get_track_mappings(request):
     return [
-        TrackMapping(track, request.session_user.loved_tracks)
+        TrackMapping(track, request.session_user.loved_tracks())
         for track in sorted(
             request.session_user.starred_tracks,
             key=attrgetter('added'),
@@ -88,6 +85,6 @@ def love_tracks(request):
                 if track:
                     request.session_user.love_track(track, mapping.track.added.timestamp())
 
-    lastfm_playlist_track_repository.clear_user(request.session_user)
+    request.session_user.reload_loved_tracks()
 
     return redirect('index')
