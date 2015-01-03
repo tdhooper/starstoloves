@@ -13,7 +13,8 @@ from .connection import (
     connection_index_decorator,
     connection_index_processor,
     connection_status_decorator,
-    disconnect_spotify as connection_disconnect_spotify
+    disconnect_spotify as connection_disconnect_spotify,
+    disconnect_lastfm as connection_disconnect_lastfm
 )
 
 
@@ -44,6 +45,13 @@ def disconnect_spotify(request):
         for mapping in get_track_mappings(request):
             mapping.query.stop()
     return connection_disconnect_spotify(request)
+
+
+@connection_status_decorator
+def disconnect_lastfm(request):
+    if request.is_lastfm_connected:
+        request.session_user.reload_loved_tracks()
+    return connection_disconnect_lastfm(request)
 
 
 @connection_status_decorator

@@ -310,10 +310,17 @@ def test_disconnect_spotify_clears_searches(client, queries):
     assert queries['another_track'].stop.call_count is 1
 
 
+@pytest.mark.usefixtures("spotify_connected")
+@pytest.mark.usefixtures("lastfm_connected")
+def test_disconnect_lastfm_clears_loved_tracks(client, queries, session_user):
+    client.get(reverse('disconnect_lastfm'))
+    assert session_user.reload_loved_tracks.call_count is 1
+
+
 
 @pytest.mark.usefixtures("spotify_connected")
 @pytest.mark.usefixtures("lastfm_connected")
-@pytest.mark.usefixtures("spotify_user_with_starred")
+@pytest.mark.usefixtures("spotify_session")
 class TestReloadLastfm():
 
     def test_reloads_loved_tracks(self, client, session_user):
