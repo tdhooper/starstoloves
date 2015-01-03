@@ -72,12 +72,15 @@ class User(RepositoryItem):
         lastfm_playlist_track_repository.clear_user(self)
 
 
-    def love_track(self, track, timestamp=None):
-        self.lastfm_user.love_track(
-            track_name=track.track_name,
-            artist_name=track.artist_name,
-            timestamp=timestamp,
-        )
+    def love_tracks(self, tracks):
+        self.lastfm_user.love_tracks([
+            {
+                'track_name': track['track'].track_name,
+                'artist_name': track['track'].artist_name,
+                'timestamp': track['timestamp'],
+            }
+            for track in tracks
+        ])
 
 
     @property

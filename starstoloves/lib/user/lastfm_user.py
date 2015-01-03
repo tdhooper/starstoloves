@@ -23,6 +23,8 @@ class LastfmUser:
         return [
             {
                 'url': track['url'],
+                'track_name': track['name'],
+                'artist_name': track['artist']['name'],
                 'added': int(track['date']['uts']),
             }
             for track in loved_tracks_response['track']
@@ -35,3 +37,24 @@ class LastfmUser:
             'artist': artist_name,
             'timestamp': timestamp,
         })
+
+
+    def love_tracks(self, tracks):
+        loved_tracks = self.loved_tracks
+        for track in tracks:
+            if loved_tracks and self._contains_track(track, loved_tracks):
+                lastfm_app.track.unlove(
+                    artist=track['artist_name'],
+                    track=track['track_name'],
+                )
+            self.love_track(**track)
+
+
+    def _contains_track(self, a, tracks):
+        for b in tracks:
+            if self._compare_tracks(a, b):
+                return True
+
+
+    def _compare_tracks(self, a, b):
+        return a['artist_name'] == b['artist_name'] and a['track_name'] == b['track_name']

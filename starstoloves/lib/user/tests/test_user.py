@@ -157,7 +157,7 @@ class TestReloadStarredTracks:
 
 
 
-class TestUserLoveTrack:
+class TestUserLoveTracks:
 
     def test_lastfm_user_is_created_with_lastfm_connection(self, user, LastfmUser, lastfm_connection_repository):
         lastfm_user = user.lastfm_user
@@ -168,12 +168,15 @@ class TestUserLoveTrack:
 
     def test_proxies_to_lastfm_user(self, user, lastfm_user):
         track = LastfmTrack('some_url_a', 'some_track_a', 'some_artist_a')
-        user.love_track(track, 123)
-        assert lastfm_user.love_track.call_args == call(
-            track_name='some_track_a',
-            artist_name='some_artist_a',
-            timestamp=123,
-        )
+        user.love_tracks([{
+            'track': track,
+            'timestamp': 123,
+        }])
+        assert lastfm_user.love_tracks.call_args == call([{
+            'track_name': 'some_track_a',
+            'artist_name': 'some_artist_a',
+            'timestamp': 123,
+        }])
 
 
 

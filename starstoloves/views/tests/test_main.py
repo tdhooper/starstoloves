@@ -209,27 +209,27 @@ class TestLoveTracks():
             ],
         });
 
-        calls = lastfm_user.love_track.call_args_list
+        loved_tracks = lastfm_user.love_tracks.call_args[0][0]
 
-        assert len(calls) is 3
+        assert len(loved_tracks) is 3
 
-        assert call(
-            track_name=some_track_results['almost'].track_name,
-            artist_name=some_track_results['almost'].artist_name,
-            timestamp=123456,
-        ) in calls
+        assert {
+            'track_name': some_track_results['almost'].track_name,
+            'artist_name': some_track_results['almost'].artist_name,
+            'timestamp': 123456,
+        } in loved_tracks
 
-        assert call(
-            track_name=some_track_results['nope'].track_name,
-            artist_name=some_track_results['nope'].artist_name,
-            timestamp=123456,
-        ) in calls
+        assert {
+            'track_name': some_track_results['nope'].track_name,
+            'artist_name': some_track_results['nope'].artist_name,
+            'timestamp': 123456,
+        } in loved_tracks
 
-        assert call(
-            track_name=another_track_results['match'].track_name,
-            artist_name=another_track_results['match'].artist_name,
-            timestamp=789012,
-        ) in calls
+        assert {
+            'track_name': another_track_results['match'].track_name,
+            'artist_name': another_track_results['match'].artist_name,
+            'timestamp': 789012,
+        } in loved_tracks
 
 
     def test_gets_fresh_loved_tracks(self, client, lastfm_user):
@@ -241,7 +241,7 @@ class TestLoveTracks():
             }
         ]
 
-        def love_track(**kwargs):
+        def love_tracks(*args, **kwargs):
             lastfm_user.loved_tracks = [
                 {
                     'url': 'some_url_3',
@@ -252,7 +252,7 @@ class TestLoveTracks():
                     'added': 456
                 },
             ]
-        lastfm_user.love_track.side_effect = love_track
+        lastfm_user.love_tracks.side_effect = love_tracks
 
         response = client.get(reverse('index'))
         assert response.context['mappings'][1].results[0]['loved'] is not False
@@ -277,7 +277,7 @@ class TestLoveTracks():
             ],
         });
 
-        assert lastfm_user.love_track.call_count is 0
+        assert lastfm_user.love_tracks.call_count is 0
 
 
 
