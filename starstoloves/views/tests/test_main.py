@@ -321,6 +321,22 @@ def test_disconnect_lastfm_clears_loved_tracks(client, queries, session_user):
 @pytest.mark.usefixtures("spotify_connected")
 @pytest.mark.usefixtures("lastfm_connected")
 @pytest.mark.usefixtures("spotify_session")
+class TestReloadSpotify():
+
+    def test_reloads_starred_tracks(self, client, session_user):
+        response = client.get(reverse('reload_spotify'), follow=True)
+        assert session_user.reload_starred_tracks.call_count is 1
+
+
+    def test_redirects_to_index(self, client):
+        response = client.get(reverse('reload_spotify'), follow=True)
+        assert response.redirect_chain[0][0] == 'http://testserver' + reverse('index')
+
+
+
+@pytest.mark.usefixtures("spotify_connected")
+@pytest.mark.usefixtures("lastfm_connected")
+@pytest.mark.usefixtures("spotify_session")
 class TestReloadLastfm():
 
     def test_reloads_loved_tracks(self, client, session_user):

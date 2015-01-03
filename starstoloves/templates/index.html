@@ -15,7 +15,7 @@
                     {% if not spUsername %}
                         <a href="{{lfmDisconnectUrl}}">disconnect</a>
                     {% else %}
-                        <a href="{% url 'reload_lastfm' %}">reload loved tracks</a>
+                        <a href="{% url 'reload_lastfm' %}">reload loved</a>
                     {% endif %}
                 </p>
             {% else %}
@@ -36,7 +36,11 @@
                     <span class="instruction">Connected to Spotify as</span>
                     <strong>{{spUsername}}</strong>
                 </h2>
-                <p class="step-links">(<a href="{{spDisconnectUrl}}">disconnect</a>)</p>
+                <p class="step-links">
+                    <a href="{{spDisconnectUrl}}">disconnect</a>
+                    ·
+                    <a href="{% url 'reload_spotify' %}">reload starred</a>
+                </p>
             {% elif spForm %}
                 <h2 class="sp-connect-heading">
                     <span class="step-counter">Step 2:</span>

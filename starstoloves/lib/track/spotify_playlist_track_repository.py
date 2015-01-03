@@ -29,3 +29,8 @@ def for_user(user):
             user=model_repository.from_user(user)
         )
     ]
+
+def clear_user(user):
+    SpotifyPlaylistTrackModel.objects.filter(
+        user=model_repository.from_user(user)
+    ).delete()

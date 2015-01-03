@@ -99,3 +99,23 @@ class TestForUser:
         assert another_user_tracks[0].track_name == 'tother_track'
         assert another_user_tracks[0].artist_name == 'tother_artist'
         assert another_user_tracks[0].added.timestamp() == 222
+
+
+
+class TestClearUser:
+
+    def test_removes_loved_tracks_from_user(
+        self,
+        user,
+        playlist_track,
+        another_playlist_track,
+    ):
+        assert len(spotify_playlist_track_repository.for_user(user)) is 2
+
+        spotify_playlist_track_repository.clear_user(user)
+        assert spotify_playlist_track_repository.for_user(user) == []
+
+
+    def test_copes_with_no_loved_tracks(self, user):
+        assert spotify_playlist_track_repository.for_user(user) == []
+        spotify_playlist_track_repository.clear_user(user)

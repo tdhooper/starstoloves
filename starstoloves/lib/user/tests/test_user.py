@@ -39,6 +39,28 @@ def spotify_user(SpotifyUser):
 
 
 @pytest.fixture
+def starred_tracks():
+    return [
+            {
+                'track_name': 'some_track',
+                'artist_name': 'some_artist',
+                'date_saved': 123,
+            }
+        ]
+
+
+@pytest.fixture
+def different_starred_tracks():
+    return [
+            {
+                'track_name': 'another_track',
+                'artist_name': 'another_artist',
+                'date_saved': 456,
+            }
+        ]
+
+
+@pytest.fixture
 def loved_tracks_property():
     return PropertyMock(return_value=[
         {
@@ -77,14 +99,6 @@ class TestUser:
 
 class TestUserStarredTracks:
 
-    starred_tracks = [
-            {
-                'track_name': 'some_track',
-                'artist_name': 'some_artist',
-                'date_saved': 123,
-            }
-        ]
-
 
     def test_spotify_user_is_created_with_spotify_connection(self, user, SpotifyUser, spotify_connection_repository):
         spotify_user = user.spotify_user
@@ -93,33 +107,53 @@ class TestUserStarredTracks:
         assert spotify_user is SpotifyUser.return_value
 
 
-    def test_returns_SpotifyPlaylistTracks(self, user, spotify_user):
-        spotify_user.starred_tracks = self.starred_tracks
+    def test_returns_SpotifyPlaylistTracks(self, user, spotify_user, starred_tracks):
+        spotify_user.starred_tracks = starred_tracks
         assert isinstance(user.starred_tracks[0], SpotifyPlaylistTrack)
 
 
-    def test_uses_starred_tracks_data_from_spotify_user(self, user, spotify_user):
-        spotify_user.starred_tracks = self.starred_tracks
+    def test_uses_starred_tracks_data_from_spotify_user(self, user, spotify_user, starred_tracks):
+        spotify_user.starred_tracks = starred_tracks
         assert user.starred_tracks[0].user == user
         assert user.starred_tracks[0].track_name == 'some_track'
         assert user.starred_tracks[0].artist_name == 'some_artist'
         assert user.starred_tracks[0].added.timestamp() == 123
 
 
-    def test_stores_starred_tracks(self, user, spotify_user):
-        starred_tracks_property = PropertyMock(return_value=self.starred_tracks)
+    def test_stores_starred_tracks(self, user, spotify_user, starred_tracks):
+        starred_tracks_property = PropertyMock(return_value=starred_tracks)
         type(spotify_user).starred_tracks = starred_tracks_property
 
         user.starred_tracks
         new_user = user_repository.from_session_key('some_key')
-        starred_tracks = new_user.starred_tracks
+        tracks = new_user.starred_tracks
 
-        assert starred_tracks[0].user == new_user
-        assert starred_tracks[0].track_name == 'some_track'
-        assert starred_tracks[0].artist_name == 'some_artist'
-        assert starred_tracks[0].added.timestamp() == 123
+        assert tracks[0].user == new_user
+        assert tracks[0].track_name == 'some_track'
+        assert tracks[0].artist_name == 'some_artist'
+        assert tracks[0].added.timestamp() == 123
 
         assert starred_tracks_property.call_count is 1
+
+
+
+class TestReloadStarredTracks:
+
+    def test_clears_persisted_loved_tracks(self, user, spotify_user, starred_tracks, different_starred_tracks):
+        spotify_user.starred_tracks = starred_tracks
+
+        tracks = user.starred_tracks
+
+        spotify_user.starred_tracks = different_starred_tracks
+        user.reload_starred_tracks()
+
+        user_again = user_repository.from_session_key(user.session_key)
+        tracks_again = user_again.starred_tracks
+
+        assert len(tracks_again) is 1
+        assert tracks_again[0].track_name == 'another_track'
+        assert tracks_again[0].artist_name == 'another_artist'
+        assert tracks_again[0].added.timestamp() == 456
 
 
 

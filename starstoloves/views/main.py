@@ -101,3 +101,8 @@ def love_tracks(request):
 def reload_lastfm(request):
     request.session_user.reload_loved_tracks()
     return redirect('index')
+
+
+def reload_spotify(request):
+    request.session_user.reload_starred_tracks()
+    return redirect('index')

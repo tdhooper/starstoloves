@@ -63,6 +63,10 @@ class User(RepositoryItem):
         ]
 
 
+    def reload_starred_tracks(self):
+        spotify_playlist_track_repository.clear_user(self)
+
+
     def reload_loved_tracks(self):
         self.loved_tracks.cache_clear()
         lastfm_playlist_track_repository.clear_user(self)
