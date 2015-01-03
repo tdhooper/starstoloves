@@ -88,3 +88,8 @@ def love_tracks(request):
     request.session_user.reload_loved_tracks()
 
     return redirect('index')
+
+
+def reload_lastfm(request):
+    request.session_user.reload_loved_tracks()
+    return redirect('index')

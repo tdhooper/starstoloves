@@ -100,6 +100,14 @@ def has_results(
     combined_search_patch.side_effect = combined_search
 
 
+@pytest.fixture
+def session_user(create_patch):
+    user = MagicMock(spec=User)()
+    repo = create_patch('starstoloves.middleware.user_repository')
+    repo.from_session_key.return_value = user
+    return user
+
+
 
 @pytest.mark.usefixtures("lastfm_connected")
 @pytest.mark.usefixtures("spotify_connected")
@@ -300,3 +308,19 @@ def test_disconnect_spotify_clears_searches(client, queries):
     response = client.get(reverse('disconnect_spotify'), follow=True)
     assert queries['some_track'].stop.call_count is 1
     assert queries['another_track'].stop.call_count is 1
+
+
+
+@pytest.mark.usefixtures("spotify_connected")
+@pytest.mark.usefixtures("lastfm_connected")
+@pytest.mark.usefixtures("spotify_user_with_starred")
+class TestReloadLastfm():
+
+    def test_reloads_loved_tracks(self, client, session_user):
+        response = client.get(reverse('reload_lastfm'), follow=True)
+        assert session_user.reload_loved_tracks.call_count is 1
+
+
+    def test_redirects_to_index(self, client):
+        response = client.get(reverse('reload_lastfm'), follow=True)
+        assert response.redirect_chain[0][0] == 'http://testserver' + reverse('index')
