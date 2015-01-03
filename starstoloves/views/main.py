@@ -1,6 +1,7 @@
 import json
 import re
 from operator import attrgetter
+from itertools import chain
 
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
@@ -84,20 +85,27 @@ def result_update(request):
 
 
 def love_tracks(request):
-    mappings = get_track_mappings(request)
-    mappings_by_id = {mapping.id: mapping for mapping in mappings}
-    tracks_to_love = []
+    mappings_by_id = {
+        mapping.id: mapping
+        for mapping in get_track_mappings(request)
+    }
 
-    for mapping_id, urls in request.POST.lists():
-        mapping = mappings_by_id.get(mapping_id)
-        if mapping:
-            for url in urls:
-                track = lastfm_track_repository.get(url)
-                if track:
-                    tracks_to_love.append({
-                        'track': track,
-                        'timestamp': mapping.track.added.timestamp(),
-                    })
+    tracks_to_love = list(chain.from_iterable([
+        [
+            {
+                'track': track,
+                'timestamp': mapping.track.added.timestamp(),
+            }
+            for track in [
+                lastfm_track_repository.get(url)
+                for url in urls
+            ] if track
+        ]
+        for mapping, urls in [
+            (mappings_by_id.get(mapping_id), urls)
+            for mapping_id, urls in request.POST.lists()
+        ] if mapping
+    ]))
 
     if tracks_to_love:
         request.session_user.love_tracks(tracks_to_love)

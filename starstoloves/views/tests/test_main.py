@@ -280,6 +280,18 @@ class TestLoveTracks():
         assert lastfm_user.love_tracks.call_count is 0
 
 
+    def test_ignores_junk_ids(self, client, lastfm_user):
+        response = client.get(reverse('index'))
+
+        client.post(reverse('love_tracks'), {
+            'not_an_id': [
+                'some_url_4',
+            ],
+        });
+
+        assert lastfm_user.love_tracks.call_count is 0
+
+
 
 @pytest.fixture
 def queries():
