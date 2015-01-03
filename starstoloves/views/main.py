@@ -44,6 +44,7 @@ def disconnect_spotify(request):
     if request.is_spotify_connected:
         for mapping in get_track_mappings(request):
             mapping.query.stop()
+        request.session_user.reload_starred_tracks()
     return connection_disconnect_spotify(request)
 
 

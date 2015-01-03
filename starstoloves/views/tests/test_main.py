@@ -302,12 +302,21 @@ def LastfmQuery_patch(create_patch, queries):
 
 
 @pytest.mark.usefixtures("spotify_connected")
-@pytest.mark.usefixtures('LastfmQuery_patch')
-@pytest.mark.usefixtures("spotify_user_with_starred")
-def test_disconnect_spotify_clears_searches(client, queries):
-    response = client.get(reverse('disconnect_spotify'), follow=True)
-    assert queries['some_track'].stop.call_count is 1
-    assert queries['another_track'].stop.call_count is 1
+@pytest.mark.usefixtures("lastfm_connected")
+class TestDisconnectSpotify():
+
+    @pytest.mark.usefixtures('LastfmQuery_patch')
+    @pytest.mark.usefixtures("spotify_user_with_starred")
+    def test_clears_searches(self, client, queries):
+        client.get(reverse('disconnect_spotify'), follow=True)
+        assert queries['some_track'].stop.call_count is 1
+        assert queries['another_track'].stop.call_count is 1
+
+
+    def test_clears_starred_tracks(self, client, session_user):
+        client.get(reverse('disconnect_spotify'), follow=True)
+        assert session_user.reload_starred_tracks.call_count is 1
+
 
 
 @pytest.mark.usefixtures("spotify_connected")
