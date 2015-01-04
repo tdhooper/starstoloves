@@ -49,13 +49,51 @@ def loved_api_response():
                     'uts': '345',
                 },
             },
-        ]
+        ],
+        '@attr': {
+            'user': 'tdhooper',
+            'page': '1',
+            'perPage': '2',
+            'totalPages': '2',
+            'total': '3'
+        }
     }
 
 
 @pytest.fixture
-def lastfm_api_returns_tracks(request, lastfm_app, loved_api_response):
-    lastfm_app.user.get_loved_tracks.return_value = loved_api_response
+def loved_api_response_page_2():
+    return {
+        'track': [
+            {
+                'name': 'tother_track',
+                'artist': {
+                    'name': 'tother_artist',
+                },
+                'url': 'tother_url',
+                'date': {
+                    'uts': '999',
+                },
+            }
+        ],
+        '@attr': {
+            'user': 'tdhooper',
+            'page': '2',
+            'perPage': '2',
+            'totalPages': '2',
+            'total': '3'
+        }
+    }
+
+
+@pytest.fixture
+def lastfm_api_returns_tracks(request, lastfm_app, loved_api_response, loved_api_response_page_2):
+
+    def get_loved_tracks(user, page=None):
+        if page is 2:
+            return loved_api_response_page_2
+        return loved_api_response
+
+    lastfm_app.user.get_loved_tracks.side_effect = get_loved_tracks
 
 
 def test_it_sets_the_session_key_on_the_api(lastfm_connection, lastfm_app):
@@ -72,7 +110,7 @@ class TestLovedTracks():
 
     def test_it_gets_loved_tracks_from_the_lastfm_api(self, lastfm_user, lastfm_app, lastfm_connection):
         lastfm_user.loved_tracks
-        assert lastfm_app.user.get_loved_tracks.call_args == call(lastfm_connection.username)
+        assert lastfm_app.user.get_loved_tracks.call_args_list[0] == call(user=lastfm_connection.username, page=1)
 
 
     def test_it_returns_the_track_urls_and_dates(self, lastfm_user, lastfm_app):
@@ -87,6 +125,11 @@ class TestLovedTracks():
                 'artist_name': 'another_artist',
                 'url': 'another_url',
                 'added': 345,
+            },{
+                'track_name': 'tother_track',
+                'artist_name': 'tother_artist',
+                'url': 'tother_url',
+                'added': 999,
             },
         ]
 

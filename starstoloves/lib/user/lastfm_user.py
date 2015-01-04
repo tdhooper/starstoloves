@@ -14,21 +14,31 @@ class LastfmUser:
             return None
 
         username = self.connection.username
+        tracks = []
+        total_pages = 1
+        page = 0
 
-        loved_tracks_response = lastfm_app.user.get_loved_tracks(username)
+        while page < total_pages:
+            page += 1
+            response = lastfm_app.user.get_loved_tracks(user=username, page=page)
 
-        if not 'track' in loved_tracks_response:
-            return None
+            try:
+                tracks += [
+                    {
+                        'url': track['url'],
+                        'track_name': track['name'],
+                        'artist_name': track['artist']['name'],
+                        'added': int(track['date']['uts']),
+                    }
+                    for track in response['track']
+                ]
 
-        return [
-            {
-                'url': track['url'],
-                'track_name': track['name'],
-                'artist_name': track['artist']['name'],
-                'added': int(track['date']['uts']),
-            }
-            for track in loved_tracks_response['track']
-        ]
+                total_pages = int(response['@attr']['totalPages'])
+
+            except KeyError:
+                break
+
+        return tracks or None
 
 
     def love_track(self, track_name, artist_name, timestamp=None):
