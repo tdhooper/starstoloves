@@ -142,15 +142,19 @@ class TestIndex():
             {
                 'track': some_track_results['match'],
                 'loved': False,
+                'love': True,
             },{
                 'track': some_track_results['almost'],
                 'loved': False,
+                'love': False,
             },{
                 'track': some_track_results['reversed'],
                 'loved': False,
+                'love': False,
             },{
                 'track': some_track_results['nope'],
                 'loved': False,
+                'love': False,
             }
         ]
 
@@ -172,15 +176,19 @@ class TestIndex():
             {
                 'track': some_track_results['match'],
                 'loved': datetime.fromtimestamp(123),
+                'love': False,
             },{
                 'track': some_track_results['reversed'],
                 'loved': datetime.fromtimestamp(456),
+                'love': False,
             },{
                 'track': some_track_results['almost'],
                 'loved': False,
+                'love': False,
             },{
                 'track': some_track_results['nope'],
                 'loved': False,
+                'love': False,
             }
         ]
 

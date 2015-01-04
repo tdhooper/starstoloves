@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, call
 
 import pytest
 
-from starstoloves.lib.track.spotify_track import SpotifyTrack
+from starstoloves.lib.track.spotify_track import SpotifyPlaylistTrack
 from starstoloves.lib.track.lastfm_track import LastfmTrack, LastfmPlaylistTrack
 from starstoloves.lib.search.query import LastfmQuery
 from ..mapping import TrackMapping
@@ -12,9 +12,11 @@ from ..mapping import TrackMapping
 
 @pytest.fixture
 def spotify_track():
-    return SpotifyTrack(
+    return SpotifyPlaylistTrack(
         track_name='some_track',
         artist_name='some_artist',
+        user=None,
+        added=datetime.fromtimestamp(123),
     )
 
 
@@ -135,6 +137,48 @@ class TestTrackMappingResults():
         assert mapping.results[0]['track'].url == 'track_2_url'
         assert mapping.results[1]['track'].url == 'track_3_url'
         assert mapping.results[2]['track'].url == 'track_1_url'
+
+
+    def test_marks_top_result_for_loving_if_unloved(
+        self,
+        spotify_track,
+        query,
+        lastfm_tracks,
+    ):
+        query.results = lastfm_tracks
+        mapping = TrackMapping(spotify_track)
+        assert mapping.results[0]['love'] == True
+        assert mapping.results[1]['love'] == False
+        assert mapping.results[2]['love'] == False
+
+
+    def test_doesnt_mark_top_result_for_loving_if_loved_before_added(
+        self,
+        spotify_track,
+        query,
+        lastfm_tracks,
+        loved_tracks,
+    ):
+        query.results = lastfm_tracks
+        mapping = TrackMapping(spotify_track, loved_tracks)
+        assert mapping.results[0]['love'] == False
+        assert mapping.results[1]['love'] == False
+        assert mapping.results[2]['love'] == False
+
+
+    def test_marks_top_result_for_loving_if_loved_after_added(
+        self,
+        spotify_track,
+        query,
+        lastfm_tracks,
+        loved_tracks,
+    ):
+        query.results = lastfm_tracks
+        spotify_track.added = datetime.fromtimestamp(1)
+        mapping = TrackMapping(spotify_track, loved_tracks)
+        assert mapping.results[0]['love'] == True
+        assert mapping.results[1]['love'] == False
+        assert mapping.results[2]['love'] == False
 
 
     def _result_by_url(self, results, url):

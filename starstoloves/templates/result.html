@@ -21,6 +21,9 @@
                                     type="checkbox"
                                     name="{{ mapping.id }}"
                                     value="{{ result.track.url }}"
+                                    {% if result.love %}
+                                        checked="checked"
+                                    {% endif %}
                                 />
                             </td>
                             <td class="result-track-name">

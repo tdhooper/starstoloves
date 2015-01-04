@@ -40,6 +40,7 @@ class TrackMapping():
         if self.loved_tracks:
 
             for result in results:
+
                 result['loved'] = next((
                     loved_track.added
                     for loved_track in self.loved_tracks
@@ -47,5 +48,14 @@ class TrackMapping():
                 ), False)
 
             results = sorted(results, key=lambda result: 0 if result['loved'] else 1)
+
+        for i, result in enumerate(results):
+            if i is 0:
+                if result['loved']:
+                    result['love'] = result['loved'] > self.track.added
+                else:
+                    result['love'] = True
+            else:
+                result['love'] = False
 
         return results
