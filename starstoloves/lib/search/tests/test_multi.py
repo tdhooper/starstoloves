@@ -12,11 +12,17 @@ from ..multi import (
     merge,
     score,
     rank,
+    get_correction,
 )
 from .fixtures import lastfm_app
 
 
 threshold = 0.8
+
+
+@pytest.fixture
+def lastfm_app(create_patch):
+    return create_patch('starstoloves.lib.search.multi.lastfm_app')
 
 
 @pytest.fixture
@@ -96,6 +102,16 @@ def rank_patch(create_patch):
     patched = create_patch('starstoloves.lib.search.multi.rank')
     patched.side_effect = rank
     return patched
+
+
+@pytest.fixture()
+def correction_patch(create_patch):
+    return create_patch('starstoloves.lib.search.multi.get_correction')
+
+
+@pytest.fixture
+def no_corrections(correction_patch):
+    correction_patch.return_value = None
 
 
 @pytest.fixture
@@ -278,6 +294,48 @@ class TestRank():
         ]
 
 
+class TestGetCorrection():
+
+    def test_gets_correction_from_lastfm(self, tracks, lastfm_app):
+        get_correction(tracks[0])
+        assert lastfm_app.request.call_args == call(
+            'track',
+            'getcorrection',
+            {
+                'artist': 'track_1_artist',
+                'track': 'track_1_track',
+            },
+        )
+
+
+    def test_returns_corrected_track(self, tracks, lastfm_app):
+        lastfm_app.request.return_value = {
+            'corrections': {
+                'correction': {
+                    'track': {
+                        'url': 'corrected_track_url',
+                        'name': 'corrected_track',
+                        'artist': {
+                            'name': 'corrected_artist'
+                        }
+                    }
+                }
+            }
+        }
+        corrected_track = get_correction(tracks[0])
+        assert isinstance(corrected_track, LastfmTrack)
+        assert corrected_track.url == 'corrected_track_url'
+        assert corrected_track.track_name == 'corrected_track'
+        assert corrected_track.artist_name == 'corrected_artist'
+
+
+    def test_returns_none_if_no_correction(self, tracks, lastfm_app):
+        lastfm_app.request.return_value = {
+            'corrections': ''
+        }
+        assert get_correction(tracks[0]) is None
+
+
 @pytest.mark.usefixtures('lastfm_app', 'separate_search_has_tracks')
 class TestSearchLastfm():
 
@@ -314,6 +372,13 @@ class TestSearchLastfm():
         assert results[1].track == tracks_from_separate[1]
 
 
+    def test_gets_correction_for_top_result(self, rank_patch, tracks, correction_patch):
+        rank_patch.return_value = tracks
+        multi_search('query_track', 'query_artist')
+        assert correction_patch.call_args == call(tracks[0])
+
+
+
 @pytest.mark.usefixtures('lastfm_app')
 class TestSearchLastfmWhenNoSeparateOrCombinedSearchResults():
 
@@ -327,7 +392,12 @@ class TestSearchLastfmWhenNoSeparateOrCombinedSearchResults():
         assert tracks is None
 
 
-@pytest.mark.usefixtures('set_scores_from_class', 'lastfm_app', 'separate_search_has_tracks')
+@pytest.mark.usefixtures(
+    'set_scores_from_class',
+    'lastfm_app',
+    'separate_search_has_tracks',
+    'no_corrections',
+)
 class TestSearchLastfmWhenSeparateSearchResultsAboveThreshold():
 
     scores = {
@@ -351,7 +421,8 @@ class TestSearchLastfmWhenSeparateSearchResultsAboveThreshold():
     'set_scores_from_class',
     'lastfm_app',
     'separate_search_has_tracks',
-    'combined_search_has_tracks'
+    'combined_search_has_tracks',
+    'no_corrections',
 )
 class TestSearchLastfmWhenSeparateSearchResultsBelowThreshold():
 
@@ -429,6 +500,25 @@ class TestSearchLastfmWhenSeparateSearchResultsBelowThreshold():
         ]
 
 
+    def test_puts_correction_at_top_of_results(
+        self,
+        tracks_from_separate,
+        tracks_from_combined,
+        correction_patch,
+    ):
+        correction = LastfmTrack(url='corrected_url')
+        correction_patch.return_value = correction
+
+        result_tracks = multi_search('query_track', 'query_artist')
+        assert result_tracks == [
+            correction,
+            tracks_from_separate[1],
+            tracks_from_combined[0],
+            tracks_from_separate[0],
+            tracks_from_combined[1],
+        ]
+
+
 @pytest.mark.usefixtures('lastfm_app')
 class TestAgainstRealResults():
 
@@ -436,7 +526,8 @@ class TestAgainstRealResults():
         self,
         separate_search_patch,
         combined_search_patch,
-        get_result_fixtures
+        get_result_fixtures,
+        no_corrections,
     ):
         parser = LastfmResultParser()
         separate_search_patch.return_value = parser.parse(get_result_fixtures('result_separate_asys.json'))
@@ -450,7 +541,8 @@ class TestAgainstRealResults():
     def test_good_separate_results_danger(
         self,
         separate_search_patch,
-        get_result_fixtures
+        get_result_fixtures,
+        no_corrections,
     ):
         parser = LastfmResultParser()
         separate_search_patch.return_value = parser.parse(get_result_fixtures('result_separate_danger.json'))
@@ -463,7 +555,8 @@ class TestAgainstRealResults():
     def test_badly_ordered_separate_results_the_subs(
         self,
         separate_search_patch,
-        get_result_fixtures
+        get_result_fixtures,
+        no_corrections,
     ):
         parser = LastfmResultParser()
         separate_search_patch.return_value = parser.parse(get_result_fixtures('result_separate_the_subs.json'))
@@ -476,7 +569,8 @@ class TestAgainstRealResults():
     def test_good_separate_results_rhythm_and_sound(
         self,
         separate_search_patch,
-        get_result_fixtures
+        get_result_fixtures,
+        no_corrections,
     ):
         parser = LastfmResultParser()
         separate_search_patch.return_value = parser.parse(get_result_fixtures('result_separate_rhythm_and_sound.json'))
@@ -489,7 +583,8 @@ class TestAgainstRealResults():
     def test_good_separate_results_mixhell(
         self,
         separate_search_patch,
-        get_result_fixtures
+        get_result_fixtures,
+        no_corrections,
     ):
         parser = LastfmResultParser()
         separate_search_patch.return_value = parser.parse(get_result_fixtures('result_separate_mixhell.json'))
@@ -502,7 +597,8 @@ class TestAgainstRealResults():
     def test_good_separate_results_different_casing_break_science(
         self,
         separate_search_patch,
-        get_result_fixtures
+        get_result_fixtures,
+        no_corrections,
     ):
         parser = LastfmResultParser()
         separate_search_patch.return_value = parser.parse(get_result_fixtures('result_separate_break_science.json'))

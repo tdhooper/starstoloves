@@ -3,6 +3,8 @@ from copy import deepcopy
 from operator import attrgetter
 import pprint
 
+from starstoloves.lib.lastfm import lastfm_app
+from starstoloves.lib.track.lastfm_track import LastfmTrack
 from .strategies import separate_search_strategy, combined_search_strategy
 
 
@@ -70,10 +72,27 @@ def rank(results):
     return s
 
 
+def get_correction(track):
+    response = lastfm_app.request('track', 'getcorrection', {
+        'artist': track.artist_name,
+        'track': track.track_name,
+    })
+    try:
+        track_data = response['corrections']['correction']['track']
+        return LastfmTrack(
+            url=track_data['url'],
+            track_name=track_data['name'],
+            artist_name=track_data['artist']['name'],
+        )
+    except TypeError:
+        return None
+
+
 def multi_search(track_name, artist_name):
     threshold = 0.8
     strategies = [separate_search_strategy, combined_search_strategy]
     results = []
+
     for strategy in strategies:
         tracks = strategy(track_name, artist_name)
         if tracks:
@@ -81,7 +100,15 @@ def multi_search(track_name, artist_name):
             results = merge(results, new_results)
             score(track_name, artist_name, results)
             results = rank(results)
-            
+
             if results[0].score > threshold:
                 break
-    return [result.track for result in results]
+
+    tracks = [result.track for result in results]
+
+    if tracks:
+        correction = get_correction(tracks[0])
+        if correction:
+            tracks.insert(0, correction)
+
+    return tracks

@@ -45,6 +45,11 @@ def combined_search_patch(create_patch):
 
 
 @pytest.fixture
+def get_correction_patch(create_patch):
+    return create_patch('starstoloves.lib.search.multi.get_correction')
+
+
+@pytest.fixture
 def lastfm_user(create_patch):
     instance = create_patch('starstoloves.lib.user.user.LastfmUser').return_value
     instance.loved_tracks = None
@@ -73,6 +78,7 @@ def has_results(
     spotify_user_with_starred,
     separate_search_patch,
     combined_search_patch,
+    get_correction_patch,
     some_track_results,
     another_track_results
 ):
@@ -98,6 +104,7 @@ def has_results(
 
     separate_search_patch.side_effect = separate_search
     combined_search_patch.side_effect = combined_search
+    get_correction_patch.return_value = None
 
 
 @pytest.fixture
