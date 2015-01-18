@@ -12,8 +12,8 @@ from starstoloves.lib.user import user_repository
 
 @pytest.fixture
 def create_patch(request):
-    def create_patch(module):
-        patcher = patch(module)
+    def create_patch(*args, **kwargs):
+        patcher = patch(*args, **kwargs)
         def fin():
             patcher.stop()
         request.addfinalizer(fin)

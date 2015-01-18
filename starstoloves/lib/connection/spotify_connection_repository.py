@@ -1,19 +1,25 @@
 import sys
 
-from starstoloves.lib.spotify_session import session as spotify_session
-from starstoloves import model_repository
+from spotipy.oauth2 import SpotifyOAuth
+
+from starstoloves import settings, model_repository
 from starstoloves.models import SpotifyConnection, User
 from .spotify_connection import SpotifyConnectionHelper
 
-def from_user(user):
+def from_user(user, redirect_uri):
     user_model = model_repository.from_user(user)
     connection_model, created = SpotifyConnection.objects.get_or_create(user=user_model)
+    auth = SpotifyOAuth(
+        client_id=settings.SPOTIFY['client_id'],
+        client_secret=settings.SPOTIFY['client_secret'],
+        redirect_uri=redirect_uri,
+    )
     return SpotifyConnectionHelper(
         user,
-        spotify_session,
+        auth,
         username=connection_model.username,
         state=connection_model.state,
-        user_uri=connection_model.user_uri,
+        token=connection_model.token,
         repository=sys.modules[__name__]
     )
 
@@ -22,7 +28,7 @@ def save(connection):
     connection_model, created = SpotifyConnection.objects.get_or_create(user=user_model)
     connection_model.username = connection.username
     connection_model.state = connection.state
-    connection_model.user_uri = connection.user_uri
+    connection_model.token = connection.token
     connection_model.save()
 
 def delete(connection):

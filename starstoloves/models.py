@@ -40,7 +40,7 @@ class LastfmConnection(models.Model):
 
 class SpotifyConnection(models.Model):
     username = models.CharField(max_length=300, null=True)
-    user_uri = models.CharField(max_length=300, null=True)
+    token = models.CharField(max_length=300, null=True)
     state = models.IntegerField(null=True)
     user = models.OneToOneField(User, related_name='spotify_connection')
 
