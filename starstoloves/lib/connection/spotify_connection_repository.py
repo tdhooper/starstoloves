@@ -1,22 +1,14 @@
 import sys
 
-from spotipy.oauth2 import SpotifyOAuth
-
-from starstoloves import settings, model_repository
+from starstoloves import model_repository
 from starstoloves.models import SpotifyConnection, User
 from .spotify_connection import SpotifyConnectionHelper
 
-def from_user(user, redirect_uri):
+def from_user(user):
     user_model = model_repository.from_user(user)
     connection_model, created = SpotifyConnection.objects.get_or_create(user=user_model)
-    auth = SpotifyOAuth(
-        client_id=settings.SPOTIFY['client_id'],
-        client_secret=settings.SPOTIFY['client_secret'],
-        redirect_uri=redirect_uri,
-    )
     return SpotifyConnectionHelper(
         user,
-        auth,
         username=connection_model.username,
         state=connection_model.state,
         token=connection_model.token,

@@ -2,7 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-import spotipy
+from spotipy import Spotify
+from spotipy.oauth2 import SpotifyOAuth, SpotifyOauthError
 
 from starstoloves.models import SpotifyConnection
 from starstoloves.lib.connection.spotify_connection import SpotifyConnectionHelper
@@ -18,9 +19,9 @@ class SpotifyConnectionFixtures(CommonConnectionFixtures):
 
     def __init__(self):
         super().__init__()
-        self.spotipy_auth_patcher = patch('starstoloves.lib.connection.spotify_connection_repository.SpotifyOAuth', autospec=True)
+        self.spotipy_auth_patcher = patch('starstoloves.lib.connection.spotify_connection.SpotifyOAuth', autospec=True)
         self.spotipy_api_patcher = patch('starstoloves.lib.connection.spotify_connection.Spotify', autospec=True)
-        self.spotipy_auth = self.spotipy_auth_patcher.start().return_value
+        self.SpotifyOAuth = self.spotipy_auth_patcher.start()
         self.Spotify = self.spotipy_api_patcher.start()
 
     def finalizer(self):
@@ -30,32 +31,41 @@ class SpotifyConnectionFixtures(CommonConnectionFixtures):
 
     @property
     def connection(self):
-        return spotify_connection_repository.from_user(self.user, 'some_callback_url')
+        return spotify_connection_repository.from_user(self.user)
 
     @property
     def fetch_connection(self):
         def fetch():
-            return spotify_connection_repository.from_user(self.user, 'some_callback_url')
+            return spotify_connection_repository.from_user(self.user)
         return fetch
 
     def successful_connection(self):
+
+        auth = MagicMock(spec=SpotifyOAuth).return_value
+        def SpotifyOAuth_instance(client_id, client_secret, redirect_uri):
+            if redirect_uri == 'some_callback_url':
+                return auth
+        self.SpotifyOAuth.side_effect = SpotifyOAuth_instance
+
         def get_access_token(response_code):
             if response_code == 'some_response_code':
                 return {
                     'access_token': 'some_spotify_token'
                 }
-        self.spotipy_auth.get_access_token.side_effect = get_access_token
+        auth.get_access_token.side_effect = get_access_token
 
-        def get_api_instance(auth=None):
+        spotify = MagicMock(spec=Spotify).return_value
+        def Spotify_instance(auth=None):
             if auth == 'some_spotify_token':
-                return self.Spotify.return_value
-        self.Spotify.side_effect = get_api_instance
-        self.Spotify.return_value.me.return_value = {'id': 'some_username'}
+                return spotify
+        self.Spotify.side_effect = Spotify_instance
 
-        self.connection.connect('some_response_code')
+        spotify.me.return_value = {'id': 'some_username'}
+
+        self.connection.connect('some_response_code', 'some_callback_url')
 
 
     def failed_connection(self):
-        self.spotipy_auth.get_access_token.side_effect = spotipy.oauth2.SpotifyOauthError
-        self.connection.connect('some_response_code')
+        self.SpotifyOAuth.return_value.get_access_token.side_effect = SpotifyOauthError
+        self.connection.connect('some_response_code', 'some_callback_url')
 
