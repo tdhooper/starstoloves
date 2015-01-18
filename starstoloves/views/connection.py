@@ -105,6 +105,19 @@ def connect_lastfm(request):
     return redirect(auth_url)
 
 
+def connect_spotify(request):
+    spotify_connection = spotify_connection_repository.from_user(request.session_user)
+    if spotify_connection.is_connected:
+        return redirect('index')
+    code = request.GET.get('code')
+    callback_url = request.build_absolute_uri(reverse('connect_spotify'))
+    if code:
+        spotify_connection.connect(code, callback_url)
+        return redirect('index')
+    auth_url = spotify_connection.auth_url(callback_url)
+    return redirect(auth_url)
+
+
 def disconnect_lastfm(request):
     lastfm_connection = lastfm_connection_repository.from_user(request.session_user)
     lastfm_connection.disconnect()

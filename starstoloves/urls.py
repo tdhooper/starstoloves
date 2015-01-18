@@ -4,6 +4,7 @@ from starstoloves.views import main, connection
 urlpatterns = patterns('',
     url(r'^$',                      main.index, name='index'),
     url(r'^connect-lastfm/$',       connection.connect_lastfm, name='connect_lastfm'),
+    url(r'^connect-spotify/$',      connection.connect_spotify, name='connect_spotify'),
     url(r'^disconnect-lastfm/$',    main.disconnect_lastfm, name='disconnect_lastfm'),
     url(r'^disconnect-spotify/$',   main.disconnect_spotify, name='disconnect_spotify'),
     url(r'^reload-lastfm/$',        main.reload_lastfm, name='reload_lastfm'),
