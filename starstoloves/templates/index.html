@@ -41,16 +41,14 @@
                     ·
                     <a href="{% url 'reload_spotify' %}">reload starred</a>
                 </p>
-            {% elif spForm %}
+            {% elif spConnectUrl %}
                 <h2 class="sp-connect-heading">
                     <span class="step-counter">Step 2:</span>
-                    Connect to Spotify:
+                    <a href="{{spConnectUrl}}">Connect to Spotify</a>
                 </h2>
-                <form action="{{spConnectUrl}}" method="POST" class="sp-connect-form">
-                    {% csrf_token %}
-                    {{spForm.as_p}}
-                    <input type="submit" />
-                </form>
+                {% if spConnectFailure %}
+                    <p class="step-error">Authentication failed</p>
+                {% endif %}
             {% else %}
                 <h2 class="sp-connect-heading step-disabled">
                     <span class="step-counter">Step 2:</span>

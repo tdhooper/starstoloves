@@ -12,19 +12,19 @@ from .fixtures.connection_fixtures import *
 pytestmark = pytest.mark.django_db
 
 
-@pytest.mark.usefixtures("lastfm_disconnected")
+@pytest.mark.usefixtures("lastfm_connected")
 @pytest.mark.usefixtures("spotify_disconnected")
-def test_index_returns_no_spotify_form_when_lastfm_is_not_connected(client, spotify_connection):
+def test_index_returns_spotify_connect_url(client):
     response = client.get('/')
-    assert 'spForm' not in response.context
+    assert response.context['spConnectUrl'] == reverse('connect_spotify')
 
 
 @pytest.mark.usefixtures("lastfm_connected")
 @pytest.mark.usefixtures("spotify_disconnected")
-def test_index_returns_spotify_form(client, spotify_connection):
+def test_index_shows_connection_failures(client, spotify_connection):
+    spotify_connection.state = spotify_connection.FAILED
     response = client.get('/')
-    assert isinstance(response.context['spForm'], SpotifyConnectForm)
-    assert response.context['spConnectUrl'] == reverse('index')
+    assert response.context['spConnectFailure'] == True
 
 
 @pytest.mark.usefixtures("lastfm_connected")

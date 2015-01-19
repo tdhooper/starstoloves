@@ -87,8 +87,11 @@ def add_spotify_context(request, context):
         })
     else:
         context.update({
-            'spForm': request.spotify_form,
-            'spConnectUrl': reverse('index'),
+            'spConnectUrl': reverse('connect_spotify'),
+        })
+    if spotify_connection.state is spotify_connection.FAILED:
+        context.update({
+            'spConnectFailure': True
         })
 
 
