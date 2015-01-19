@@ -1,4 +1,6 @@
-from starstoloves.lib.spotify_session import session as spotify_session
+from datetime import datetime
+
+from spotipy import Spotify
 
 
 class SpotifyUser:
@@ -8,26 +10,21 @@ class SpotifyUser:
 
     @property
     def starred_tracks(self):
-        # TODO: Remove the redundant separate method
-        tracks = self._starred_tracks_data
+        result = self.api.user_playlist(self.connection.username)
+        tracks = []
+
+        while result:
+            for track in result['items']:
+                tracks.append({
+                    'track_name': track['track']['name'],
+                    'artist_name': track['track']['artists'][0]['name'],
+                    'date_saved': int(datetime.strptime(track['added_at'], '%Y-%m-%dT%H:%M:%SZ').timestamp()),
+                })
+            result = self.api.next(result)
+
         return tracks
 
-    @property
-    def _starred_tracks_data(self):
-        starred = self.api_user.starred
-        playlist = starred.load().tracks_with_metadata
-        tracks = [(item, item.track.load()) for item in playlist]
-        track_data = [
-            {
-                'track_name': track.name,
-                'artist_name': track.artists[0].load().name,
-                'date_saved': item.create_time,
-            }
-            for item, track in tracks
-        ]
-        return track_data
 
     @property
-    def api_user(self):
-        user_uri = self.connection.user_uri
-        return spotify_session.get_user(user_uri).load()
+    def api(self):
+        return Spotify(auth=self.connection.token)
