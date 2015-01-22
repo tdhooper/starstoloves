@@ -11,6 +11,7 @@ class SpotifyUser:
     @property
     def starred_tracks(self):
         result = self.api.user_playlist(self.connection.username)
+        result = result['tracks']
         tracks = []
 
         while result:
