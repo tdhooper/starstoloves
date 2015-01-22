@@ -356,7 +356,7 @@ def test_disconnect_lastfm_clears_loved_tracks(client, queries, session_user):
 
 @pytest.mark.usefixtures("spotify_connected")
 @pytest.mark.usefixtures("lastfm_connected")
-@pytest.mark.usefixtures("spotify_session")
+@pytest.mark.usefixtures("spotify_api")
 class TestReloadSpotify():
 
     def test_reloads_starred_tracks(self, client, session_user):
@@ -372,7 +372,7 @@ class TestReloadSpotify():
 
 @pytest.mark.usefixtures("spotify_connected")
 @pytest.mark.usefixtures("lastfm_connected")
-@pytest.mark.usefixtures("spotify_session")
+@pytest.mark.usefixtures("spotify_api")
 class TestReloadLastfm():
 
     def test_reloads_loved_tracks(self, client, session_user):
