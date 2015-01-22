@@ -16,10 +16,11 @@ class SpotifyUser:
 
         while result:
             for track in result['items']:
+                added = track['added_at']
                 tracks.append({
                     'track_name': track['track']['name'],
                     'artist_name': track['track']['artists'][0]['name'],
-                    'date_saved': int(datetime.strptime(track['added_at'], '%Y-%m-%dT%H:%M:%SZ').timestamp()),
+                    'date_saved': int(datetime.strptime(added, '%Y-%m-%dT%H:%M:%SZ').timestamp()) if added else 0,
                 })
             result = self.api.next(result)
 

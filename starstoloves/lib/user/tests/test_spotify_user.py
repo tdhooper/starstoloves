@@ -66,3 +66,31 @@ class TestStarredTracks:
                 'date_saved': 1273801872,
             }
         ]
+
+
+    def test_starred_tracks_handles_empty_timestamps(self, spotify_user, spotify_api):
+        spotify_api.user_playlist.return_value = {
+          'tracks': {
+            'items': [
+              {
+                'added_at': None,
+                'track': {
+                  'name': 'some_track',
+                  'artists': [
+                    {
+                      'name': 'some_artist',
+                    },
+                  ],
+                },
+              }
+            ],
+          }
+        }
+
+        assert spotify_user.starred_tracks == [
+            {
+                'track_name': 'some_track',
+                'artist_name': 'some_artist',
+                'date_saved': 0,
+            }
+        ]
