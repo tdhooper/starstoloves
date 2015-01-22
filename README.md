@@ -6,20 +6,18 @@ Migrate Spotify stars to Last.fm loves.
 Setup
 -----
 
-You will need a Spotify premium account, Spotify application key, and a Last.fm API application key and secret.
-
-A Spotify application key can be obtained from https://devaccount.spotify.com/my-account/keys/, and a Last.fm application key and secret from http://www.last.fm/api/account/create.
-
-1. Rename `starstoloves/starstoloves/settings/local.py.example` to `local.py`
- * Add your Last.fm key and secret to `local.py`
- * Add your Spotify premium account username and password to `local.py`
-2. Save the binary version of your Spotify application key to `starstoloves/starstoloves/spotify_appkey.key`
-3. Install Vagrant http://www.vagrantup.com/
+1. You will need Last.fm and Spotify accounts, with an API application created for each
+ * http://www.last.fm/api/account/create
+ * https://developer.spotify.com/my-applications
+2. Rename `starstoloves/starstoloves/settings/local.py.example` to `local.py`
+ * Add your Last.fm application key and secret
+ * Add your Spotify application client_id and client_secret
+3. Install Vagrant http://www.vagrantup.com
 4. Start vagrant:
     
         $ vagrant up
         
-5. The site should be available at [http://localhost:8111/](http://localhost:8111)
+5. The site should be available at [http://localhost:8111](http://localhost:8111)
 
 Debugging
 ---------
@@ -33,3 +31,13 @@ For the Celery worker do:
 
     $ vagrant ssh
     $ screen -r celeryWorker
+
+Running tests
+-------------
+
+Run tests like so:
+
+    $ vagrant ssh
+    $ workon starstoloves
+    $ cd /vagrant
+    $ py.test

@@ -33,4 +33,4 @@ screen -S "celeryWorker" -p 0 -X stuff "cd $PROJECT_DIR && workon $VIRTUALENV_NA
 screen -S "celeryWorker" -p 0 -X stuff "celery -A starstoloves worker -l info
 "
 
-echo 'The site should be accessible at http://localhost:8081'
+echo 'The site should be accessible at http://localhost:8111'
