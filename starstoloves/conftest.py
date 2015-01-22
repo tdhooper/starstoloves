@@ -1,7 +1,3 @@
-import builtins
-builtins.spotify_session = 'spotify_api_session'
-
-
 from unittest.mock import patch
 
 import pytest

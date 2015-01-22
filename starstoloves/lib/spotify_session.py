@@ -1,1 +1,0 @@
-session = spotify_session

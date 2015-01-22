@@ -33,19 +33,6 @@ fi
 # postgresql setup for project
 createdb -Upostgres $DB_NAME
 
-# Install libspotify
-
-sudo apt-get install -y build-essential python-dev wget
-
-# from http://pyspotify.mopidy.com/en/latest/installation/
-wget -q -O - https://apt.mopidy.com/mopidy.gpg | sudo apt-key add -
-sudo wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/mopidy.list
-sudo apt-get update
-sudo apt-get install -y libspotify-dev
-
-# from http://stackoverflow.com/questions/21158317/ioerror-on-production-server
-sudo apt-get install libffi-dev
-
 # Install RabbitMQ
 sudo apt-get install -y rabbitmq-server
 

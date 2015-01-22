@@ -110,7 +110,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'starstoloves.middleware.SessionUser',
-    'starstoloves.middleware.SpotifySession',
 )
 
 SESSION_SAVE_EVERY_REQUEST=True
