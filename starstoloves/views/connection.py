@@ -45,8 +45,9 @@ class ConnectionStatusMiddleware:
     def process_request(self, request):
         lastfm_connection = lastfm_connection_repository.from_user(request.session_user)
         spotify_connection = spotify_connection_repository.from_user(request.session_user)
-        request.is_lastfm_connected = lastfm_connection.is_connected
-        request.is_spotify_connected = spotify_connection.is_connected
+
+        request.is_lastfm_connected = lambda: lastfm_connection.is_connected
+        request.is_spotify_connected = lambda: spotify_connection.is_connected
 
 
 connection_status_decorator = decorator_from_middleware(ConnectionStatusMiddleware)

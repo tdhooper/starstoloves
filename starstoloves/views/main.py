@@ -14,6 +14,7 @@ from .connection import (
     connection_index_decorator,
     connection_index_processor,
     connection_status_decorator,
+    connect_lastfm as connection_connect_lastfm,
     disconnect_spotify as connection_disconnect_spotify,
     disconnect_lastfm as connection_disconnect_lastfm
 )
@@ -35,14 +36,22 @@ def get_track_mappings(request):
 @connection_status_decorator
 def index(request):
     context = {}
-    if request.is_lastfm_connected and request.is_spotify_connected:
+    if request.is_lastfm_connected() and request.is_spotify_connected():
         context['mappings'] = get_track_mappings(request)
     return render_to_response('index.html', context_instance=RequestContext(request, context, [connection_index_processor]))
 
 
 @connection_status_decorator
+def connect_lastfm(request):
+    response = connection_connect_lastfm(request)
+    if request.is_lastfm_connected():
+        request.session_user.loved_tracks()
+    return response
+
+
+@connection_status_decorator
 def disconnect_spotify(request):
-    if request.is_spotify_connected:
+    if request.is_spotify_connected():
         for mapping in get_track_mappings(request):
             mapping.query.stop()
         request.session_user.reload_starred_tracks()
@@ -51,14 +60,14 @@ def disconnect_spotify(request):
 
 @connection_status_decorator
 def disconnect_lastfm(request):
-    if request.is_lastfm_connected:
+    if request.is_lastfm_connected():
         request.session_user.reload_loved_tracks()
     return connection_disconnect_lastfm(request)
 
 
 @connection_status_decorator
 def result_update(request):
-    if request.is_spotify_connected:
+    if request.is_spotify_connected():
         mappings = get_track_mappings(request)
         status_by_id = {
             re.search('status\[(.+)\]', key).groups()[0]: value

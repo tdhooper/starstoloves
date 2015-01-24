@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 
+from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
@@ -343,6 +344,20 @@ class TestDisconnectSpotify():
     def test_clears_starred_tracks(self, client, session_user):
         client.get(reverse('disconnect_spotify'), follow=True)
         assert session_user.reload_starred_tracks.call_count is 1
+
+
+
+@pytest.mark.usefixtures("spotify_disconnected")
+@pytest.mark.usefixtures("lastfm_disconnected")
+def test_connect_lastfm_preloads_loved_tracks(client, session_user, create_patch, lastfm_connection):
+
+    def connect_lastfm(request):
+        lastfm_connection.is_connected = True
+        return redirect('index')
+    create_patch('starstoloves.views.main.connection_connect_lastfm').side_effect = connect_lastfm
+
+    client.get(reverse('connect_lastfm'), {'token': 'some_token'}, follow=True)
+    assert session_user.loved_tracks.call_count is 1
 
 
 
