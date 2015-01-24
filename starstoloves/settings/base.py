@@ -138,6 +138,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'djcelery',
     'south',
+    'django_extensions',
 
     'starstoloves',
     # Uncomment the next line to enable admin documentation:
