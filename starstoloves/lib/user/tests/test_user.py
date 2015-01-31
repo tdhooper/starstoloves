@@ -67,10 +67,10 @@ def loved_tracks_property():
     return PropertyMock(return_value=[
         {
             'url': 'some_url_a',
-            'added': 123,
+            'added': datetime(1970, 1, 1, 0, 2, 3, tzinfo=timezone.utc),
         },{
             'url': 'some_url_b',
-            'added': 456,
+            'added': datetime(1970, 1, 1, 0, 5, 45, tzinfo=timezone.utc),
         },
     ])
 
@@ -79,7 +79,7 @@ def loved_tracks_property():
 def different_loved_tracks():
     return [{
         'url': 'some_url_c',
-        'added': 789,
+        'added': datetime(1970, 1, 1, 0, 16, 39, tzinfo=timezone.utc),
     }]
 
 
@@ -190,11 +190,11 @@ class TestUserLovedTracks:
 
         assert isinstance(tracks[0], LastfmPlaylistTrack)
         assert tracks[0].url == 'some_url_a'
-        assert tracks[0].added.timestamp() == 123
+        assert tracks[0].added == datetime(1970, 1, 1, 0, 2, 3, tzinfo=timezone.utc)
 
         assert isinstance(tracks[1], LastfmPlaylistTrack)
         assert tracks[1].url == 'some_url_b'
-        assert tracks[1].added.timestamp() == 456
+        assert tracks[1].added == datetime(1970, 1, 1, 0, 5, 45, tzinfo=timezone.utc)
 
 
     def test_persists_result(self, user, loved_tracks_property):
@@ -244,7 +244,7 @@ class TestReloadLovedTracks:
         assert tracks != tracks_again
         assert len(tracks_again) is 1
         assert tracks_again[0].url == 'some_url_c'
-        assert tracks_again[0].added.timestamp() == 789
+        assert tracks_again[0].added == datetime(1970, 1, 1, 0, 16, 39, tzinfo=timezone.utc)
 
 
     def test_clears_memoised_loved_tracks(self, user, loved_tracks_property, different_loved_tracks):
@@ -258,4 +258,4 @@ class TestReloadLovedTracks:
         assert tracks != tracks_again
         assert len(tracks_again) is 1
         assert tracks_again[0].url == 'some_url_c'
-        assert tracks_again[0].added.timestamp() == 789
+        assert tracks_again[0].added == datetime(1970, 1, 1, 0, 16, 39, tzinfo=timezone.utc)

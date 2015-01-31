@@ -171,11 +171,11 @@ class TestIndex():
         lastfm_user.loved_tracks = [
             {
                 'url': 'some_url_3',
-                'added': 123
+                'added': datetime(1970, 1, 1, 0, 2, 3, tzinfo=timezone.utc),
             },
             {
                 'url': 'some_url_4',
-                'added': 456
+                'added': datetime(1970, 1, 1, 0, 5, 45, tzinfo=timezone.utc),
             },
         ]
 
@@ -183,11 +183,11 @@ class TestIndex():
         assert response.context['mappings'][1].results == [
             {
                 'track': some_track_results['match'],
-                'loved': datetime.fromtimestamp(123),
+                'loved': datetime(1970, 1, 1, 0, 2, 3, tzinfo=timezone.utc),
                 'love': False,
             },{
                 'track': some_track_results['reversed'],
-                'loved': datetime.fromtimestamp(456),
+                'loved': datetime(1970, 1, 1, 0, 5, 45, tzinfo=timezone.utc),
                 'love': False,
             },{
                 'track': some_track_results['almost'],
@@ -244,7 +244,7 @@ class TestLoveTracks():
         assert {
             'track_name': another_track_results['match'].track_name,
             'artist_name': another_track_results['match'].artist_name,
-            'timestamp': 789012,
+            'timestamp': 792612,
         } in loved_tracks
 
 
@@ -253,7 +253,7 @@ class TestLoveTracks():
         lastfm_user.loved_tracks = [
             {
                 'url': 'some_url_3',
-                'added': 123
+                'added': datetime(1970, 1, 1, 0, 2, 3, tzinfo=timezone.utc)
             }
         ]
 
@@ -261,11 +261,11 @@ class TestLoveTracks():
             lastfm_user.loved_tracks = [
                 {
                     'url': 'some_url_3',
-                    'added': 123
+                    'added': datetime(1970, 1, 1, 0, 2, 3, tzinfo=timezone.utc)
                 },
                 {
                     'url': 'some_url_4',
-                    'added': 456
+                    'added': datetime(1970, 1, 1, 0, 5, 45, tzinfo=timezone.utc)
                 },
             ]
         lastfm_user.love_tracks.side_effect = love_tracks

@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from unittest.mock import MagicMock, call, PropertyMock
 
 import pytest
@@ -119,17 +120,17 @@ class TestLovedTracks():
                 'track_name': 'some_track',
                 'artist_name': 'some_artist',
                 'url': 'some_url',
-                'added': 123,
+                'added': datetime(1970, 1, 1, 0, 2, 3, tzinfo=timezone.utc),
             },{
                 'track_name': 'another_track',
                 'artist_name': 'another_artist',
                 'url': 'another_url',
-                'added': 345,
+                'added': datetime(1970, 1, 1, 0, 5, 45, tzinfo=timezone.utc),
             },{
                 'track_name': 'tother_track',
                 'artist_name': 'tother_artist',
                 'url': 'tother_url',
-                'added': 999,
+                'added': datetime(1970, 1, 1, 0, 16, 39, tzinfo=timezone.utc),
             },
         ]
 

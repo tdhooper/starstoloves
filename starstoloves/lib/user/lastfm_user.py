@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from starstoloves.lib.lastfm import lastfm_app
 
 
@@ -28,7 +30,7 @@ class LastfmUser:
                         'url': track['url'],
                         'track_name': track['name'],
                         'artist_name': track['artist']['name'],
-                        'added': int(track['date']['uts']),
+                        'added': datetime.fromtimestamp(int(track['date']['uts']), tz=timezone.utc),
                     }
                     for track in response['track']
                 ]

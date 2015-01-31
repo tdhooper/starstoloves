@@ -47,12 +47,12 @@ def loved_tracks():
         LastfmPlaylistTrack(
             user=None,
             url='track_2_url',
-            added=datetime(1970, 1, 1, 0, 0, 12),
+            added=datetime(1970, 1, 1, 0, 0, 12, tzinfo=timezone.utc),
         ),
         LastfmPlaylistTrack(
             user=None,
             url='track_3_url',
-            added=datetime(1970, 1, 1, 0, 0, 34),
+            added=datetime(1970, 1, 1, 0, 0, 34, tzinfo=timezone.utc),
         ),
     ]
 
@@ -127,8 +127,8 @@ class TestTrackMappingResults():
         query.results = lastfm_tracks
         mapping = TrackMapping(spotify_track, loved_tracks)
         assert self._result_by_url(mapping.results, 'track_1_url')['loved'] == False
-        assert self._result_by_url(mapping.results, 'track_2_url')['loved'] == datetime(1970, 1, 1, 0, 0, 12)
-        assert self._result_by_url(mapping.results, 'track_3_url')['loved'] == datetime(1970, 1, 1, 0, 0, 34)
+        assert self._result_by_url(mapping.results, 'track_2_url')['loved'] == datetime(1970, 1, 1, 0, 0, 12, tzinfo=timezone.utc)
+        assert self._result_by_url(mapping.results, 'track_3_url')['loved'] == datetime(1970, 1, 1, 0, 0, 34, tzinfo=timezone.utc)
 
 
     def test_moves_loved_tracks_to_the_top_of_the_list(self, spotify_track, query, lastfm_tracks, loved_tracks):
@@ -174,7 +174,7 @@ class TestTrackMappingResults():
         loved_tracks,
     ):
         query.results = lastfm_tracks
-        spotify_track.added = datetime.fromtimestamp(1)
+        spotify_track.added = datetime.fromtimestamp(1, tz=timezone.utc)
         mapping = TrackMapping(spotify_track, loved_tracks)
         assert mapping.results[0]['love'] == True
         assert mapping.results[1]['love'] == False

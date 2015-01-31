@@ -57,7 +57,7 @@ class User(RepositoryItem):
             lastfm_playlist_track_repository.get_or_create(
                 user=self,
                 url=track['url'],
-                added=datetime.fromtimestamp(track['added'])
+                added=track['added']
             )
             for track in loved_tracks_data
         ]
