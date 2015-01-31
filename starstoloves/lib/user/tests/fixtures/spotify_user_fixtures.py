@@ -9,7 +9,7 @@ playlist_response = {
   'tracks': {
     'items': [
       {
-        'added_at': '1970-01-02T11:17:36Z',
+        'added_at': '1970-01-02T10:17:36Z',
         'track': {
           'name': 'some_track',
           'artists': [

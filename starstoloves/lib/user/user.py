@@ -34,7 +34,7 @@ class User(RepositoryItem):
                 user=self,
                 track_name=track['track_name'],
                 artist_name=track['artist_name'],
-                added=datetime.fromtimestamp(track['date_saved'])
+                added=track['date_saved']
             )
             for track in self.spotify_user.starred_tracks
         ]

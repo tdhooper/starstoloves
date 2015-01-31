@@ -1,4 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timezone
+
+from dateutil.parser import parse
 
 from spotipy import Spotify
 
@@ -20,7 +22,7 @@ class SpotifyUser:
                 tracks.append({
                     'track_name': track['track']['name'],
                     'artist_name': track['track']['artists'][0]['name'],
-                    'date_saved': int(datetime.strptime(added, '%Y-%m-%dT%H:%M:%SZ').timestamp()) if added else 0,
+                    'date_saved': parse(added) if added else datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
                 })
             result = self.api.next(result)
 

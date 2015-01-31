@@ -1,4 +1,5 @@
 from unittest.mock import MagicMock, call
+from datetime import datetime, timezone
 
 import pytest
 
@@ -40,11 +41,11 @@ class TestStarredTracks:
             {
                 'track_name': 'some_track',
                 'artist_name': 'some_artist',
-                'date_saved': 123456,
+                'date_saved': datetime(1970, 1, 2, 10, 17, 36, tzinfo=timezone.utc),
             },{
                 'track_name': 'another_track',
                 'artist_name': 'another_artist',
-                'date_saved': 789012,
+                'date_saved': datetime(1970, 1, 10, 4, 10, 12, tzinfo=timezone.utc),
             }
         ]
 
@@ -55,15 +56,15 @@ class TestStarredTracks:
             {
                 'track_name': 'some_track',
                 'artist_name': 'some_artist',
-                'date_saved': 123456,
+                'date_saved': datetime(1970, 1, 2, 10, 17, 36, tzinfo=timezone.utc),
             },{
                 'track_name': 'another_track',
                 'artist_name': 'another_artist',
-                'date_saved': 789012,
+                'date_saved': datetime(1970, 1, 10, 4, 10, 12, tzinfo=timezone.utc),
             },{
                 'track_name': 'other_track',
                 'artist_name': 'other_artist',
-                'date_saved': 1273801872,
+                'date_saved': datetime(2010, 5, 14, 2, 51, 12, tzinfo=timezone.utc),
             }
         ]
 
@@ -91,6 +92,6 @@ class TestStarredTracks:
             {
                 'track_name': 'some_track',
                 'artist_name': 'some_artist',
-                'date_saved': 0,
+                'date_saved': datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
             }
         ]

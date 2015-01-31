@@ -52,7 +52,7 @@ class TrackMapping():
         for i, result in enumerate(results):
             if i is 0:
                 if result['loved']:
-                    result['love'] = result['loved'] > self.track.added
+                    result['love'] = result['loved'].timestamp() > self.track.added.timestamp()
                 else:
                     result['love'] = True
             else:

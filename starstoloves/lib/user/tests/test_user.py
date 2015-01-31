@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 import pytest
 
 from unittest.mock import MagicMock, call, PropertyMock
@@ -44,7 +46,7 @@ def starred_tracks():
             {
                 'track_name': 'some_track',
                 'artist_name': 'some_artist',
-                'date_saved': 123,
+                'date_saved': datetime(1970, 1, 2, 10, 17, 36, tzinfo=timezone.utc),
             }
         ]
 
@@ -55,7 +57,7 @@ def different_starred_tracks():
             {
                 'track_name': 'another_track',
                 'artist_name': 'another_artist',
-                'date_saved': 456,
+                'date_saved': datetime(1970, 1, 10, 4, 10, 12, tzinfo=timezone.utc),
             }
         ]
 
@@ -117,7 +119,7 @@ class TestUserStarredTracks:
         assert user.starred_tracks[0].user == user
         assert user.starred_tracks[0].track_name == 'some_track'
         assert user.starred_tracks[0].artist_name == 'some_artist'
-        assert user.starred_tracks[0].added.timestamp() == 123
+        assert user.starred_tracks[0].added == datetime(1970, 1, 2, 10, 17, 36, tzinfo=timezone.utc)
 
 
     def test_stores_starred_tracks(self, user, spotify_user, starred_tracks):
@@ -131,7 +133,7 @@ class TestUserStarredTracks:
         assert tracks[0].user == new_user
         assert tracks[0].track_name == 'some_track'
         assert tracks[0].artist_name == 'some_artist'
-        assert tracks[0].added.timestamp() == 123
+        assert tracks[0].added == datetime(1970, 1, 2, 10, 17, 36, tzinfo=timezone.utc)
 
         assert starred_tracks_property.call_count is 1
 
@@ -153,7 +155,7 @@ class TestReloadStarredTracks:
         assert len(tracks_again) is 1
         assert tracks_again[0].track_name == 'another_track'
         assert tracks_again[0].artist_name == 'another_artist'
-        assert tracks_again[0].added.timestamp() == 456
+        assert tracks_again[0].added == datetime(1970, 1, 10, 4, 10, 12, tzinfo=timezone.utc)
 
 
 

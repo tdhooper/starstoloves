@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import MagicMock, call
 
 import pytest
@@ -16,7 +16,7 @@ def spotify_track():
         track_name='some_track',
         artist_name='some_artist',
         user=None,
-        added=datetime.fromtimestamp(123),
+        added=datetime(1970, 1, 1, 0, 0, 12, tzinfo=timezone.utc),
     )
 
 
@@ -47,12 +47,12 @@ def loved_tracks():
         LastfmPlaylistTrack(
             user=None,
             url='track_2_url',
-            added=datetime.fromtimestamp(123),
+            added=datetime(1970, 1, 1, 0, 0, 12),
         ),
         LastfmPlaylistTrack(
             user=None,
             url='track_3_url',
-            added=datetime.fromtimestamp(456),
+            added=datetime(1970, 1, 1, 0, 0, 34),
         ),
     ]
 
@@ -127,8 +127,8 @@ class TestTrackMappingResults():
         query.results = lastfm_tracks
         mapping = TrackMapping(spotify_track, loved_tracks)
         assert self._result_by_url(mapping.results, 'track_1_url')['loved'] == False
-        assert self._result_by_url(mapping.results, 'track_2_url')['loved'] == datetime.fromtimestamp(123)
-        assert self._result_by_url(mapping.results, 'track_3_url')['loved'] == datetime.fromtimestamp(456)
+        assert self._result_by_url(mapping.results, 'track_2_url')['loved'] == datetime(1970, 1, 1, 0, 0, 12)
+        assert self._result_by_url(mapping.results, 'track_3_url')['loved'] == datetime(1970, 1, 1, 0, 0, 34)
 
 
     def test_moves_loved_tracks_to_the_top_of_the_list(self, spotify_track, query, lastfm_tracks, loved_tracks):

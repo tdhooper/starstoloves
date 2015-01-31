@@ -9,3 +9,4 @@ pytest==2.5.2
 pytest-django==2.6.2
 -e git+git://github.com/joohoi/spotipy.git#egg=spotipy
 django-extensions==1.4.9
+python-dateutil==2.4.0

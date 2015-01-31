@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import uuid4
 from unittest.mock import MagicMock, call, patch
 
@@ -136,12 +136,12 @@ class TestIndex():
         assert isinstance(response.context['mappings'][0], TrackMapping)
         assert response.context['mappings'][0].track.track_name == 'another_track'
         assert response.context['mappings'][0].track.artist_name == 'another_artist'
-        assert response.context['mappings'][0].track.added.timestamp() == 789012
+        assert response.context['mappings'][0].track.added == datetime(1970, 1, 10, 4, 10, 12, tzinfo=timezone.utc)
 
         assert isinstance(response.context['mappings'][1], TrackMapping)
         assert response.context['mappings'][1].track.track_name == 'some_track'
         assert response.context['mappings'][1].track.artist_name == 'some_artist'
-        assert response.context['mappings'][1].track.added.timestamp() == 123456
+        assert response.context['mappings'][1].track.added == datetime(1970, 1, 2, 10, 17, 36, tzinfo=timezone.utc)
 
 
     def test_returns_results(self, client, some_track_results):
