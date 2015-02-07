@@ -28,10 +28,24 @@ def style(request):
 
     mappings = [
         track_mapping(
-            SpotifyPlaylistTrack(None, 'Highly Explicit - Huoratron Remix', 'Mixhell', datetime.fromtimestamp(123456)),
+            SpotifyPlaylistTrack(None, 'DPM', 'Vessel', datetime.fromtimestamp(123456)),
             'PENDING',
-            [],
-            loved_tracks
+        ),
+        track_mapping(
+            SpotifyPlaylistTrack(None, 'Highly Explicit - Huoratron Remix', 'Mixhell', datetime.fromtimestamp(123456)),
+            'STARTED',
+        ),
+        track_mapping(
+            SpotifyPlaylistTrack(None, 'V Day Baby', 'Cristobal Tapia de Veer', datetime.fromtimestamp(123456)),
+            'RETRY',
+        ),
+        track_mapping(
+            SpotifyPlaylistTrack(None, 'CIRCLONT14 [152.97][shrymoming mix]', 'Aphex Twin', datetime.fromtimestamp(123456)),
+            'FAILURE',
+        ),
+        track_mapping(
+            SpotifyPlaylistTrack(None, 'Toothpaste', 'Igorrr', datetime.fromtimestamp(123456)),
+            'REVOKED',
         ),
         track_mapping(
             SpotifyPlaylistTrack(None, '11h30 - datA remix', 'Danger', datetime.fromtimestamp(123456)),
@@ -56,12 +70,6 @@ def style(request):
                     listeners=1939,
                 ),
             ],
-            loved_tracks
-        ),
-        track_mapping(
-            SpotifyPlaylistTrack(None, 'No More Fucking Rock´n´ Roll', 'A.S.Y.S.', datetime.fromtimestamp(123456)),
-            'SUCCESS',
-            [],
             loved_tracks
         ),
     ]

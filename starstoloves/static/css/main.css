@@ -142,6 +142,22 @@ ul {
     color: #666;
 }
 
+.result-status {
+    clear: left;
+}
+
+.result-status--pending,
+.result-status--searching,
+.result-status--retrying {
+    background: url('/static/images/loading.gif') 0 50% no-repeat;
+    padding-left: 35px;
+}
+
+.result-status--revoked {
+    color: red;
+}
+
+
 /* Result list
    ========================================================================== */
 

@@ -1,7 +1,19 @@
 {% load humanize %}
 
 <div class="js-result mapping" data-status="{{ mapping.status }}" data-id="{{ mapping.id }}">
-    {% if mapping.status == 'SUCCESS' %}
+    {% if mapping.status == 'PENDING' %}
+        <p class="result-status result-status--pending">Pending</p>
+
+    {% elif mapping.status == 'STARTED' %}
+        <p class="result-status result-status--searching">Searching</p>
+
+    {% elif mapping.status == 'RETRY' %}
+        <p class="result-status result-status--retrying">Retrying</p>
+
+    {% elif mapping.status == 'REVOKED' %}
+        <p class="result-status result-status--revoked">Task revoked</p>
+
+    {% elif mapping.status == 'SUCCESS' and mapping.results%}
         {% if mapping.results %}
             <table class="js-toggle-more result-list">
                 <thead>
@@ -49,9 +61,10 @@
                 </tbody>
             </table>
         {% else %}
-            <p>No Last.fm tracks found, <a href="http://www.last.fm/search?q={{mapping.track.artist_name}} {{mapping.track.track_name}}&amp;type=track">try searching manually</a></p>
+            <p class="result-status">No Last.fm tracks found, <a href="http://www.last.fm/search?q={{mapping.track.artist_name}} {{mapping.track.track_name}}&amp;type=track">try searching manually</a></p>
         {% endif %}
-    {% elif track.status == 'FAILURE' %}
-        <p>Last.fm search failed, <a href="http://www.last.fm/search?q={{mapping.track.artist_name}} {{mapping.track.track_name}}&amp;type=track">try searching manually</a></p>
+
+    {% elif mapping.status == 'FAILURE' %}
+        <p class="result-status">Last.fm search failed, <a href="http://www.last.fm/search?q={{mapping.track.artist_name}} {{mapping.track.track_name}}&amp;type=track">try searching manually</a></p>
     {% endif %}
 </div>
