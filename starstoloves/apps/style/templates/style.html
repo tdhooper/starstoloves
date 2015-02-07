@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% load humanize %}
+
+{% block content %}
+
+    <ul class="js-results-list" data-csrf-token="{{ csrf_token }}">
+        {% for mapping in mappings %}
+            <li>
+                <h3 class="track">
+                    {{mapping.track.artist_name}} - {{mapping.track.track_name}}
+                </h3>
+                <p class="date-saved" title="{{ mapping.track.added }}">
+                    {{ mapping.track.added|naturalday:"j M Y" }}
+                </p>
+                {% include 'result.html' %}
+            </li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}
