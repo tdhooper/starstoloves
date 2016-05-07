@@ -42,7 +42,7 @@ class SpotifyConnectionFixtures(CommonConnectionFixtures):
     def successful_connection(self):
 
         auth = MagicMock(spec=SpotifyOAuth).return_value
-        def SpotifyOAuth_instance(client_id, client_secret, redirect_uri):
+        def SpotifyOAuth_instance(client_id, client_secret, redirect_uri, scope):
             if redirect_uri == 'some_callback_url':
                 return auth
         self.SpotifyOAuth.side_effect = SpotifyOAuth_instance

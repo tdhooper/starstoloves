@@ -17,6 +17,7 @@ class SpotifyConnectionHelper(ConnectionHelper):
             client_id=settings.SPOTIFY['client_id'],
             client_secret=settings.SPOTIFY['client_secret'],
             redirect_uri=redirect_uri,
+            scope='playlist-read-private',
         )
 
     def auth_url(self, redirect_uri):

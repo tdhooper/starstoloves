@@ -14,7 +14,7 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture
 def auth(fixtures):
     auth = MagicMock(spec=SpotifyOAuth).return_value
-    def SpotifyOAuth_instance(client_id, client_secret, redirect_uri):
+    def SpotifyOAuth_instance(client_id, client_secret, redirect_uri, scope):
         if redirect_uri == 'some_callback_url':
             return auth
     fixtures.SpotifyOAuth.side_effect = SpotifyOAuth_instance
