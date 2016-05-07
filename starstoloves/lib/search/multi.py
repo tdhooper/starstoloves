@@ -80,7 +80,7 @@ def get_correction(track):
     try:
         track_data = response['corrections']['correction']['track']
         return LastfmTrack(
-            url='http://' + track_data['url'],
+            url=track_data['url'],
             track_name=track_data['name'],
             artist_name=track_data['artist']['name'],
         )

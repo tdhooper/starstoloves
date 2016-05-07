@@ -324,7 +324,7 @@ class TestGetCorrection():
         }
         corrected_track = get_correction(tracks[0])
         assert isinstance(corrected_track, LastfmTrack)
-        assert corrected_track.url == 'http://corrected_track_url'
+        assert corrected_track.url == 'corrected_track_url'
         assert corrected_track.track_name == 'corrected_track'
         assert corrected_track.artist_name == 'corrected_artist'
 
