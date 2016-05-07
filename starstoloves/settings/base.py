@@ -137,7 +137,7 @@ INSTALLED_APPS = (
 
     'django.contrib.admin',
     'djcelery',
-    'south',
+    # 'south',
     'django_extensions',
 
     'starstoloves',
