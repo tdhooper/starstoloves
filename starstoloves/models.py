@@ -20,14 +20,14 @@ class User(models.Model):
 
 
 class SpotifyPlaylistTrack(models.Model):
-    user = models.ForeignKey(User)
-    track = models.ForeignKey(SpotifyTrack)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    track = models.ForeignKey(SpotifyTrack, on_delete=models.CASCADE)
     added = models.DateTimeField()
 
 
 class LastfmPlaylistTrack(models.Model):
-    user = models.ForeignKey(User)
-    track = models.ForeignKey(LastfmTrack)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    track = models.ForeignKey(LastfmTrack, on_delete=models.CASCADE)
     added = models.DateTimeField()
 
 
@@ -51,8 +51,8 @@ class LastfmQuery(models.Model):
 
 
 class LastfmQueryResult(models.Model):
-    query = models.ForeignKey(LastfmQuery)
-    track = models.ForeignKey(LastfmTrack)
+    query = models.ForeignKey(LastfmQuery, on_delete=models.CASCADE)
+    track = models.ForeignKey(LastfmTrack, on_delete=models.CASCADE)
 
 
 class LastfmSearch(models.Model):
