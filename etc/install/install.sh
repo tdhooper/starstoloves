@@ -51,6 +51,7 @@ echo "source `which virtualenvwrapper.sh`" >> ~/.bashrc
 # Change to the project directory
 cd $PROJECT_DIR
 workon $VIRTUALENV_NAME
+setvirtualenvproject
 
 # Install Mercurial, needed for some requirements
 sudo apt-get install -y mercurial
@@ -64,7 +65,7 @@ sudo apt-get install -y git
 bower install --config.interactive=false
 
 # Install the project locally
-./setup.py develop
+python setup.py develop
 
 # Django project setup
 ./manage.py syncdb --noinput
