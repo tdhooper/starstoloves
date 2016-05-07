@@ -55,8 +55,11 @@ def connect_lastfm(request):
 @connection_status_decorator
 def disconnect_spotify(request):
     if request.is_spotify_connected():
-        for mapping in get_track_mappings(request):
-            mapping.query.stop()
+        try:
+            for mapping in get_track_mappings(request):
+                mapping.query.stop()
+        except Exception as e:
+            pass
         request.session_user.reload_starred_tracks()
     return connection_disconnect_spotify(request)
 
@@ -102,22 +105,24 @@ def love_tracks(request):
         for mapping in get_track_mappings(request)
     }
 
-    tracks_to_love = list(chain.from_iterable([
-        [
-            {
-                'track': track,
-                'timestamp': mapping.track.added.timestamp(),
-            }
-            for track in [
-                lastfm_track_repository.get(url)
-                for url in urls
-            ] if track
+    mapping_and_urls = []
+    for mapping_id, urls in request.POST.lists():
+        mapping = mappings_by_id.get(mapping_id)
+        if mapping:
+            mapping_and_urls.append((mapping, urls))
+
+    tracks_to_love = []
+    for mapping, urls in mapping_and_urls:
+        tracks = [
+            lastfm_track_repository.get(url)
+            for url in urls
         ]
-        for mapping, urls in [
-            (mappings_by_id.get(mapping_id), urls)
-            for mapping_id, urls in request.POST.lists()
-        ] if mapping
-    ]))
+        for track in tracks:
+            if track:
+                tracks_to_love.append({
+                    'track': track,
+                    'timestamp': mapping.track.added.timestamp(),
+                })
 
     if tracks_to_love:
         request.session_user.love_tracks(tracks_to_love)
