@@ -37,7 +37,10 @@ def get_track_mappings(request):
 def index(request):
     context = {}
     if request.is_lastfm_connected() and request.is_spotify_connected():
-        context['mappings'] = get_track_mappings(request)
+        try:
+            context['mappings'] = get_track_mappings(request)
+        except Exception as e:
+            context['error'] = e
     return render_to_response('index.html', context_instance=RequestContext(request, context, [connection_index_processor]))
 
 

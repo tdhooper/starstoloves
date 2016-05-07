@@ -99,6 +99,10 @@ h3 {
     width: 1px;
 }
 
+.app-error {
+    color: #f33;
+}
+
 .step-error,
 .errorlist {
     margin: 6px 0 0;
